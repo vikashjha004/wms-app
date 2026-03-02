@@ -1,0 +1,2216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WMS — Workforce Management System</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#07111f;--navy:#0d1d30;--navy2:#122338;--navy3:#1a3048;
+  --border:#1e3a55;--surface:#112030;--surface2:#162a3e;
+  --muted:#7a95ae;--text:#d6e8f5;--white:#eef6fc;--text-dim:#557a96;
+  --teal:#0ea5e9;--accent:#38bdf8;--violet:#7c3aed;--violet2:#a78bfa;
+  --green:#22c55e;--amber:#f59e0b;--red:#ef4444;--pink:#ec4899;
+  --cyan:#06b6d4;--orange:#f97316;
+  --r:12px;--shadow:0 8px 32px rgba(0,0,0,.5);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);overflow:hidden}
+
+/* LOGIN */
+#loginScreen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:999;background-image:radial-gradient(ellipse at 20% 50%,rgba(14,165,233,.07) 0%,transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(124,58,237,.06) 0%,transparent 50%)}
+.login-card{background:var(--navy2);border:1px solid var(--border);border-radius:20px;padding:36px;width:400px;max-width:95vw;box-shadow:var(--shadow)}
+.logo-mark{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#0ea5e9,#7c3aed);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:17px;color:#fff}
+.login-users{margin-top:14px;display:flex;flex-direction:column;gap:4px;max-height:300px;overflow-y:auto}
+.login-users::-webkit-scrollbar{width:3px}.login-users::-webkit-scrollbar-thumb{background:var(--navy3);border-radius:2px}
+.luc{padding:7px 11px;border-radius:8px;border:1px solid var(--border);background:var(--navy3);cursor:pointer;font-size:11px;color:var(--muted);transition:all .15s;display:flex;align-items:center;justify-content:space-between}
+.luc:hover{border-color:var(--teal);color:var(--white);background:var(--surface2)}
+.role-tag{font-size:9px;font-weight:700;padding:2px 7px;border-radius:5px}
+.role-manager{background:rgba(14,165,233,.2);color:var(--teal)}
+.role-lead{background:rgba(124,58,237,.2);color:var(--violet2)}
+.role-associate{background:rgba(34,197,94,.2);color:var(--green)}
+.role-admin{background:rgba(239,68,68,.2);color:#ef4444}
+.login-inp{width:100%;background:var(--navy3);border:1px solid var(--border);border-radius:9px;padding:10px 13px;font-family:'Sora',sans-serif;font-size:13px;color:var(--white);outline:none;transition:border-color .15s}
+.login-inp:focus{border-color:var(--teal)}
+.login-inp option{background:var(--navy)}
+.login-btn{width:100%;margin-top:18px;padding:11px;border-radius:10px;border:none;background:linear-gradient(135deg,#0ea5e9,#7c3aed);color:#fff;font-family:'Sora',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s}
+.login-btn:hover{opacity:.9;transform:translateY(-1px);box-shadow:0 6px 24px rgba(14,165,233,.4)}
+
+/* APP */
+#app{display:none;height:100vh;flex-direction:column}
+#app.visible{display:flex}
+.topbar{height:50px;background:var(--navy);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 18px;gap:14px;flex-shrink:0;z-index:50}
+.topbar-logo{display:flex;align-items:center;gap:8px}
+.tl-mark{width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,#0ea5e9,#7c3aed);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px;color:#fff}
+.tl-brand{font-size:13px;font-weight:800;color:var(--white)}
+.tb-div{width:1px;height:22px;background:var(--border)}
+.topbar-nav{display:flex;gap:1px;flex:1;overflow-x:auto}
+.topbar-nav::-webkit-scrollbar{height:0}
+.tnav{padding:5px 12px;border-radius:7px;cursor:pointer;font-size:11px;font-weight:600;color:var(--muted);border:none;background:transparent;font-family:'Sora',sans-serif;white-space:nowrap;transition:all .15s}
+.tnav:hover{color:var(--white);background:var(--surface2)}
+.tnav.active{background:rgba(14,165,233,.14);color:var(--accent);border:1px solid rgba(14,165,233,.2)}
+.topbar-right{display:flex;align-items:center;gap:8px;margin-left:auto;flex-shrink:0}
+.role-pill{padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700}
+.user-av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff}
+.user-nm{font-size:11px;font-weight:600;color:var(--white)}
+.logout-btn{padding:4px 10px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-size:10px;font-family:'Sora',sans-serif;transition:all .15s}
+.logout-btn:hover{border-color:var(--red);color:var(--red)}
+.app-body{flex:1;overflow:hidden;display:flex}
+.page{display:none;flex:1;overflow-y:auto;padding:22px 26px}
+.page::-webkit-scrollbar{width:5px}.page::-webkit-scrollbar-thumb{background:var(--navy3);border-radius:3px}
+.page.active{display:block}
+
+/* COMMON */
+.sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.sec-title{font-size:15px;font-weight:700;color:var(--white)}
+.sec-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.divider{height:1px;background:var(--border);margin:16px 0}
+
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:10px;margin-bottom:20px}
+.sc{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px;position:relative;overflow:hidden}
+.sc::after{content:'';position:absolute;top:-20px;right:-20px;width:64px;height:64px;border-radius:50%;opacity:.09}
+.sc-bl::after{background:var(--teal)}.sc-vl::after{background:var(--violet)}.sc-gn::after{background:var(--green)}.sc-am::after{background:var(--amber)}.sc-rd::after{background:var(--red)}.sc-pk::after{background:var(--pink)}.sc-cy::after{background:var(--cyan)}
+.sc-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-dim);margin-bottom:7px}
+.sc-val{font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:700}
+.sc-bl .sc-val{color:var(--teal)}.sc-vl .sc-val{color:var(--violet2)}.sc-gn .sc-val{color:var(--green)}.sc-am .sc-val{color:var(--amber)}.sc-rd .sc-val{color:var(--red)}.sc-pk .sc-val{color:var(--pink)}.sc-cy .sc-val{color:var(--cyan)}
+.sc-sub{font-size:10px;color:var(--muted);margin-top:3px}
+
+/* KANBAN */
+.board-bar{display:flex;align-items:flex-end;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.kanban{display:flex;gap:12px;overflow-x:auto;padding-bottom:10px;min-height:460px}
+.kanban::-webkit-scrollbar{height:5px}.kanban::-webkit-scrollbar-thumb{background:var(--navy3);border-radius:3px}
+.kb-col{min-width:268px;width:268px;background:var(--surface);border-radius:var(--r);border:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0}
+.kb-head{padding:11px 13px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
+.kb-title-row{display:flex;align-items:center;gap:6px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px}
+.kb-dot{width:7px;height:7px;border-radius:50%}
+.kb-cnt{background:var(--navy3);color:var(--muted);font-size:10px;font-weight:700;padding:1px 7px;border-radius:10px;font-family:'JetBrains Mono',monospace}
+.kb-body{padding:9px;flex:1;overflow-y:auto}
+.kb-body::-webkit-scrollbar{width:3px}.kb-body::-webkit-scrollbar-thumb{background:var(--navy3);border-radius:2px}
+.task-card{background:var(--surface2);border-radius:9px;padding:11px;border:1px solid var(--border);margin-bottom:7px;cursor:pointer;transition:all .15s}
+.task-card:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 5px 18px rgba(0,0,0,.4)}
+.task-card[draggable="true"]{cursor:grab}.task-card[draggable="true"]:active{cursor:grabbing}.task-card.dragging{opacity:.35}
+.tc-top{display:flex;align-items:center;gap:5px;margin-bottom:6px}
+.tc-type{font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px}
+.tc-prio{width:6px;height:6px;border-radius:50%;margin-left:auto;flex-shrink:0}
+.tc-title{font-size:12px;font-weight:600;color:var(--white);margin-bottom:5px;line-height:1.4}
+.tc-row{font-size:10px;color:var(--muted);margin-bottom:2px;display:flex;gap:5px;align-items:flex-start;line-height:1.4}
+.tc-row strong{color:var(--text-dim);min-width:50px;flex-shrink:0;font-size:10px}
+.tc-bottom{display:flex;align-items:center;justify-content:space-between;margin-top:7px}
+/* Hours bar on card */
+.hrs-bar-wrap{height:4px;background:var(--navy3);border-radius:2px;margin-top:6px;overflow:hidden}
+.hrs-bar-fill{height:100%;border-radius:2px;transition:width .3s}
+.kb-add-btn{width:100%;padding:7px;border-radius:7px;border:1px dashed rgba(14,165,233,.25);background:transparent;color:var(--muted);cursor:pointer;font-size:11px;font-family:'Sora',sans-serif;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:4px;margin-top:3px}
+.kb-add-btn:hover{border-color:var(--teal);color:var(--teal);background:rgba(14,165,233,.04)}
+
+/* TABLES */
+.tbl-wrap{background:var(--surface);border-radius:var(--r);border:1px solid var(--border);overflow:hidden}
+.tbl{width:100%;border-collapse:collapse;font-size:12px}
+.tbl th{padding:9px 11px;background:var(--surface2);color:var(--text-dim);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap}
+.tbl td{padding:9px 11px;border-bottom:1px solid rgba(30,58,95,.3);vertical-align:middle}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:rgba(22,42,62,.5)}
+.tbl-sel{background:var(--navy);border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-family:'Sora',sans-serif;font-size:11px;color:var(--text);outline:none;cursor:pointer}
+.tbl-sel option{background:var(--navy)}
+.tbl-inp{background:var(--navy);border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-family:'Sora',sans-serif;font-size:11px;color:var(--text);outline:none;width:100%;transition:border-color .15s}
+.tbl-inp:focus{border-color:var(--teal)}
+.tbl-inp:disabled,.tbl-sel:disabled{opacity:.5;cursor:not-allowed;background:var(--surface2)}
+.hrs-low{border-color:var(--red)!important;background:rgba(239,68,68,.06)!important}
+
+/* HOURS COMPARISON */
+.hrs-compare{display:flex;align-items:center;gap:5px;font-family:'JetBrains Mono',monospace;font-size:11px}
+.hrs-assigned{color:var(--muted)}
+.hrs-actual{font-weight:700}
+.hrs-over{color:var(--red)}
+.hrs-under{color:var(--amber)}
+.hrs-exact{color:var(--green)}
+
+/* TOTAL BAR */
+.total-bar{display:flex;align-items:center;gap:16px;padding:11px 15px;background:var(--surface2);border-top:1px solid var(--border);flex-wrap:wrap}
+.tbar-lbl{font-size:10px;color:var(--muted)}
+.tbar-val{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:var(--accent)}
+
+/* DAILY OVERVIEW */
+.daily-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:12px}
+.daily-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.dc-head{padding:11px 15px;background:var(--surface2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.dc-name{font-size:12px;font-weight:700;color:var(--white);display:flex;align-items:center;gap:7px}
+.dc-av{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;flex-shrink:0}
+.dc-row{display:flex;align-items:flex-start;padding:8px 15px;border-bottom:1px solid rgba(30,58,95,.28);font-size:11px;gap:8px}
+.dc-row:last-child{border-bottom:none}
+.dc-task{flex:1;font-weight:500;color:var(--text)}
+.dc-hrs-box{text-align:right;flex-shrink:0}
+.dc-foot{display:flex;justify-content:space-between;padding:7px 15px;border-top:1px solid var(--border);font-size:10px;background:var(--surface2)}
+
+/* TEAM */
+.team-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px}
+.team-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px;transition:all .15s}
+.team-card:hover{border-color:rgba(14,165,233,.3);box-shadow:0 4px 18px rgba(14,165,233,.07)}
+.tc-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.tc-avt{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;flex-shrink:0}
+.tc-metrics{display:flex;justify-content:space-between;padding-top:10px;border-top:1px solid var(--border);margin-top:10px}
+.tc-met-val{font-family:'JetBrains Mono',monospace;font-size:17px;font-weight:700;text-align:center}
+.tc-met-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-top:2px;text-align:center}
+
+/* ASSOC HOURS TABLE */
+.assoc-hrs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:12px;margin-top:18px}
+.aht-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.aht-head{padding:12px 15px;background:var(--surface2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.aht-name{font-size:12px;font-weight:700;color:var(--white);display:flex;align-items:center;gap:8px}
+.aht-summary{display:flex;gap:12px;font-size:10px}
+.aht-row{padding:8px 15px;border-bottom:1px solid rgba(30,58,95,.25);display:grid;grid-template-columns:1fr 60px 60px 60px;gap:6px;align-items:center;font-size:11px}
+.aht-row:last-child{border-bottom:none}
+.aht-task{font-weight:500;color:var(--text)}
+.aht-head-row{padding:6px 15px;background:var(--navy3);display:grid;grid-template-columns:1fr 60px 60px 60px;gap:6px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text-dim)}
+.over-bar{height:3px;border-radius:2px;margin-top:4px}
+
+/* MODALS */
+.overlay{position:fixed;inset:0;background:rgba(7,17,31,.9);backdrop-filter:blur(8px);z-index:200;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
+.overlay.open{opacity:1;pointer-events:all}
+.modal{background:var(--navy2);border-radius:15px;padding:22px;width:540px;max-width:96vw;border:1px solid var(--border);transform:translateY(14px);transition:transform .2s;max-height:88vh;overflow-y:auto}
+.modal::-webkit-scrollbar{width:4px}.modal::-webkit-scrollbar-thumb{background:var(--navy3);border-radius:2px}
+.overlay.open .modal{transform:translateY(0)}
+.modal-title{font-size:15px;font-weight:700;color:var(--white);margin-bottom:16px}
+.fg{margin-bottom:11px}
+.fl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text-dim);margin-bottom:4px;display:block}
+.fc{width:100%;background:var(--navy);border:1px solid var(--border);border-radius:7px;padding:8px 11px;font-family:'Sora',sans-serif;font-size:12px;color:var(--text);outline:none;transition:border-color .15s}
+.fc:focus{border-color:var(--teal)}
+textarea.fc{resize:vertical;min-height:58px}
+select.fc option{background:var(--navy)}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fa{display:flex;gap:7px;justify-content:flex-end;margin-top:16px}
+.msel{min-height:72px}
+.colors-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:3px}
+.clr{width:22px;height:22px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:transform .1s}
+.clr:hover{transform:scale(1.2)}.clr.sel{border-color:#fff}
+
+/* BUTTONS */
+.btn{padding:6px 14px;border-radius:7px;border:none;cursor:pointer;font-family:'Sora',sans-serif;font-size:11px;font-weight:600;transition:all .15s}
+.btn-primary{background:linear-gradient(135deg,#0ea5e9,#38bdf8);color:#fff}
+.btn-primary:hover{opacity:.9;transform:translateY(-1px);box-shadow:0 4px 14px rgba(14,165,233,.4)}
+.btn-violet{background:linear-gradient(135deg,#7c3aed,#a78bfa);color:#fff}
+.btn-violet:hover{opacity:.9;transform:translateY(-1px)}
+.btn-green{background:linear-gradient(135deg,#16a34a,#22c55e);color:#fff}
+.btn-green:hover{opacity:.9;transform:translateY(-1px)}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border)}
+.btn-ghost:hover{border-color:var(--teal);color:var(--teal)}
+.btn-sm{padding:4px 11px;font-size:10px;border-radius:6px}
+.btn-danger{background:rgba(239,68,68,.12);color:var(--red);border:1px solid rgba(239,68,68,.2);padding:3px 9px;border-radius:5px;cursor:pointer;font-size:10px;font-weight:600;font-family:'Sora',sans-serif;transition:all .15s}
+.btn-danger:hover{background:var(--red);color:#fff}
+.btn-success{background:rgba(34,197,94,.12);color:var(--green);border:1px solid rgba(34,197,94,.2);padding:4px 11px;border-radius:6px;cursor:pointer;font-size:11px;font-weight:600;font-family:'Sora',sans-serif;transition:all .15s}
+.btn-success:hover{background:var(--green);color:#fff}
+
+/* BADGES */
+.badge{padding:2px 8px;border-radius:20px;font-size:9px;font-weight:700;display:inline-block;white-space:nowrap}
+.b-ns{background:rgba(148,163,184,.1);color:var(--muted)}
+.b-ip{background:rgba(124,58,237,.15);color:var(--violet2)}
+.b-hold{background:rgba(245,158,11,.15);color:var(--amber)}
+.b-done{background:rgba(34,197,94,.15);color:var(--green)}
+.b-rev{background:rgba(59,130,246,.15);color:#60a5fa}
+.b-asgn{background:rgba(14,165,233,.15);color:var(--teal)}
+
+/* MISC */
+.notice{background:rgba(14,165,233,.07);border:1px solid rgba(14,165,233,.18);border-radius:8px;padding:9px 14px;font-size:11px;color:var(--accent);margin-bottom:16px;display:flex;align-items:center;gap:7px}
+.empty-state{padding:36px;text-align:center;color:var(--muted);font-size:12px}
+.ctrl{background:var(--navy2);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-family:'Sora',sans-serif;font-size:11px;color:var(--text);outline:none;transition:border-color .15s}
+.ctrl:focus{border-color:var(--teal)}
+select.ctrl option{background:var(--navy)}
+.ctrl-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--text-dim);margin-bottom:4px;display:block}
+.info-row{display:flex;gap:6px;align-items:flex-start;font-size:11px;color:var(--muted);margin-bottom:4px}
+.info-row strong{color:var(--text-dim);min-width:58px;font-size:10px;flex-shrink:0}
+.pb-wrap{height:4px;background:var(--navy3);border-radius:2px;overflow:hidden;margin-top:5px}
+.pb-fill{height:100%;border-radius:2px;transition:width .4s}
+.date-nav{display:flex;align-items:center;gap:8px}
+.date-btn{width:28px;height:28px;border-radius:5px;background:var(--surface);border:1px solid var(--border);color:var(--muted);cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.date-btn:hover{border-color:var(--teal);color:var(--teal)}
+.date-lbl{font-size:12px;font-weight:700;color:var(--white);min-width:130px;text-align:center}
+
+/* TOAST */
+.toasts{position:fixed;bottom:16px;right:16px;z-index:999;display:flex;flex-direction:column;gap:6px;pointer-events:none}
+.toast{background:var(--navy2);border:1px solid var(--border);color:var(--text);padding:8px 14px;border-radius:9px;font-size:12px;font-weight:500;display:flex;align-items:center;gap:7px;box-shadow:var(--shadow);animation:tin .2s ease}
+@keyframes tin{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* PROJ CARD GRID */
+.proj-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:12px;margin-bottom:22px}
+.proj-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px;cursor:pointer;transition:all .15s}
+.proj-card:hover{border-color:rgba(14,165,233,.3);transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.35)}
+</style>
+</head>
+<body>
+
+<!-- ══════════ LOADING OVERLAY ══════════ -->
+<div id="loadOverlay" style="position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;gap:16px">
+  <div style="width:44px;height:44px;border-radius:50%;border:3px solid var(--border);border-top-color:var(--teal);animation:spin .8s linear infinite"></div>
+  <div id="loadMsg" style="font-size:13px;color:var(--muted);font-weight:600">Connecting to Google Sheets…</div>
+  <div style="font-size:11px;color:var(--text-dim)">WMS · Workforce Management System</div>
+</div>
+<style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+
+<!-- ══════════ LOGIN ══════════ -->
+<div id="loginScreen">
+  <div style="display:flex;gap:28px;align-items:flex-start;max-width:860px;width:100%;padding:20px">
+    <!-- Login Form -->
+    <div class="login-card" style="width:360px;flex-shrink:0">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:28px">
+        <div class="logo-mark">W</div>
+        <div><div style="font-size:20px;font-weight:800;color:var(--white)">WMS</div><div style="font-size:11px;color:var(--muted)">Workforce Management System</div></div>
+      </div>
+      <label style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text-dim);display:block;margin-bottom:5px">Email Address</label>
+      <input class="login-inp" id="loginEmail" type="email" placeholder="you@company.com" onkeydown="if(event.key==='Enter')doLogin()">
+      <label style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text-dim);display:block;margin-bottom:5px;margin-top:12px">Password</label>
+      <div style="position:relative">
+        <input class="login-inp" id="loginPassword" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+        <button onclick="togglePwd()" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);cursor:pointer;font-size:13px" id="pwdToggleBtn">👁</button>
+      </div>
+      <div id="loginError" style="color:var(--red);font-size:11px;margin-top:8px;display:none"></div>
+      <button class="login-btn" onclick="doLogin()">Sign In →</button>
+      <div style="margin-top:14px;text-align:center;font-size:10px;color:var(--text-dim)">Contact your admin to get access</div>
+    </div>
+    <!-- Credentials hint panel -->
+    <div style="flex:1;background:var(--navy2);border:1px solid var(--border);border-radius:16px;padding:22px;box-shadow:var(--shadow)">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text-dim);margin-bottom:14px">Demo Credentials — click to auto-fill</div>
+      <div id="credList" style="display:flex;flex-direction:column;gap:4px;max-height:420px;overflow-y:auto;padding-right:4px"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ APP ══════════ -->
+<div id="app">
+  <header class="topbar">
+    <div class="topbar-logo"><div class="tl-mark">W</div><span class="tl-brand">WMS</span></div>
+    <div class="tb-div"></div>
+    <nav class="topbar-nav" id="topNav"></nav>
+    <div class="topbar-right">
+      <div id="syncStatus" style="margin-right:6px;display:flex;align-items:center;gap:6px">
+        <span id="syncLabel" style="font-size:11px;font-weight:600"></span>
+        <button id="syncBtn" onclick="forceSync()" title="Click to sync now" style="display:none;padding:3px 8px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-size:10px;font-family:'Sora',sans-serif;transition:all .15s" onmouseover="this.style.color='var(--white)'" onmouseout="this.style.color='var(--muted)'">↻ Retry</button>
+      </div>
+      <span class="role-pill" id="rolePill"></span>
+      <div style="display:flex;align-items:center;gap:6px">
+        <div class="user-av" id="userAv"></div>
+        <span class="user-nm" id="userNm"></span>
+      </div>
+      <button class="logout-btn" onclick="logout()">Log out</button>
+    </div>
+  </header>
+  <div class="app-body">
+    <div id="pages" style="flex:1;overflow:hidden;position:relative;display:flex;flex-direction:column">
+
+      <!-- MANAGER DASHBOARD -->
+      <div class="page" id="page-dashboard">
+        <div class="sec-head"><div><div class="sec-title">Live Dashboard</div><div class="sec-sub">Full overview — all projects, tasks, hours tracking</div></div>
+          <div style="display:flex;gap:7px">
+            <button class="btn btn-primary btn-sm" onclick="openProjModal()">+ Project</button>
+            <button class="btn btn-ghost btn-sm" onclick="openTaskModal()">+ Task</button>
+          </div>
+        </div>
+        <div class="stats-grid" id="dashStats"></div>
+        <div class="divider"></div>
+        <div class="sec-head"><div class="sec-title">Projects</div></div>
+        <div class="proj-grid" id="projCards"></div>
+        <div class="sec-head"><div class="sec-title">All Tasks</div></div>
+        <div class="tbl-wrap"><table class="tbl"><thead><tr><th>#</th><th>Task</th><th>Project</th><th>Lead</th><th>Associate</th><th>Status</th><th>Due</th><th>Est.Hrs</th><th>Actual Hrs</th><th>Δ</th></tr></thead><tbody id="dashTasksTbl"></tbody></table></div>
+      </div>
+
+      <!-- PROJECT PLANNING (Manager) -->
+      <div class="page" id="page-planner">
+        <div class="sec-head"><div><div class="sec-title">Project Planning</div><div class="sec-sub">Create projects, tasks, assign to leads</div></div>
+          <div style="display:flex;gap:7px">
+            <button class="btn btn-primary btn-sm" onclick="openProjModal()">+ Project</button>
+            <button class="btn btn-ghost btn-sm" onclick="openTaskModal()">+ Task</button>
+            <button class="btn btn-ghost btn-sm" onclick="addBucketPrompt()">+ Bucket</button>
+          </div>
+        </div>
+        <div class="board-bar">
+          <div><label class="ctrl-lbl">Project</label><select class="ctrl" id="plannerProjSel" onchange="onPlannerProjChange()"></select></div>
+          <div style="align-self:flex-end"><button class="btn btn-violet btn-sm" onclick="openAssignProjModal()">Assign Project to Lead →</button></div>
+        </div>
+        <div class="kanban" id="kanbanBoard"></div>
+      </div>
+
+      <!-- LEAD TASK ASSIGNMENT (Manager → Lead) -->
+      <div class="page" id="page-lead-assign">
+        <div class="sec-head"><div><div class="sec-title">Lead Task Assignment</div><div class="sec-sub">Manager assigns tasks to leads</div></div>
+          <button class="btn btn-primary btn-sm" onclick="openLeadAssignModal()">+ Assign to Lead</button>
+        </div>
+        <div class="tbl-wrap"><table class="tbl"><thead><tr><th>#</th><th>Date</th><th>Project</th><th>Task</th><th>Lead</th><th>Initiated By</th><th>Due</th><th>Est.Hrs</th><th>Actual Hrs</th><th>Status</th><th>Remarks</th><th>Update</th></tr></thead><tbody id="leadAssignTbl"></tbody></table>
+        <div class="empty-state" id="laEmpty"><div style="font-size:28px;margin-bottom:8px">📋</div>No lead assignments yet</div></div>
+      </div>
+
+      <!-- ASSOCIATE HOURS OVERVIEW (Manager) -->
+      <div class="page" id="page-hours-report">
+        <div class="sec-head"><div><div class="sec-title">Associate Hours Report</div><div class="sec-sub">Assigned vs Actual worked hours per associate per task</div></div>
+          <div class="date-nav"><button class="date-btn" onclick="changeOvDay(-1)">‹</button><div class="date-lbl" id="ovDateLbl"></div><button class="date-btn" onclick="changeOvDay(1)">›</button><button class="btn btn-ghost btn-sm" onclick="ovDate='all';renderHoursReport()">All Time</button></div>
+        </div>
+        <div class="stats-grid" id="hrsStats"></div>
+        <div class="assoc-hrs-grid" id="assocHrsGrid"></div>
+      </div>
+
+      <!-- DAILY OVERVIEW (Manager/Lead) -->
+      <div class="page" id="page-daily-overview">
+        <div class="sec-head"><div><div class="sec-title">Daily Work Overview</div><div class="sec-sub">Associate daily hours and task status</div></div>
+          <div class="date-nav"><button class="date-btn" onclick="changeOvDay(-1)">‹</button><div class="date-lbl" id="ovDateLbl2"></div><button class="date-btn" onclick="changeOvDay(1)">›</button></div>
+        </div>
+        <div class="daily-grid" id="dailyGrid"></div>
+      </div>
+
+      <!-- LEAD DASHBOARD -->
+      <div class="page" id="page-lead-dashboard">
+        <div class="sec-head"><div><div class="sec-title">My Projects & Tasks</div><div class="sec-sub">Manage assigned projects, delegate to associates</div></div></div>
+        <div class="stats-grid" id="leadStats"></div>
+        <div class="divider"></div>
+        <div class="sec-head"><div class="sec-title">My Projects</div></div>
+        <div class="proj-grid" id="leadProjCards"></div>
+        <div class="sec-head">
+          <div class="sec-title">Task Board</div>
+          <div style="display:flex;gap:7px;align-items:flex-end">
+            <div><label class="ctrl-lbl">Project</label><select class="ctrl" id="leadBoardProjSel" onchange="renderLeadBoard()"></select></div>
+            <button class="btn btn-violet btn-sm" onclick="openAssocAssignModal()">Assign Task to Associate →</button>
+          </div>
+        </div>
+        <div class="kanban" id="leadKanban"></div>
+      </div>
+
+      <!-- ASSOCIATE ASSIGNMENT (Lead → Associate) -->
+      <div class="page" id="page-assoc-assign">
+        <div class="sec-head"><div><div class="sec-title">Associate Task Assignment</div><div class="sec-sub">Lead assigns tasks to associates</div></div>
+          <button class="btn btn-violet btn-sm" onclick="openAssocAssignModal()">+ Assign to Associate</button>
+        </div>
+        <div class="tbl-wrap"><table class="tbl"><thead><tr><th>#</th><th>Date</th><th>Project</th><th>Task</th><th>Associate</th><th>Lead</th><th>Due</th><th>Est.Hrs</th><th>Actual Hrs</th><th>Status</th><th>Remarks</th><th>Update</th></tr></thead><tbody id="assocAssignTbl"></tbody></table>
+        <div class="empty-state" id="aaEmpty"><div style="font-size:28px;margin-bottom:8px">👤</div>No associate assignments yet</div></div>
+      </div>
+
+      <!-- MY TASKS (Associate) -->
+      <div class="page" id="page-my-tasks">
+        <div class="sec-head"><div><div class="sec-title">My Tasks</div><div class="sec-sub">Click any task to update status or log time</div></div></div>
+        <div class="stats-grid" id="assocStats"></div>
+        <div class="notice">📌 Click any task card to update status (In Progress → Completed) and log your hours. Changes reflect immediately to your lead and manager.</div>
+        <div class="kanban" id="assocKanban"></div>
+      </div>
+
+      <!-- DAILY TRACKER (Associate) -->
+      <div class="page" id="page-tracker">
+        <div class="sec-head"><div><div class="sec-title">Daily Task Tracker</div><div class="sec-sub">Log your daily hours and progress</div></div>
+          <button class="btn btn-green btn-sm" onclick="addTrackerRow()">+ Add Entry</button>
+        </div>
+        <div style="display:flex;align-items:flex-end;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+          <div><label class="ctrl-lbl">Date</label><input class="ctrl" type="date" id="trackDate"></div>
+          <div><label class="ctrl-lbl">Associate</label><input class="ctrl" id="trackAssoc" readonly></div>
+          <div><label class="ctrl-lbl">Project</label><select class="ctrl" id="trackProj" onchange="populateTrackTask()"></select></div>
+          <div><label class="ctrl-lbl">Task</label><select class="ctrl" id="trackTask"></select></div>
+        </div>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead><tr><th>#</th><th>Task</th><th>Project</th><th>Initiated By</th><th>Start</th><th>Due</th><th>Assigned To</th><th>Est. Hrs</th><th>Hours Worked</th><th>Status</th><th>Remarks</th><th>Submit</th></tr></thead>
+            <tbody id="trackerTbl"></tbody>
+          </table>
+          <div class="total-bar">
+            <span class="tbar-lbl">Total Today:</span><span class="tbar-val" id="totalHrs">0</span><span class="tbar-lbl">hrs</span>
+            <span class="tbar-lbl" style="margin-left:12px">Completed Tasks:</span><span class="tbar-val" style="color:var(--green);font-size:16px" id="completedCnt">0</span>
+            <span class="tbar-lbl" style="margin-left:12px">Submitted:</span><span class="tbar-val" style="color:var(--amber);font-size:16px" id="submittedCnt">0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- TEAM -->
+      <div class="page" id="page-team">
+        <div class="sec-head"><div class="sec-title">Team Members</div></div>
+        <div class="team-grid" id="teamGrid"></div>
+      </div>
+
+      <!-- ADMIN — USER MANAGEMENT -->
+      <div class="page" id="page-admin">
+        <!-- Offline warning banner -->
+        <div id="offlineBanner" style="display:none;margin-bottom:16px;padding:12px 16px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:10px;display:flex;align-items:flex-start;gap:10px">
+          <span style="font-size:18px;flex-shrink:0">⚠️</span>
+          <div>
+            <div style="font-size:12px;font-weight:700;color:#ef4444;margin-bottom:3px">Google Sheets sync is unavailable</div>
+            <div style="font-size:11px;color:var(--muted);line-height:1.6">
+              This app must be hosted over <strong style="color:var(--text)">HTTPS</strong> to sync with Google Sheets. Changes are being saved locally in your browser only.<br>
+              <strong style="color:var(--teal)">Fix:</strong> Upload <code style="background:var(--navy3);padding:1px 5px;border-radius:4px">wms-v4.html</code> to GitHub Pages or any HTTPS host — then all devices share the same live data.
+            </div>
+            <button onclick="forceSync()" style="margin-top:8px;padding:5px 14px;border-radius:6px;border:1px solid rgba(14,165,233,.3);background:rgba(14,165,233,.1);color:var(--teal);font-size:11px;font-weight:600;cursor:pointer;font-family:'Sora',sans-serif">↻ Try Again</button>
+          </div>
+        </div>
+        <div class="sec-head">
+          <div><div class="sec-title">User Management</div><div class="sec-sub">Create, edit and manage team member accounts and credentials</div></div>
+          <button class="btn btn-primary btn-sm" onclick="openUserModal()">+ Create User</button>
+        </div>
+        <!-- Stats -->
+        <div class="stats-grid" id="adminStats"></div>
+        <!-- Users Table -->
+        <div class="tbl-wrap" style="margin-top:6px">
+          <table class="tbl">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>User</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Department</th>
+                <th>Status</th>
+                <th>Created</th>
+                <th>Last Login</th>
+                <th>Tasks</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="adminUsersTbl"></tbody>
+          </table>
+          <div class="empty-state" id="adminEmpty" style="display:none"><div style="font-size:28px;margin-bottom:8px">👥</div>No users yet. Create the first user.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ MODALS ══════════ -->
+
+<!-- Project Modal -->
+<div class="overlay" id="projModal" onclick="bgClose(event,'projModal')">
+  <div class="modal">
+    <div class="modal-title">📁 New Project</div>
+    <div class="fg"><label class="fl">Project Name *</label><input class="fc" id="pm_name" placeholder="e.g. Solar Grid Alpha"></div>
+    <div class="fr"><div class="fg"><label class="fl">Account / Client</label><input class="fc" id="pm_account" placeholder="Client name"></div>
+      <div class="fg"><label class="fl">Type</label><select class="fc" id="pm_type"><option>PR</option><option>QC</option><option>Dev</option><option>Design</option><option>Admin</option></select></div></div>
+    <div class="fg"><label class="fl">Description</label><textarea class="fc" id="pm_desc" placeholder="Brief description…"></textarea></div>
+    <div class="fr"><div class="fg"><label class="fl">Start Date</label><input class="fc" id="pm_start" type="date"></div>
+      <div class="fg"><label class="fl">Due Date</label><input class="fc" id="pm_due" type="date"></div></div>
+    <div class="fg"><label class="fl">Assign Leads</label><select class="fc msel" id="pm_leads" multiple></select><div style="font-size:10px;color:var(--muted);margin-top:3px">Hold Ctrl/Cmd for multiple</div></div>
+    <div class="fg"><label class="fl">Color</label><div class="colors-row" id="pm_colors"></div></div>
+    <div class="fa"><button class="btn btn-ghost" onclick="closeModal('projModal')">Cancel</button><button class="btn btn-primary" onclick="saveProject()">Create Project</button></div>
+  </div>
+</div>
+
+<!-- Task Modal -->
+<div class="overlay" id="taskModal" onclick="bgClose(event,'taskModal')">
+  <div class="modal">
+    <div class="modal-title" id="taskModalTitle">📝 New Task</div>
+    <div class="fg"><label class="fl">Task Title *</label><input class="fc" id="tm_title" placeholder="What needs to be done?"></div>
+    <div class="fr"><div class="fg"><label class="fl">Project *</label><select class="fc" id="tm_proj" onchange="onTaskProjChange()"></select></div>
+      <div class="fg"><label class="fl">Bucket</label><select class="fc" id="tm_bucket"></select></div></div>
+    <div class="fr"><div class="fg"><label class="fl">Initiated By</label><input class="fc" id="tm_initiated"></div>
+      <div class="fg"><label class="fl">Task Type</label><select class="fc" id="tm_type"><option>PR</option><option>QC</option><option>Dev</option><option>Design</option><option>Admin</option></select></div></div>
+    <div class="fr"><div class="fg"><label class="fl">Start Date</label><input class="fc" id="tm_start" type="date"></div>
+      <div class="fg"><label class="fl">Due Date</label><input class="fc" id="tm_due" type="date"></div></div>
+    <div class="fr"><div class="fg"><label class="fl">Priority</label><select class="fc" id="tm_priority"><option>High</option><option>Medium</option><option>Low</option></select></div>
+      <div class="fg"><label class="fl">Est. Hours</label><input class="fc" id="tm_hours" type="number" min="1" placeholder="e.g. 8"></div></div>
+    <div class="fr"><div class="fg"><label class="fl">Assign Lead</label><select class="fc" id="tm_lead"></select></div>
+      <div class="fg"><label class="fl">Assign Associate</label><select class="fc" id="tm_assoc"></select></div></div>
+    <div class="fg"><label class="fl">Status</label><select class="fc" id="tm_status"><option>Not Started</option><option>In Progress</option><option>On Hold</option><option>Completed</option><option>Review</option></select></div>
+    <div class="fg"><label class="fl">Description / Instructions</label><textarea class="fc" id="tm_desc" placeholder="Detailed description…"></textarea></div>
+    <div class="fg"><label class="fl">Lead Remarks</label><textarea class="fc" id="tm_leadRemark"></textarea></div>
+    <div class="fg"><label class="fl">User Remarks</label><textarea class="fc" id="tm_userRemark"></textarea></div>
+    <div class="fa"><button class="btn btn-ghost" onclick="closeModal('taskModal')">Cancel</button><button class="btn btn-primary" onclick="saveTask()">Save Task</button></div>
+  </div>
+</div>
+
+<!-- Assign Project to Lead -->
+<div class="overlay" id="assignProjModal" onclick="bgClose(event,'assignProjModal')">
+  <div class="modal">
+    <div class="modal-title">🔗 Assign Project to Lead</div>
+    <div class="fg"><label class="fl">Project</label><select class="fc" id="ap_proj"></select></div>
+    <div class="fg"><label class="fl">Leads (Ctrl/Cmd for multiple)</label><select class="fc msel" id="ap_leads" multiple></select></div>
+    <div class="fg"><label class="fl">Remarks</label><input class="fc" id="ap_remark" placeholder="Optional notes…"></div>
+    <div class="fa"><button class="btn btn-ghost" onclick="closeModal('assignProjModal')">Cancel</button><button class="btn btn-violet" onclick="saveAssignProj()">Assign</button></div>
+  </div>
+</div>
+
+<!-- Lead Assignment Modal (Manager → Lead) -->
+<div class="overlay" id="leadAssignModal" onclick="bgClose(event,'leadAssignModal')">
+  <div class="modal">
+    <div class="modal-title">📋 Assign Task to Lead</div>
+    <div class="fr"><div class="fg"><label class="fl">Date</label><input class="fc" id="la_date" type="date"></div>
+      <div class="fg"><label class="fl">Initiated By</label><input class="fc" id="la_initiated" readonly></div></div>
+    <div class="fr"><div class="fg"><label class="fl">Project</label><select class="fc" id="la_proj" onchange="populateLaTask()"></select></div>
+      <div class="fg"><label class="fl">Task</label><select class="fc" id="la_task"></select></div></div>
+    <div class="fr"><div class="fg"><label class="fl">Assign to Lead</label><select class="fc" id="la_lead"></select></div>
+      <div class="fg"><label class="fl">Status</label><select class="fc" id="la_status"><option>Assigned</option><option>In Progress</option><option>On Hold</option></select></div></div>
+    <div class="fg"><label class="fl">Remarks</label><input class="fc" id="la_remark" placeholder="Optional…"></div>
+    <div class="fa"><button class="btn btn-ghost" onclick="closeModal('leadAssignModal')">Cancel</button><button class="btn btn-primary" onclick="saveLeadAssign()">Assign to Lead</button></div>
+  </div>
+</div>
+
+<!-- Associate Assignment Modal (Lead → Associate) -->
+<div class="overlay" id="assocAssignModal" onclick="bgClose(event,'assocAssignModal')">
+  <div class="modal">
+    <div class="modal-title">👤 Assign Task to Associate</div>
+    <div class="fr"><div class="fg"><label class="fl">Date</label><input class="fc" id="aa_date" type="date"></div>
+      <div class="fg"><label class="fl">Lead</label><input class="fc" id="aa_lead" readonly></div></div>
+    <div class="fr"><div class="fg"><label class="fl">Project</label><select class="fc" id="aa_proj" onchange="populateAaTask()"></select></div>
+      <div class="fg"><label class="fl">Task</label><select class="fc" id="aa_task"></select></div></div>
+    <div class="fr"><div class="fg"><label class="fl">Assign to Associate</label><select class="fc" id="aa_assoc"></select></div>
+      <div class="fg"><label class="fl">Status</label><select class="fc" id="aa_status"><option>Assigned</option><option>In Progress</option><option>On Hold</option></select></div></div>
+    <div class="fg"><label class="fl">Instructions / Remarks</label><textarea class="fc" id="aa_remark" placeholder="Instructions for associate…"></textarea></div>
+    <div class="fa"><button class="btn btn-ghost" onclick="closeModal('assocAssignModal')">Cancel</button><button class="btn btn-violet" onclick="saveAssocAssign()">Assign to Associate</button></div>
+  </div>
+</div>
+
+<!-- Task Detail / Update Modal (Associate / all roles) -->
+<div class="overlay" id="taskDetailModal" onclick="bgClose(event,'taskDetailModal')">
+  <div class="modal">
+    <div class="modal-title" id="tdm_title">Task Details</div>
+    <div id="tdm_info"></div>
+    <div class="divider"></div>
+    <div style="font-size:10px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px">Update Status & Log Time</div>
+    <div class="fr"><div class="fg"><label class="fl">Update Status</label>
+      <select class="fc" id="tdm_status"><option>Not Started</option><option>In Progress</option><option>On Hold</option><option>Completed</option><option>Review</option></select></div>
+      <div class="fg"><label class="fl">Hours Worked Today</label><input class="fc" id="tdm_hours" type="number" min="0" step="0.5" placeholder="0"></div></div>
+    <div class="fg"><label class="fl">Your Remarks</label><textarea class="fc" id="tdm_remark" placeholder="What did you work on?"></textarea></div>
+    <div id="tdm_hrs_summary" style="margin-top:10px"></div>
+    <div class="fa"><button class="btn btn-ghost" onclick="closeModal('taskDetailModal')">Close</button><button class="btn btn-green" onclick="submitTaskUpdate()">Save Update</button></div>
+  </div>
+</div>
+
+<!-- User Create / Edit Modal -->
+<div class="overlay" id="userModal" onclick="bgClose(event,'userModal')">
+  <div class="modal" style="width:580px">
+    <div class="modal-title" id="userModalTitle">👤 Create New User</div>
+    <!-- Avatar preview -->
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px;padding:14px;background:var(--navy3);border-radius:10px">
+      <div id="userAvatarPreview" style="width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#fff;background:#0ea5e9;flex-shrink:0">?</div>
+      <div>
+        <div id="userNamePreview" style="font-size:14px;font-weight:700;color:var(--white)">New User</div>
+        <div id="userRolePreview" style="font-size:11px;color:var(--muted);margin-top:2px">Select role below</div>
+        <div id="userEmailPreview" style="font-size:11px;color:var(--text-dim);margin-top:1px">—</div>
+      </div>
+      <div style="margin-left:auto">
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;color:var(--text-dim);margin-bottom:6px">Avatar Color</div>
+        <div id="um_colors" class="colors-row"></div>
+      </div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Full Name *</label><input class="fc" id="um_name" placeholder="e.g. Arjun Kapoor" oninput="updateUserPreview()"></div>
+      <div class="fg"><label class="fl">Employee ID</label><input class="fc" id="um_empid" placeholder="e.g. EMP001"></div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Email Address *</label><input class="fc" id="um_email" type="email" placeholder="arjun@company.com" oninput="updateUserPreview()"></div>
+      <div class="fg"><label class="fl">Department</label><input class="fc" id="um_dept" placeholder="e.g. Engineering, QC, Sales…"></div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Role *</label>
+        <select class="fc" id="um_role" onchange="updateUserPreview()">
+          <option value="">— Select Role —</option>
+          <option value="admin">Admin</option>
+          <option value="manager">Manager</option>
+          <option value="lead">Lead</option>
+          <option value="associate">Associate</option>
+        </select>
+      </div>
+      <div class="fg"><label class="fl">Phone</label><input class="fc" id="um_phone" placeholder="+91 98765 43210"></div>
+    </div>
+    <!-- Password section -->
+    <div style="border:1px solid var(--border);border-radius:9px;padding:14px;margin-top:4px;background:var(--navy3)">
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--text-dim);margin-bottom:10px">🔐 Login Credentials</div>
+      <div class="fr">
+        <div class="fg">
+          <label class="fl">Password *</label>
+          <div style="position:relative">
+            <input class="fc" id="um_password" type="password" placeholder="Min. 6 characters">
+            <button onclick="toggleUmPwd('um_password')" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);cursor:pointer;font-size:12px">👁</button>
+          </div>
+        </div>
+        <div class="fg">
+          <label class="fl">Confirm Password *</label>
+          <div style="position:relative">
+            <input class="fc" id="um_password2" type="password" placeholder="Repeat password">
+            <button onclick="toggleUmPwd('um_password2')" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);cursor:pointer;font-size:12px">👁</button>
+          </div>
+        </div>
+      </div>
+      <div id="um_pwd_hint" style="font-size:10px;color:var(--muted);margin-top:4px">Password will be used by this user to log in along with their email.</div>
+      <div id="um_edit_pwd_note" style="font-size:10px;color:var(--amber);margin-top:4px;display:none">Leave both fields empty to keep the current password unchanged.</div>
+    </div>
+    <div class="fg" style="margin-top:12px"><label class="fl">Status</label>
+      <select class="fc" id="um_status"><option value="active">Active</option><option value="inactive">Inactive</option></select>
+    </div>
+    <div id="um_error" style="color:var(--red);font-size:11px;margin-top:8px;display:none"></div>
+    <div class="fa">
+      <button class="btn btn-ghost" onclick="closeModal('userModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveUser()" id="um_saveBtn">Create User</button>
+    </div>
+  </div>
+</div>
+
+<!-- User Credential View Modal (admin view password) -->
+<div class="overlay" id="credViewModal" onclick="bgClose(event,'credViewModal')">
+  <div class="modal" style="width:400px">
+    <div class="modal-title">🔑 User Credentials</div>
+    <div id="credViewContent"></div>
+    <div class="fa"><button class="btn btn-ghost" onclick="closeModal('credViewModal')">Close</button></div>
+  </div>
+</div>
+
+<div class="toasts" id="toasts"></div>
+
+<script>
+// ══════════════════════════════════════════════
+// CONSTANTS
+// ══════════════════════════════════════════════
+const COLORS=['#0ea5e9','#7c3aed','#10b981','#f59e0b','#ef4444','#ec4899','#f97316','#06b6d4','#84cc16','#6366f1'];
+const PRIO_CLR={High:'#ef4444',Medium:'#f59e0b',Low:'#22c55e'};
+const ROLE_META={
+  admin:    {label:'Admin',    bg:'rgba(239,68,68,.15)',  c:'#ef4444', order:0},
+  manager:  {label:'Manager',  bg:'rgba(14,165,233,.15)', c:'#0ea5e9', order:1},
+  lead:     {label:'Lead',     bg:'rgba(124,58,237,.15)', c:'#a78bfa', order:2},
+  associate:{label:'Associate',bg:'rgba(34,197,94,.15)',  c:'#22c55e', order:3},
+};
+const STATUS_CLR={'Not Started':'#475569','In Progress':'#7c3aed','On Hold':'#f59e0b','Completed':'#22c55e','Review':'#3b82f6','Assigned':'#0ea5e9'};
+const BUCKET_CLR={'To Do':'#475569','In Progress':'#7c3aed','Review':'#3b82f6','Done':'#22c55e','On Hold':'#f59e0b'};
+const BUCKET_STATUS={'To Do':'Not Started','In Progress':'In Progress','Review':'Review','Done':'Completed','On Hold':'On Hold'};
+const TODAY='2026-03-01';
+
+// ══════════════════════════════════════════════
+// USERS (in-memory, persisted in DB)
+// ══════════════════════════════════════════════
+const DEFAULT_USERS=[
+  {id:'u_adm1',name:'Admin',         email:'admin@wms.com',    password:'admin123',   role:'admin',     initials:'AD',color:'#ef4444',dept:'IT',         empid:'EMP000',phone:'',             status:'active',createdAt:TODAY,lastLogin:''},
+  {id:'u_mgr1',name:'Sangeeta Gupta',email:'sangeeta@wms.com', password:'manager123', role:'manager',   initials:'SG',color:'#0ea5e9',dept:'Operations', empid:'EMP001',phone:'+91 98100 00001',status:'active',createdAt:TODAY,lastLogin:TODAY},
+  {id:'u_mgr2',name:'Vikram Das',    email:'vikram@wms.com',   password:'manager123', role:'manager',   initials:'VD',color:'#06b6d4',dept:'Operations', empid:'EMP002',phone:'+91 98100 00002',status:'active',createdAt:TODAY,lastLogin:TODAY},
+  {id:'u_ld1', name:'Anita Joshi',   email:'anita@wms.com',    password:'lead123',    role:'lead',      initials:'AJ',color:'#7c3aed',dept:'Engineering',empid:'EMP003',phone:'+91 98100 00003',status:'active',createdAt:TODAY,lastLogin:TODAY},
+  {id:'u_ld2', name:'Rahul Mehta',   email:'rahul@wms.com',    password:'lead123',    role:'lead',      initials:'RM',color:'#ec4899',dept:'QC',         empid:'EMP004',phone:'+91 98100 00004',status:'active',createdAt:TODAY,lastLogin:TODAY},
+  {id:'u_ld3', name:'Priya Sharma',  email:'priya@wms.com',    password:'lead123',    role:'lead',      initials:'PS',color:'#f97316',dept:'Engineering',empid:'EMP005',phone:'+91 98100 00005',status:'active',createdAt:TODAY,lastLogin:TODAY},
+  {id:'u_as1', name:'Deepak Nair',   email:'deepak@wms.com',   password:'assoc123',   role:'associate', initials:'DN',color:'#f59e0b',dept:'Engineering',empid:'EMP006',phone:'+91 98100 00006',status:'active',createdAt:TODAY,lastLogin:''},
+  {id:'u_as2', name:'Sunita Roy',    email:'sunita@wms.com',   password:'assoc123',   role:'associate', initials:'SR',color:'#22c55e',dept:'Engineering',empid:'EMP007',phone:'+91 98100 00007',status:'active',createdAt:TODAY,lastLogin:TODAY},
+  {id:'u_as3', name:'Mohd Shahzad',  email:'shahzad@wms.com',  password:'assoc123',   role:'associate', initials:'MS',color:'#ef4444',dept:'QC',         empid:'EMP008',phone:'+91 98100 00008',status:'active',createdAt:TODAY,lastLogin:''},
+  {id:'u_as4', name:'Hari Palanive', email:'hari@wms.com',     password:'assoc123',   role:'associate', initials:'HP',color:'#84cc16',dept:'Engineering',empid:'EMP009',phone:'+91 98100 00009',status:'active',createdAt:TODAY,lastLogin:''},
+  {id:'u_as5', name:'Sathya Bama',   email:'sathya@wms.com',   password:'assoc123',   role:'associate', initials:'SB',color:'#10b981',dept:'QC',         empid:'EMP010',phone:'+91 98100 00010',status:'active',createdAt:TODAY,lastLogin:''},
+];
+
+// ══════════════════════════════════════════════
+// DATABASE - Single Source of Truth
+// All updates go through mutateTask() which keeps everything in sync
+// ══════════════════════════════════════════════
+function getDefaultDB(){
+  return {
+    users: DEFAULT_USERS,
+    projects:[
+      {id:'p1',name:'Solar Grid Alpha',account:'Enphase',type:'PR',desc:'Phase 1 grid deployment',color:'#0ea5e9',start:'2026-01-15',due:'2026-04-30',assignedLeads:['u_ld1','u_ld2'],
+        buckets:{
+          'To Do':[
+            {id:'t6',title:'Panel spec documentation',initiated:'Sangeeta Gupta',start:'2026-03-15',due:'2026-04-10',assignedLead:'u_ld1',assignedAssociate:'u_as1',desc:'Document all panel specs per v3 template',leadRemark:'Use v3 template',userRemark:'',status:'Not Started',priority:'Medium',type:'PR',hours:5,actualHours:0}
+          ],
+          'In Progress':[
+            {id:'t1',title:'Review site survey files',initiated:'Vikram Das',start:'2026-02-20',due:'2026-03-15',assignedLead:'u_ld1',assignedAssociate:'u_as2',desc:'Review all survey documents',leadRemark:'Focus on electrical layout',userRemark:'50% done',status:'In Progress',priority:'High',type:'PR',hours:10,actualHours:6},
+            {id:'t3',title:'Electrical layout approval',initiated:'Vikram Das',start:'2026-02-25',due:'2026-03-20',assignedLead:'u_ld2',assignedAssociate:'u_as3',desc:'Get layout signed off',leadRemark:'Send to client',userRemark:'Awaiting client',status:'In Progress',priority:'Medium',type:'PR',hours:6,actualHours:4}
+          ],
+          'Review':[],
+          'Done':[
+            {id:'t9',title:'Initial site assessment',initiated:'Sangeeta Gupta',start:'2026-01-20',due:'2026-02-10',assignedLead:'u_ld1',assignedAssociate:'u_as1',desc:'Assess site for installation',leadRemark:'',userRemark:'All done',status:'Completed',priority:'High',type:'PR',hours:8,actualHours:9}
+          ],
+          'On Hold':[]
+        }
+      },
+      {id:'p2',name:'Rooftop QC Review',account:'Enphase',type:'QC',desc:'QC cycle 3',color:'#10b981',start:'2026-02-01',due:'2026-03-31',assignedLeads:['u_ld2','u_ld3'],
+        buckets:{
+          'To Do':[
+            {id:'t5',title:'Write QC test scripts',initiated:'Rahul Mehta',start:'2026-03-01',due:'2026-04-05',assignedLead:'u_ld2',assignedAssociate:'u_as4',desc:'Automate QC checks',leadRemark:'',userRemark:'',status:'Not Started',priority:'Low',type:'QC',hours:12,actualHours:0}
+          ],
+          'In Progress':[],
+          'Review':[
+            {id:'t7',title:'Batch 53-60 QC inspection',initiated:'Rahul Mehta',start:'2026-03-05',due:'2026-03-22',assignedLead:'u_ld2',assignedAssociate:'u_as5',desc:'Inspect batches 53-60',leadRemark:'Use checklist v3',userRemark:'3 issues found',status:'Review',priority:'Medium',type:'QC',hours:8,actualHours:7.5}
+          ],
+          'Done':[
+            {id:'t2',title:'QC batch 47-52 inspection',initiated:'Rahul Mehta',start:'2026-02-28',due:'2026-03-10',assignedLead:'u_ld3',assignedAssociate:'u_as2',desc:'Inspect all 6 batches',leadRemark:'Follow checklist v2',userRemark:'All clear',status:'Completed',priority:'High',type:'QC',hours:8,actualHours:8}
+          ],
+          'On Hold':[]
+        }
+      },
+      {id:'p3',name:'Data Migration',account:'Internal',type:'PR',desc:'Legacy system transition',color:'#f59e0b',start:'2026-02-15',due:'2026-05-15',assignedLeads:['u_ld1','u_ld3'],
+        buckets:{
+          'To Do':[],
+          'In Progress':[
+            {id:'t4',title:'Data schema mapping v2',initiated:'Sangeeta Gupta',start:'2026-03-01',due:'2026-03-25',assignedLead:'u_ld1',assignedAssociate:'u_as3',desc:'Map legacy fields to new schema',leadRemark:'Cross-reference v1',userRemark:'In progress',status:'In Progress',priority:'High',type:'PR',hours:14,actualHours:5}
+          ],
+          'Review':[],
+          'Done':[],
+          'On Hold':[]
+        }
+      }
+    ],
+    leadAssignments:[
+      {id:'la1',date:'2026-02-28',initiated:'Sangeeta Gupta',project:'p1',task:'t1',assignedLead:'u_ld1',status:'In Progress',remark:'Priority task'},
+      {id:'la2',date:'2026-03-01',initiated:'Sangeeta Gupta',project:'p3',task:'t4',assignedLead:'u_ld1',status:'Assigned',remark:''}
+    ],
+    assocAssignments:[
+      {id:'aa1',date:'2026-03-01',lead:'u_ld1',project:'p1',task:'t1',associate:'u_as2',status:'In Progress',remark:'Focus on electrical docs'},
+      {id:'aa2',date:'2026-03-01',lead:'u_ld2',project:'p2',task:'t7',associate:'u_as5',status:'Review',remark:'Log any defects found'}
+    ],
+    // Each entry: {id, date, userId, projectId, taskId, hours, status, remark, submitted}
+    trackerEntries:[
+      {id:'te1',date:'2026-02-28',userId:'u_as2',projectId:'p1',taskId:'t1',hours:6,status:'In Progress',remark:'Reviewed 30 files',submitted:true},
+      {id:'te2',date:'2026-02-28',userId:'u_as5',projectId:'p2',taskId:'t7',hours:7.5,status:'Review',remark:'Found 3 defects',submitted:true},
+      {id:'te3',date:'2026-03-01',userId:'u_as1',projectId:'p1',taskId:'t6',hours:0,status:'Not Started',remark:'',submitted:false},
+      {id:'te4',date:'2026-03-01',userId:'u_as3',projectId:'p3',taskId:'t4',hours:5,status:'In Progress',remark:'Mapped 60% fields',submitted:true}
+    ]
+  };
+}
+
+// ══════════════════════════════════════════════
+// GOOGLE SHEETS BACKEND
+// ══════════════════════════════════════════════
+const GS_URL = 'https://script.google.com/macros/s/AKfycbwTY6cOIp_mt1yGuoXvishUzqTL2-k_kRRs5xeSqozSLePtXZ-3UhYzjGyNJiXj0jON9A/exec';
+const LS_KEY = 'wms_v4_cache';
+let DB = null;
+let USERS = [];
+let syncPending = false;
+let syncTimer = null;
+let sheetsReachable = false; // tracks whether last sync attempt succeeded
+
+// Show / hide the full-screen loading overlay
+function showLoader(msg='Loading…'){
+  document.getElementById('loadOverlay').style.display='flex';
+  document.getElementById('loadMsg').textContent=msg;
+}
+function hideLoader(){ document.getElementById('loadOverlay').style.display='none'; }
+
+// Status bar in topbar
+function setSyncStatus(state, msg=''){
+  const label = document.getElementById('syncLabel');
+  const btn   = document.getElementById('syncBtn');
+  if(!label) return;
+  const cfg = {
+    syncing: {color:'var(--amber)', icon:'⏳', txt: msg||'Syncing…',       showBtn: false},
+    ok:      {color:'var(--green)', icon:'☁️',  txt: msg||'Synced',         showBtn: false},
+    offline: {color:'var(--red)',   icon:'⚠️',  txt: msg||'Offline',        showBtn: true},
+    error:   {color:'var(--red)',   icon:'❌',  txt: msg||'Sync error',     showBtn: true},
+  }[state] || {color:'var(--muted)', icon:'', txt:'', showBtn:false};
+  label.innerHTML = `<span style="color:${cfg.color}">${cfg.icon}</span> <span style="color:${cfg.color}">${cfg.txt}</span>`;
+  if(btn) btn.style.display = cfg.showBtn ? 'block' : 'none';
+}
+
+// Manual force sync — pull fresh from Sheets and re-render
+async function forceSync(){
+  setSyncStatus('syncing', 'Connecting…');
+  const ok = await pullFromSheets();
+  if(ok){
+    setSyncStatus('ok', 'Synced ✓');
+    buildCredList();
+    if(currentUser){
+      const fresh = USERS.find(u=>u.id===currentUser.id);
+      if(fresh) currentUser = fresh;
+      refreshAll();
+    }
+    toast('☁️ Synced with Google Sheets', 'var(--green)');
+  } else {
+    setSyncStatus('offline', 'Cannot reach Sheets');
+    toast('⚠️ Could not reach Google Sheets — check your connection or host the file over HTTPS', 'var(--red)');
+  }
+}
+
+// Migrate / normalise a loaded DB object
+function migrateDB(data){
+  if(!data) return getDefaultDB();
+  if(!data.users) data.users=getDefaultDB().users;
+  data.users.forEach(u=>{
+    if(!u.email)    u.email=(u.name||'user').toLowerCase().replace(/\s+/g,'.')+'@wms.com';
+    if(!u.password) u.password=(u.role||'user')+'123';
+    if(!u.status)   u.status='active';
+    if(!u.createdAt)u.createdAt=TODAY;
+    if(!u.dept)     u.dept='';
+    if(!u.phone)    u.phone='';
+    if(!u.empid)    u.empid='';
+    if(!u.lastLogin)u.lastLogin='';
+  });
+  if(!data.users.find(u=>u.role==='admin')){
+    data.users.unshift({id:'u_adm1',name:'Admin',email:'admin@wms.com',password:'admin123',role:'admin',initials:'AD',color:'#ef4444',dept:'IT',empid:'EMP000',phone:'',status:'active',createdAt:TODAY,lastLogin:''});
+  }
+  if(!data.projects)         data.projects=[];
+  if(!data.leadAssignments)  data.leadAssignments=[];
+  if(!data.assocAssignments) data.assocAssignments=[];
+  if(!data.trackerEntries)   data.trackerEntries=[];
+  return data;
+}
+
+// Save to localStorage cache immediately
+function cacheDB(){ try{ localStorage.setItem(LS_KEY, JSON.stringify(DB)); }catch(e){} }
+
+// Read from localStorage cache (for fast first paint)
+function loadFromCache(){
+  try{
+    const raw=localStorage.getItem(LS_KEY);
+    if(raw){ DB=migrateDB(JSON.parse(raw)); USERS=DB.users; return true; }
+  }catch(e){}
+  return false;
+}
+
+// Pull latest data from Google Sheets
+async function pullFromSheets(){
+  try{
+    const url = GS_URL + '?action=read&t=' + Date.now();
+    const res = await fetch(url, { method:'GET', redirect:'follow' });
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const remote = await res.json();
+    if(remote.error) throw new Error(remote.error);
+    const merged = {
+      users:            remote.users            || getDefaultDB().users,
+      projects:         remote.projects         || [],
+      leadAssignments:  remote.leadAssignments  || [],
+      assocAssignments: remote.assocAssignments || [],
+      trackerEntries:   remote.trackerEntries   || [],
+    };
+    DB = migrateDB(merged);
+    USERS = DB.users;
+    cacheDB();
+    sheetsReachable = true;
+    return true;
+  }catch(e){
+    console.warn('Pull failed:', e);
+    sheetsReachable = false;
+    return false;
+  }
+}
+
+// Push current DB to Google Sheets (debounced — max once per 1.5s)
+function saveDB(){
+  cacheDB(); // always write cache immediately
+  clearTimeout(syncTimer);
+  syncTimer = setTimeout(async ()=>{
+    if(syncPending) return;
+    syncPending=true;
+    setSyncStatus('syncing');
+    try{
+      const res = await fetch(GS_URL, {
+        method: 'POST',
+        redirect: 'follow',
+        headers: { 'Content-Type': 'text/plain' }, // text/plain avoids preflight
+        body: JSON.stringify({
+          action:'write',
+          data:{
+            users:            DB.users,
+            projects:         DB.projects,
+            leadAssignments:  DB.leadAssignments,
+            assocAssignments: DB.assocAssignments,
+            trackerEntries:   DB.trackerEntries,
+          }
+        })
+      });
+      const json = await res.json();
+      if(json.ok){ setSyncStatus('ok', 'Saved to Sheets ✓'); sheetsReachable = true; }
+      else        { setSyncStatus('error', json.error||'Write error'); sheetsReachable = false; }
+    }catch(e){
+      setSyncStatus('offline','Offline — saved locally');
+      sheetsReachable = false;
+      console.warn('Push failed:', e);
+    }finally{
+      syncPending=false;
+    }
+  }, 1500);
+}
+
+// Initialise: load cache first (instant), then pull from Sheets
+async function initDB(){
+  const hasCached = loadFromCache();
+  if(hasCached){
+    // Render login immediately using cache
+    hideLoader();
+    buildCredList();
+  } else {
+    showLoader('Connecting to Google Sheets…');
+  }
+  // Always pull fresh data from Sheets
+  setSyncStatus('syncing','Connecting…');
+  const ok = await pullFromSheets();
+  if(ok){
+    setSyncStatus('ok','Connected');
+    hideLoader();
+    buildCredList();
+    // If user already logged in (page reload), refresh current view
+    if(currentUser){
+      const fresh = USERS.find(u=>u.id===currentUser.id);
+      if(fresh) currentUser=fresh;
+      refreshAll();
+    }
+  } else {
+    if(hasCached){
+      setSyncStatus('offline','Offline — using cached data');
+    } else {
+      // No cache and can't reach sheets — use defaults
+      DB = getDefaultDB();
+      USERS = DB.users;
+      setSyncStatus('offline','Could not reach Sheets — using demo data');
+      hideLoader();
+      buildCredList();
+    }
+  }
+}
+
+// Kick off initialisation (async, non-blocking)
+initDB();
+
+// ══════════════════════════════════════════════
+// CORE MUTATION - ALL status/hours updates go through here
+// This keeps tasks, assocAssignments, leadAssignments, trackerEntries all in sync
+// ══════════════════════════════════════════════
+function mutateTask(taskId, {status, userRemark, leadRemark, hoursToAdd, submittedByUserId}){
+  const found = findTask(taskId);
+  if(!found) return false;
+  const {task} = found;
+
+  if(status !== undefined) {
+    task.status = status;
+    // Sync assocAssignments status
+    DB.assocAssignments.filter(a=>a.task===taskId).forEach(a=>a.status=status);
+    // Sync leadAssignments status
+    DB.leadAssignments.filter(a=>a.task===taskId).forEach(a=>{
+      if(status==='Completed') a.status='Completed';
+      else if(status==='In Progress') a.status='In Progress';
+    });
+    // Move to correct bucket
+    moveToBucketByStatus(found, status);
+  }
+  if(userRemark !== undefined) task.userRemark = userRemark;
+  if(leadRemark !== undefined) task.leadRemark = leadRemark;
+  if(hoursToAdd && hoursToAdd > 0) {
+    task.actualHours = (task.actualHours||0) + hoursToAdd;
+    // Add tracker entry
+    if(submittedByUserId){
+      const projId = found.project.id;
+      DB.trackerEntries.push({
+        id: uid(), date: TODAY, userId: submittedByUserId,
+        projectId: projId, taskId, hours: hoursToAdd,
+        status: task.status, remark: task.userRemark||'', submitted: true
+      });
+    }
+  }
+  saveDB();
+  return true;
+}
+
+function moveToBucketByStatus(found, newStatus){
+  const {task, project, bucket} = found;
+  const targetBucket = Object.entries(BUCKET_STATUS).find(([b,s])=>s===newStatus)?.[0] || bucket;
+  if(targetBucket !== bucket && project.buckets[targetBucket] !== undefined){
+    project.buckets[bucket] = project.buckets[bucket].filter(t=>t.id!==task.id);
+    project.buckets[targetBucket].push(task);
+  }
+}
+
+// ══════════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════════
+const uid = () => '_'+Math.random().toString(36).substr(2,9);
+const fmt = d => { if(!d) return '—'; try{return new Date(d+'T00:00:00').toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});}catch{return d;} };
+const isLate = d => d && d < TODAY;
+const getUser = id => USERS.find(u=>u.id===id);
+const getProject = id => DB.projects.find(p=>p.id===id);
+const bcls = s => ({'Not Started':'b-ns','In Progress':'b-ip','On Hold':'b-hold','Completed':'b-done','Review':'b-rev','Assigned':'b-asgn'})[s]||'b-ns';
+const initials = n => (n||'').split(' ').map(x=>x[0]).slice(0,2).join('').toUpperCase();
+const esc = s => (s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+
+function allTasks(projId){
+  const projs = projId ? DB.projects.filter(p=>p.id===projId) : DB.projects;
+  return projs.flatMap(p=>Object.values(p.buckets).flat());
+}
+function findTask(taskId){
+  for(const p of DB.projects) for(const [b,tasks] of Object.entries(p.buckets)){
+    const t=tasks.find(x=>x.id===taskId); if(t) return {task:t,project:p,bucket:b};
+  }
+  return null;
+}
+function myProjects(user){
+  if(user.role==='manager') return DB.projects;
+  if(user.role==='lead') return DB.projects.filter(p=>(p.assignedLeads||[]).includes(user.id));
+  if(user.role==='associate'){
+    const myIds=new Set(DB.assocAssignments.filter(a=>a.associate===user.id).map(a=>a.task));
+    return DB.projects.filter(p=>Object.values(p.buckets).flat().some(t=>t.assignedAssociate===user.id||myIds.has(t.id)));
+  }
+  return [];
+}
+function myTasks(user){
+  if(user.role==='manager') return allTasks();
+  if(user.role==='lead'){
+    return myProjects(user).flatMap(p=>Object.values(p.buckets).flat().filter(t=>t.assignedLead===user.id));
+  }
+  if(user.role==='associate'){
+    const myIds=new Set(DB.assocAssignments.filter(a=>a.associate===user.id).map(a=>a.task));
+    return allTasks().filter(t=>t.assignedAssociate===user.id||myIds.has(t.id));
+  }
+  return [];
+}
+
+// Actual hours for a task = sum of all tracker entries for that task
+function getActualHours(taskId){
+  return DB.trackerEntries.filter(e=>e.taskId===taskId&&e.submitted).reduce((s,e)=>s+e.hours,0);
+}
+// Hours logged today by userId for taskId
+function getTodayHours(taskId, userId){
+  return DB.trackerEntries.filter(e=>e.taskId===taskId&&e.userId===userId&&e.date===TODAY&&e.submitted).reduce((s,e)=>s+e.hours,0);
+}
+
+function toast(msg, color='var(--teal)'){
+  const c=document.getElementById('toasts');
+  const t=document.createElement('div'); t.className='toast';
+  t.innerHTML=`<span style="color:${color}">●</span> ${msg}`;
+  c.appendChild(t); setTimeout(()=>t.remove(),3000);
+}
+
+// Refresh all visible pages after a mutation
+function refreshAll(){
+  USERS = DB.users;
+  saveDB();
+  const renders={
+    dashboard:renderManagerDashboard,planner:renderPlanner,
+    'lead-assign':renderLeadAssignPage,'hours-report':renderHoursReport,
+    'daily-overview':renderDailyOverview,'lead-dashboard':renderLeadDashboard,
+    'assoc-assign':renderAssocAssignPage,'my-tasks':renderMyTasks,
+    tracker:renderTracker,team:renderTeam,admin:renderAdminPage
+  };
+  renders[currentPage]?.();
+}
+
+// ══════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════
+let currentUser=null, currentPage='', curPlannerProj=null;
+let editingTaskId=null, selectedTaskId=null;
+let selColor=COLORS[0], ovDate=TODAY, dragId=null;
+
+// ══════════════════════════════════════════════
+// LOGIN  —  Email + Password
+// ══════════════════════════════════════════════
+function buildCredList(){
+  const roleOrder=['admin','manager','lead','associate'];
+  const active=[...USERS].filter(u=>u.status!=='inactive').sort((a,b)=>roleOrder.indexOf(a.role)-roleOrder.indexOf(b.role));
+  const groups={};
+  active.forEach(u=>{ if(!groups[u.role]) groups[u.role]=[]; groups[u.role].push(u); });
+  let html='';
+  Object.entries(groups).forEach(([role,users])=>{
+    const rm=ROLE_META[role]||ROLE_META.associate;
+    html+=`<div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--text-dim);margin:8px 0 4px;padding-left:2px">${rm.label}s</div>`;
+    users.forEach(u=>{
+      html+=`<div class="luc" onclick="fillCreds('${u.email.replace(/'/g,"\'")}','${u.password.replace(/'/g,"\'")}')">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="width:26px;height:26px;border-radius:50%;background:${u.color};color:#fff;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">${u.initials}</div>
+          <div>
+            <div style="font-weight:600;color:var(--white);font-size:11px">${u.name}</div>
+            <div style="font-size:10px;color:var(--muted);margin-top:1px">${u.email}</div>
+          </div>
+        </div>
+        <div style="text-align:right;flex-shrink:0;margin-left:8px">
+          <span class="role-tag role-${role}" style="display:block;text-align:center;margin-bottom:3px">${rm.label}</span>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-dim)">${u.password}</div>
+        </div>
+      </div>`;
+    });
+  });
+  document.getElementById('credList').innerHTML=html;
+}
+function fillCreds(email,pwd){
+  document.getElementById('loginEmail').value=email;
+  document.getElementById('loginPassword').value=pwd;
+  document.getElementById('loginError').style.display='none';
+}
+function togglePwd(){
+  const inp=document.getElementById('loginPassword');
+  inp.type=inp.type==='password'?'text':'password';
+}
+function doLogin(){
+  const email=document.getElementById('loginEmail').value.trim().toLowerCase();
+  const pwd=document.getElementById('loginPassword').value;
+  const errEl=document.getElementById('loginError');
+  errEl.style.display='none';
+  if(!email||!pwd){ errEl.textContent='Please enter your email and password.'; errEl.style.display='block'; return; }
+  const u=USERS.find(x=>x.email&&x.email.toLowerCase()===email&&x.password===pwd);
+  if(!u){ errEl.textContent='Incorrect email or password. Please try again.'; errEl.style.display='block'; return; }
+  if(u.status==='inactive'){ errEl.textContent='This account is deactivated. Contact your administrator.'; errEl.style.display='block'; return; }
+  u.lastLogin=TODAY; saveDB();
+  loginAs(u);
+}
+function loginAs(u){
+  currentUser=u; USERS=DB.users;
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('app').classList.add('visible');
+  document.getElementById('userNm').textContent=u.name;
+  document.getElementById('userAv').textContent=u.initials;
+  document.getElementById('userAv').style.background=u.color;
+  const rm=ROLE_META[u.role]||ROLE_META.associate;
+  const p=document.getElementById('rolePill'); p.textContent=rm.label; p.style.background=rm.bg; p.style.color=rm.c;
+  buildNav();
+  const firstPage={admin:'admin',manager:'dashboard',lead:'lead-dashboard',associate:'my-tasks'}[u.role]||'dashboard';
+  showPage(firstPage);
+}
+function logout(){
+  currentUser=null;
+  document.getElementById('app').classList.remove('visible');
+  document.getElementById('loginScreen').style.display='flex';
+  document.getElementById('loginEmail').value='';
+  document.getElementById('loginPassword').value='';
+  document.getElementById('loginError').style.display='none';
+  buildCredList();
+}
+
+// ══════════════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════════════
+const NAV={
+  admin:    [{id:'admin',         l:'⚙️ User Management'}],
+  manager:  [{id:'dashboard',     l:'📊 Dashboard'},{id:'planner',l:'🗂 Planning'},{id:'lead-assign',l:'📋 Lead Assignment'},{id:'hours-report',l:'⏱ Hours Report'},{id:'daily-overview',l:'📅 Daily Overview'},{id:'team',l:'👥 Team'}],
+  lead:     [{id:'lead-dashboard',l:'🗂 My Projects'},{id:'assoc-assign',l:'📋 Associate Assignment'},{id:'daily-overview',l:'📅 Daily Overview'},{id:'team',l:'👥 Team'}],
+  associate:[{id:'my-tasks',      l:'✅ My Tasks'},{id:'tracker',l:'⏱ Task Tracker'},{id:'team',l:'👥 Team'}]
+};
+function buildNav(){
+  document.getElementById('topNav').innerHTML=(NAV[currentUser.role]||[]).map(n=>`<button class="tnav" data-page="${n.id}" onclick="showPage('${n.id}')">${n.l}</button>`).join('');
+}
+function showPage(name){
+  currentPage=name;
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tnav').forEach(a=>a.classList.remove('active'));
+  const pg=document.getElementById('page-'+name); if(pg) pg.classList.add('active');
+  document.querySelectorAll(`.tnav[data-page="${name}"]`).forEach(a=>a.classList.add('active'));
+  ({dashboard:renderManagerDashboard,planner:renderPlanner,'lead-assign':renderLeadAssignPage,'hours-report':renderHoursReport,'daily-overview':renderDailyOverview,'lead-dashboard':renderLeadDashboard,'assoc-assign':renderAssocAssignPage,'my-tasks':renderMyTasks,tracker:renderTracker,team:renderTeam,admin:renderAdminPage})[name]?.();
+}
+
+// ══════════════════════════════════════════════
+// ADMIN — USER MANAGEMENT
+// ══════════════════════════════════════════════
+function renderAdminPage(){
+  // Show offline banner if we can't reach sheets
+  const banner = document.getElementById('offlineBanner');
+  if(banner) banner.style.display = sheetsReachable ? 'none' : 'flex';
+  const users=USERS;
+  const active=users.filter(u=>u.status==='active').length;
+  const byRole={admin:0,manager:0,lead:0,associate:0};
+  users.forEach(u=>{ if(byRole[u.role]!==undefined) byRole[u.role]++; });
+  document.getElementById('adminStats').innerHTML=`
+    <div class="sc sc-bl"><div class="sc-lbl">Total Users</div><div class="sc-val">${users.length}</div><div class="sc-sub">${active} active</div></div>
+    <div class="sc sc-rd"><div class="sc-lbl">Admins</div><div class="sc-val">${byRole.admin}</div><div class="sc-sub">Full access</div></div>
+    <div class="sc sc-cy"><div class="sc-lbl">Managers</div><div class="sc-val">${byRole.manager}</div><div class="sc-sub">Project oversight</div></div>
+    <div class="sc sc-vl"><div class="sc-lbl">Leads</div><div class="sc-val">${byRole.lead}</div><div class="sc-sub">Team leads</div></div>
+    <div class="sc sc-gn"><div class="sc-lbl">Associates</div><div class="sc-val">${byRole.associate}</div><div class="sc-sub">Task workers</div></div>
+    <div class="sc sc-am"><div class="sc-lbl">Inactive</div><div class="sc-val">${users.filter(u=>u.status==='inactive').length}</div><div class="sc-sub">Deactivated</div></div>
+  `;
+  const sortedUsers=[...users].sort((a,b)=>(ROLE_META[a.role]?.order||9)-(ROLE_META[b.role]?.order||9));
+  document.getElementById('adminEmpty').style.display=users.length?'none':'block';
+  document.getElementById('adminUsersTbl').innerHTML=sortedUsers.map((u,i)=>{
+    const rm=ROLE_META[u.role]||ROLE_META.associate;
+    const isMe=u.id===currentUser.id;
+    const taskCount=myTasks(u).length;
+    return `<tr style="${u.status==='inactive'?'opacity:.45':''}">
+      <td style="color:var(--text-dim);font-size:10px;font-family:'JetBrains Mono',monospace">${i+1}</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:34px;height:34px;border-radius:50%;background:${u.color};color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">${u.initials}</div>
+          <div>
+            <div style="font-size:12px;font-weight:700;color:var(--white)">${u.name} ${isMe?'<span style="font-size:9px;background:rgba(14,165,233,.15);color:var(--teal);padding:1px 6px;border-radius:10px;font-weight:600">You</span>':''}</div>
+            <div style="font-size:10px;color:var(--muted);margin-top:1px">${u.empid||'—'}${u.dept?' · '+u.dept:''}</div>
+          </div>
+        </div>
+      </td>
+      <td>
+        <div style="font-size:11px;color:var(--text);font-family:'JetBrains Mono',monospace">${u.email}</div>
+        ${u.phone?`<div style="font-size:10px;color:var(--muted);margin-top:2px">${u.phone}</div>`:''}
+      </td>
+      <td><span class="badge" style="background:${rm.bg};color:${rm.c};font-size:10px">${rm.label}</span></td>
+      <td style="font-size:11px;color:var(--muted)">${u.dept||'—'}</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:5px">
+          <div style="width:7px;height:7px;border-radius:50%;background:${u.status==='active'?'var(--green)':'var(--red)'}"></div>
+          <span style="font-size:11px;font-weight:600;color:${u.status==='active'?'var(--green)':'var(--red)'}">${u.status==='active'?'Active':'Inactive'}</span>
+        </div>
+      </td>
+      <td style="font-size:10px;color:var(--muted)">${fmt(u.createdAt)}</td>
+      <td style="font-size:10px;color:var(--muted)">${u.lastLogin?fmt(u.lastLogin):'<span style="color:var(--text-dim)">Never</span>'}</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent);font-weight:700">${taskCount}</td>
+      <td>
+        <div style="display:flex;gap:5px;align-items:center;flex-wrap:wrap">
+          <button onclick="editUser('${u.id}')" style="padding:4px 10px;border-radius:6px;border:1px solid rgba(14,165,233,.3);background:rgba(14,165,233,.08);color:var(--teal);font-size:10px;font-weight:600;cursor:pointer;font-family:'Sora',sans-serif">✏️ Edit</button>
+          <button onclick="viewCredential('${u.id}')" style="padding:4px 10px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:10px;font-weight:600;cursor:pointer;font-family:'Sora',sans-serif">🔑 Creds</button>
+          ${!isMe?`<button onclick="toggleUserStatus('${u.id}')" style="padding:4px 10px;border-radius:6px;border:1px solid ${u.status==='active'?'rgba(245,158,11,.3)':'rgba(34,197,94,.3)'};background:${u.status==='active'?'rgba(245,158,11,.08)':'rgba(34,197,94,.08)'};color:${u.status==='active'?'var(--amber)':'var(--green)'};font-size:10px;font-weight:600;cursor:pointer;font-family:'Sora',sans-serif">${u.status==='active'?'⏸ Deactivate':'▶ Activate'}</button>`:''}
+          ${!isMe?`<button onclick="deleteUser('${u.id}')" style="padding:4px 10px;border-radius:6px;border:1px solid rgba(239,68,68,.3);background:rgba(239,68,68,.06);color:var(--red);font-size:10px;font-weight:600;cursor:pointer;font-family:'Sora',sans-serif">🗑 Delete</button>`:''}
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+function toggleUserStatus(id){
+  const u=USERS.find(x=>x.id===id); if(!u) return;
+  u.status=u.status==='active'?'inactive':'active';
+  saveDB(); renderAdminPage(); buildCredList();
+  toast(`${u.name} ${u.status==='active'?'activated':'deactivated'}`,u.status==='active'?'var(--green)':'var(--amber)');
+}
+function deleteUser(id){
+  const u=USERS.find(x=>x.id===id); if(!u) return;
+  if(!confirm(`Delete "${u.name}"? This cannot be undone.`)) return;
+  DB.users=DB.users.filter(x=>x.id!==id); USERS=DB.users;
+  saveDB(); renderAdminPage(); buildCredList();
+  toast('User deleted','var(--red)');
+}
+function viewCredential(id){
+  const u=USERS.find(x=>x.id===id); if(!u) return;
+  const rm=ROLE_META[u.role]||ROLE_META.associate;
+  document.getElementById('credViewContent').innerHTML=`
+    <div style="display:flex;align-items:center;gap:12px;padding:14px;background:var(--navy3);border-radius:10px;margin-bottom:16px">
+      <div style="width:46px;height:46px;border-radius:50%;background:${u.color};color:#fff;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center">${u.initials}</div>
+      <div>
+        <div style="font-size:14px;font-weight:700;color:var(--white)">${u.name}</div>
+        <span class="badge" style="background:${rm.bg};color:${rm.c};margin-top:4px;display:inline-block">${rm.label}</span>
+        ${u.dept?`<span style="font-size:10px;color:var(--muted);margin-left:6px">${u.dept}</span>`:''}
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="background:var(--navy3);border-radius:9px;padding:13px;display:flex;justify-content:space-between;align-items:center;gap:10px">
+        <div>
+          <div style="font-size:9px;font-weight:700;text-transform:uppercase;color:var(--text-dim);letter-spacing:.7px;margin-bottom:4px">Email — Login ID</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--accent)">${u.email}</div>
+        </div>
+        <button onclick="copyText('${u.email}')" style="padding:5px 12px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-size:10px;font-family:'Sora',sans-serif;white-space:nowrap">📋 Copy</button>
+      </div>
+      <div style="background:var(--navy3);border-radius:9px;padding:13px;display:flex;justify-content:space-between;align-items:center;gap:10px">
+        <div>
+          <div style="font-size:9px;font-weight:700;text-transform:uppercase;color:var(--text-dim);letter-spacing:.7px;margin-bottom:4px">Password</div>
+          <div id="credPwdDisplay" style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--amber);letter-spacing:2px">${'•'.repeat(Math.min((u.password||'').length,8))}</div>
+        </div>
+        <div style="display:flex;gap:6px">
+          <button id="revealBtn" onclick="revealPwd('${u.id}')" style="padding:5px 12px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-size:10px;font-family:'Sora',sans-serif">👁 Show</button>
+          <button onclick="copyText('${u.password}')" style="padding:5px 12px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-size:10px;font-family:'Sora',sans-serif;white-space:nowrap">📋 Copy</button>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:14px;padding:11px 14px;background:rgba(14,165,233,.06);border:1px solid rgba(14,165,233,.15);border-radius:8px;font-size:11px;color:var(--accent);line-height:1.5">
+      💡 Share these with <strong>${u.name.split(' ')[0]}</strong> to log in to WMS.
+    </div>`;
+  openModal('credViewModal');
+}
+function revealPwd(id){
+  const u=USERS.find(x=>x.id===id); if(!u) return;
+  const el=document.getElementById('credPwdDisplay'), btn=document.getElementById('revealBtn');
+  if(btn.textContent.includes('Show')){ el.textContent=u.password; el.style.letterSpacing='0'; btn.textContent='🙈 Hide'; }
+  else{ el.textContent='•'.repeat(Math.min((u.password||'').length,8)); el.style.letterSpacing='2px'; btn.textContent='👁 Show'; }
+}
+function copyText(txt){
+  navigator.clipboard?.writeText(txt).then(()=>toast('Copied!','var(--green)')).catch(()=>{
+    const ta=document.createElement('textarea'); ta.value=txt; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); toast('Copied!','var(--green)');
+  });
+}
+
+// ══════════════════════════════════════════════
+// USER CREATE / EDIT MODAL
+// ══════════════════════════════════════════════
+let umClr=COLORS[0], editingUserId=null;
+function openUserModal(userId){
+  editingUserId=userId||null;
+  const isEdit=!!userId;
+  const u=isEdit?USERS.find(x=>x.id===userId):null;
+  umClr=u?.color||COLORS[Math.floor(Math.random()*COLORS.length)];
+  document.getElementById('userModalTitle').textContent=isEdit?'✏️ Edit User':'👤 Create New User';
+  document.getElementById('um_saveBtn').textContent=isEdit?'Save Changes':'Create User';
+  document.getElementById('um_edit_pwd_note').style.display=isEdit?'block':'none';
+  document.getElementById('um_error').style.display='none';
+  document.getElementById('um_name').value=u?.name||'';
+  document.getElementById('um_email').value=u?.email||'';
+  document.getElementById('um_empid').value=u?.empid||'';
+  document.getElementById('um_dept').value=u?.dept||'';
+  document.getElementById('um_phone').value=u?.phone||'';
+  document.getElementById('um_role').value=u?.role||'';
+  document.getElementById('um_status').value=u?.status||'active';
+  document.getElementById('um_password').value='';
+  document.getElementById('um_password2').value='';
+  document.getElementById('um_colors').innerHTML=COLORS.map(c=>`
+    <div class="clr ${c===umClr?'sel':''}" style="background:${c}" onclick="umClr='${c}';document.querySelectorAll('#um_colors .clr').forEach(x=>x.classList.remove('sel'));this.classList.add('sel');updateUserPreview()"></div>
+  `).join('');
+  updateUserPreview();
+  openModal('userModal');
+}
+function editUser(id){ openUserModal(id); }
+function updateUserPreview(){
+  const name=document.getElementById('um_name').value.trim()||'New User';
+  const email=document.getElementById('um_email').value.trim()||'—';
+  const role=document.getElementById('um_role').value||'associate';
+  const rm=ROLE_META[role]||ROLE_META.associate;
+  const initStr=name.split(' ').map(x=>x[0]).slice(0,2).join('').toUpperCase()||'?';
+  document.getElementById('userAvatarPreview').textContent=initStr;
+  document.getElementById('userAvatarPreview').style.background=umClr;
+  document.getElementById('userNamePreview').textContent=name;
+  document.getElementById('userRolePreview').innerHTML=`<span class="badge" style="background:${rm.bg};color:${rm.c}">${rm.label}</span>`;
+  document.getElementById('userEmailPreview').textContent=email;
+}
+function toggleUmPwd(id){ const el=document.getElementById(id); el.type=el.type==='password'?'text':'password'; }
+function saveUser(){
+  const errEl=document.getElementById('um_error');
+  errEl.style.display='none';
+  const name=document.getElementById('um_name').value.trim();
+  const email=document.getElementById('um_email').value.trim().toLowerCase();
+  const role=document.getElementById('um_role').value;
+  const pwd=document.getElementById('um_password').value;
+  const pwd2=document.getElementById('um_password2').value;
+  const empid=document.getElementById('um_empid').value.trim();
+  const dept=document.getElementById('um_dept').value.trim();
+  const phone=document.getElementById('um_phone').value.trim();
+  const status=document.getElementById('um_status').value;
+  if(!name){ errEl.textContent='Full name is required.'; errEl.style.display='block'; return; }
+  if(!email||!email.includes('@')||!email.includes('.')){ errEl.textContent='A valid email address is required.'; errEl.style.display='block'; return; }
+  if(!role){ errEl.textContent='Please select a role.'; errEl.style.display='block'; return; }
+  const conflict=USERS.find(u=>u.email.toLowerCase()===email&&u.id!==editingUserId);
+  if(conflict){ errEl.textContent=`Email "${email}" is already used by ${conflict.name}.`; errEl.style.display='block'; return; }
+  if(editingUserId){
+    const u=USERS.find(x=>x.id===editingUserId);
+    if(!u){ errEl.textContent='User not found.'; errEl.style.display='block'; return; }
+    if(pwd||pwd2){
+      if(pwd.length<6){ errEl.textContent='Password must be at least 6 characters.'; errEl.style.display='block'; return; }
+      if(pwd!==pwd2){ errEl.textContent='Passwords do not match.'; errEl.style.display='block'; return; }
+      u.password=pwd;
+    }
+    u.name=name; u.email=email; u.role=role; u.empid=empid; u.dept=dept;
+    u.phone=phone; u.status=status; u.color=umClr;
+    u.initials=name.split(' ').map(x=>x[0]).slice(0,2).join('').toUpperCase();
+    toast(`✅ "${name}" updated successfully`,'var(--green)');
+  } else {
+    if(!pwd){ errEl.textContent='Password is required for new users.'; errEl.style.display='block'; return; }
+    if(pwd.length<6){ errEl.textContent='Password must be at least 6 characters.'; errEl.style.display='block'; return; }
+    if(pwd!==pwd2){ errEl.textContent='Passwords do not match.'; errEl.style.display='block'; return; }
+    const newUser={id:uid(),name,email,password:pwd,role,empid,dept,phone,status,color:umClr,
+      initials:name.split(' ').map(x=>x[0]).slice(0,2).join('').toUpperCase(),createdAt:TODAY,lastLogin:''};
+    DB.users.push(newUser); USERS=DB.users;
+    toast(`✅ "${name}" created — they can now log in`,'var(--green)');
+  }
+  saveDB(); closeModal('userModal'); renderAdminPage(); buildCredList();
+}
+
+// ══════════════════════════════════════════════
+// RENDER: MANAGER DASHBOARD
+// ══════════════════════════════════════════════
+function renderManagerDashboard(){
+  const tasks=allTasks();
+  const done=tasks.filter(t=>t.status==='Completed').length;
+  const ip=tasks.filter(t=>t.status==='In Progress').length;
+  const late=tasks.filter(t=>isLate(t.due)&&t.status!=='Completed').length;
+  const totalEst=tasks.reduce((s,t)=>s+(t.hours||0),0);
+  const totalAct=tasks.reduce((s,t)=>s+getActualHours(t.id),0);
+
+  document.getElementById('dashStats').innerHTML=`
+    <div class="sc sc-bl"><div class="sc-lbl">Projects</div><div class="sc-val">${DB.projects.length}</div><div class="sc-sub">Active</div></div>
+    <div class="sc sc-vl"><div class="sc-lbl">Total Tasks</div><div class="sc-val">${tasks.length}</div><div class="sc-sub">${done} done</div></div>
+    <div class="sc sc-gn"><div class="sc-lbl">Completed</div><div class="sc-val">${done}</div><div class="sc-sub">${tasks.length?Math.round(done/tasks.length*100):0}%</div></div>
+    <div class="sc sc-am"><div class="sc-lbl">In Progress</div><div class="sc-val">${ip}</div><div class="sc-sub">Active work</div></div>
+    <div class="sc sc-rd"><div class="sc-lbl">Overdue</div><div class="sc-val">${late}</div><div class="sc-sub">Need attention</div></div>
+    <div class="sc sc-cy"><div class="sc-lbl">Est. Hours</div><div class="sc-val">${totalEst}</div><div class="sc-sub">${totalAct.toFixed(0)} actual</div></div>
+    <div class="sc sc-pk"><div class="sc-lbl">Team</div><div class="sc-val">${USERS.length}</div><div class="sc-sub">Members</div></div>
+  `;
+
+  document.getElementById('projCards').innerHTML=DB.projects.map(p=>{
+    const pt=Object.values(p.buckets).flat();
+    const pd=pt.filter(t=>t.status==='Completed').length;
+    const pct=pt.length?Math.round(pd/pt.length*100):0;
+    const leads=(p.assignedLeads||[]).map(getUser).filter(Boolean);
+    const estH=pt.reduce((s,t)=>s+(t.hours||0),0);
+    const actH=pt.reduce((s,t)=>s+getActualHours(t.id),0);
+    return `<div class="proj-card" onclick="curPlannerProj='${p.id}';showPage('planner')">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:9px">
+        <div style="width:9px;height:9px;border-radius:50%;background:${p.color}"></div>
+        <div style="font-size:13px;font-weight:700;color:var(--white);flex:1">${p.name}</div>
+        <span class="badge b-asgn" style="font-size:9px">${p.type}</span>
+      </div>
+      <div style="font-size:10px;color:var(--muted);margin-bottom:8px">${p.account} · Due ${fmt(p.due)}</div>
+      <div style="display:flex;justify-content:space-between;font-size:10px;margin-bottom:4px">
+        <span style="color:var(--muted)">${pd}/${pt.length} tasks</span>
+        <span style="color:${pct>=100?'var(--green)':pct>50?'var(--teal)':'var(--amber)'}">${pct}%</span>
+      </div>
+      <div class="pb-wrap"><div class="pb-fill" style="width:${pct}%;background:${p.color}"></div></div>
+      <div style="margin-top:8px;display:flex;justify-content:space-between;align-items:center">
+        <div style="display:flex">${leads.map(u=>`<div style="width:20px;height:20px;border-radius:50%;background:${u.color};color:#fff;font-size:8px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid var(--surface);margin-left:-3px">${u.initials}</div>`).join('')}</div>
+        <div style="font-size:10px;color:var(--muted)"><span style="color:var(--text-dim)">Est:</span> ${estH}h <span style="color:var(--text-dim)">Act:</span> <span style="color:${actH>estH?'var(--red)':actH===0?'var(--muted)':'var(--green)'}">${actH.toFixed(1)}h</span></div>
+      </div>
+    </div>`;
+  }).join('');
+
+  const tbody=document.getElementById('dashTasksTbl');
+  tbody.innerHTML=allTasks().map((t,i)=>{
+    const p=DB.projects.find(x=>Object.values(x.buckets).flat().some(tt=>tt.id===t.id));
+    const lead=getUser(t.assignedLead);
+    const assoc=getUser(t.assignedAssociate);
+    const act=getActualHours(t.id);
+    const est=t.hours||0;
+    const delta=act-est;
+    const deltaColor=delta>0?'var(--red)':delta<0?'var(--amber)':'var(--green)';
+    return `<tr>
+      <td style="color:var(--muted);font-size:10px;font-family:'JetBrains Mono',monospace">${i+1}</td>
+      <td><div style="font-size:12px;font-weight:600;color:var(--white)">${t.title}</div></td>
+      <td><span class="badge" style="background:${p?.color||'#475569'}22;color:${p?.color||'#94a3b8'}">${p?.name||'—'}</span></td>
+      <td>${lead?avatarChip(lead):avEmpty()}</td>
+      <td>${assoc?avatarChip(assoc):avEmpty()}</td>
+      <td><span class="badge ${bcls(t.status)}">${t.status}</span></td>
+      <td style="font-size:10px;color:${isLate(t.due)&&t.status!=='Completed'?'var(--red)':'var(--muted)'}">${fmt(t.due)}</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted)">${est}h</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent)">${act.toFixed(1)}h</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:11px;color:${deltaColor};font-weight:700">${delta>0?'+':''}${delta.toFixed(1)}h</td>
+    </tr>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════
+// RENDER: KANBAN (Manager Planner)
+// ══════════════════════════════════════════════
+function renderPlanner(){
+  const sel=document.getElementById('plannerProjSel');
+  sel.innerHTML=DB.projects.map(p=>`<option value="${p.id}">${p.name}</option>`).join('');
+  if(curPlannerProj) sel.value=curPlannerProj; else curPlannerProj=sel.value;
+  renderKanban('kanbanBoard', curPlannerProj, true);
+}
+function onPlannerProjChange(){ curPlannerProj=document.getElementById('plannerProjSel').value; renderKanban('kanbanBoard',curPlannerProj,true); }
+
+function renderKanban(containerId, projId, managerMode){
+  const proj=getProject(projId);
+  const el=document.getElementById(containerId);
+  if(!proj){el.innerHTML='<div class="empty-state">No project selected</div>';return;}
+  const filterLeadId=(!managerMode && currentUser.role==='lead') ? currentUser.id : null;
+  el.innerHTML=Object.entries(proj.buckets).map(([bucket,allT])=>{
+    const tasks=filterLeadId?allT.filter(t=>t.assignedLead===filterLeadId):allT;
+    const bc=BUCKET_CLR[bucket]||'#475569';
+    return `<div class="kb-col" ondragover="event.preventDefault()" ondrop="dropTask(event,'${esc(bucket)}','${projId}','${containerId}')">
+      <div class="kb-head">
+        <div class="kb-title-row"><div class="kb-dot" style="background:${bc}"></div><span>${bucket}</span></div>
+        <div class="kb-cnt">${tasks.length}</div>
+      </div>
+      <div class="kb-body">
+        ${tasks.map(t=>taskCardHTML(t,proj,managerMode)).join('')}
+        ${managerMode?`<button class="kb-add-btn" onclick="openTaskModal('${esc(bucket)}')">+ Add task</button>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function taskCardHTML(t, project, editable){
+  const lead=getUser(t.assignedLead);
+  const assoc=getUser(t.assignedAssociate);
+  const act=getActualHours(t.id);
+  const est=t.hours||0;
+  const pct=est>0?Math.min(100,Math.round(act/est*100)):0;
+  const barColor=pct>=100?'var(--red)':pct>70?'var(--amber)':'var(--green)';
+  return `<div class="task-card" ${editable?`draggable="true" ondragstart="dragStart(event,'${t.id}')" ondragend="dragEnd(event)"`:''}
+    onclick="openTaskDetail('${t.id}')">
+    <div class="tc-top">
+      <span class="tc-type" style="background:${project.color}22;color:${project.color}">${t.type||'PR'}</span>
+      <span class="badge ${bcls(t.status)}" style="font-size:9px">${t.status}</span>
+      <div class="tc-prio" style="background:${PRIO_CLR[t.priority]||'#475569'}"></div>
+    </div>
+    <div class="tc-title">${t.title}</div>
+    ${t.initiated?`<div class="tc-row"><strong>Initiated:</strong>${t.initiated}</div>`:''}
+    ${lead?`<div class="tc-row"><strong>Lead:</strong><span style="color:${lead.color}">${lead.name}</span></div>`:''}
+    ${assoc?`<div class="tc-row"><strong>Assoc.:</strong><span style="color:${assoc.color}">${assoc.name}</span></div>`:''}
+    ${t.due?`<div class="tc-row"><strong>Due:</strong><span style="color:${isLate(t.due)&&t.status!=='Completed'?'var(--red)':'inherit'}">${fmt(t.due)}</span></div>`:''}
+    ${t.leadRemark?`<div class="tc-row"><strong>Lead note:</strong>${t.leadRemark.slice(0,48)}${t.leadRemark.length>48?'…':''}</div>`:''}
+    ${t.userRemark?`<div class="tc-row"><strong>Remark:</strong>${t.userRemark.slice(0,48)}${t.userRemark.length>48?'…':''}</div>`:''}
+    <div class="tc-bottom">
+      <div class="hrs-compare">
+        <span class="hrs-assigned">${est}h est</span>
+        <span style="color:var(--text-dim)">·</span>
+        <span class="hrs-actual ${act>est?'hrs-over':act===est&&act>0?'hrs-exact':'hrs-under'}">${act.toFixed(1)}h actual</span>
+      </div>
+    </div>
+    <div class="hrs-bar-wrap"><div class="hrs-bar-fill" style="width:${pct}%;background:${barColor}"></div></div>
+    ${editable&&currentUser.role==='manager'?`<div style="display:flex;gap:4px;margin-top:7px">
+      <button class="btn-success" style="font-size:9px;padding:2px 8px" onclick="event.stopPropagation();editTask('${t.id}')">Edit</button>
+      <button class="btn-danger" style="font-size:9px;padding:2px 8px" onclick="event.stopPropagation();deleteTask('${t.id}')">Del</button>
+    </div>`:''}
+  </div>`;
+}
+
+function avatarChip(u){ return `<div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text)"><div style="width:18px;height:18px;border-radius:50%;background:${u.color};color:#fff;font-size:7px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">${u.initials}</div>${u.name}</div>`; }
+function avEmpty(){ return '<span style="color:var(--text-dim);font-size:11px">—</span>'; }
+
+// Drag & Drop
+function dragStart(e,id){ dragId=id; setTimeout(()=>{ const c=document.querySelector('.task-card.dragging'); if(c) c.classList.remove('dragging'); },0); e.target.classList.add('dragging'); }
+function dragEnd(e){ e.target.classList.remove('dragging'); dragId=null; }
+function dropTask(e,bucket,projId,containerId){
+  e.preventDefault(); if(!dragId) return;
+  const proj=getProject(projId); if(!proj) return;
+  let moved=null;
+  Object.entries(proj.buckets).forEach(([b,tasks])=>{
+    const i=tasks.findIndex(t=>t.id===dragId);
+    if(i!==-1){ moved=tasks.splice(i,1)[0]; }
+  });
+  if(moved){
+    const newStatus=BUCKET_STATUS[bucket]||moved.status;
+    mutateTask(moved.id,{status:newStatus});
+    // put back if mutateTask moved it
+    if(!Object.values(proj.buckets).flat().find(t=>t.id===moved.id)){
+      proj.buckets[bucket].push(moved);
+    }
+    saveDB();
+    renderKanban(containerId,projId,currentUser.role==='manager');
+    toast(`Moved → "${bucket}"`,BUCKET_CLR[bucket]||'var(--teal)');
+  }
+}
+function deleteTask(id){
+  if(!confirm('Delete this task?')) return;
+  DB.projects.forEach(p=>Object.entries(p.buckets).forEach(([b,tasks])=>{
+    const i=tasks.findIndex(t=>t.id===id); if(i!==-1) tasks.splice(i,1);
+  }));
+  DB.assocAssignments=DB.assocAssignments.filter(a=>a.task!==id);
+  DB.leadAssignments=DB.leadAssignments.filter(a=>a.task!==id);
+  saveDB(); refreshAll(); toast('Task deleted','var(--red)');
+}
+function editTask(id){
+  const found=findTask(id); if(!found) return;
+  curPlannerProj=found.project.id;
+  openTaskModal(found.bucket,found.task);
+}
+function addBucketPrompt(){
+  const n=prompt('Bucket name:'); if(!n) return;
+  const proj=getProject(curPlannerProj); if(!proj) return;
+  if(proj.buckets[n]){toast('Bucket exists','var(--amber)');return;}
+  proj.buckets[n]=[]; saveDB(); renderKanban('kanbanBoard',curPlannerProj,true);
+}
+
+// ══════════════════════════════════════════════
+// RENDER: LEAD ASSIGN TABLE (Manager → Lead)
+// ══════════════════════════════════════════════
+function renderLeadAssignPage(){
+  const rows=DB.leadAssignments;
+  document.getElementById('laEmpty').style.display=rows.length?'none':'block';
+  document.getElementById('leadAssignTbl').innerHTML=rows.map((r,i)=>{
+    const proj=getProject(r.project);
+    const lead=getUser(r.assignedLead);
+    const found=findTask(r.task);
+    const task=found?.task;
+    const act=task?getActualHours(r.task):0;
+    const est=task?.hours||0;
+    const delta=act-est;
+    return `<tr>
+      <td style="color:var(--muted);font-size:10px">${i+1}</td>
+      <td style="font-size:10px">${fmt(r.date)}</td>
+      <td>${proj?`<span class="badge" style="background:${proj.color}22;color:${proj.color}">${proj.name}</span>`:'—'}</td>
+      <td style="font-size:12px;font-weight:600;color:var(--white)">${task?.title||r.task}</td>
+      <td>${lead?avatarChip(lead):avEmpty()}</td>
+      <td style="font-size:10px;color:var(--muted)">${r.initiated||'—'}</td>
+      <td style="font-size:10px;color:${isLate(task?.due)?'var(--red)':'var(--muted)'}">${fmt(task?.due)}</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted)">${est}h</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:11px;color:${act>est?'var(--red)':'var(--accent)'}">${act.toFixed(1)}h</td>
+      <td><span class="badge ${bcls(task?.status||r.status)}">${task?.status||r.status}</span></td>
+      <td style="font-size:10px;color:var(--muted);max-width:120px">${r.remark||'—'}</td>
+      <td><select class="tbl-sel" onchange="updateLaStatus('${r.id}',this.value)">
+        ${['Assigned','In Progress','On Hold','Completed'].map(s=>`<option ${(task?.status||r.status)===s?'selected':''}>${s}</option>`).join('')}
+      </select></td>
+    </tr>`;
+  }).join('');
+}
+function updateLaStatus(id,status){
+  const r=DB.leadAssignments.find(x=>x.id===id); if(!r) return;
+  r.status=status;
+  mutateTask(r.task,{status});
+  refreshAll(); toast('Status updated');
+}
+
+// ══════════════════════════════════════════════
+// RENDER: HOURS REPORT
+// ══════════════════════════════════════════════
+function renderHoursReport(){
+  const dateLabel=ovDate==='all'?'All Time':new Date(ovDate+'T00:00:00').toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+  document.getElementById('ovDateLbl').textContent=dateLabel;
+
+  const associates=USERS.filter(u=>u.role==='associate');
+  let totalEst=0,totalAct=0,overCount=0,underCount=0;
+
+  document.getElementById('assocHrsGrid').innerHTML=associates.map(u=>{
+    const tasks=myTasks(u);
+    if(!tasks.length) return '';
+    let uEst=0,uAct=0;
+    const rows=tasks.map(t=>{
+      const entries=DB.trackerEntries.filter(e=>e.taskId===t.id&&e.userId===u.id&&e.submitted&&(ovDate==='all'||e.date===ovDate));
+      const act=entries.reduce((s,e)=>s+e.hours,0);
+      const est=t.hours||0;
+      uEst+=est; uAct+=act;
+      totalEst+=est; totalAct+=act;
+      const diff=act-est;
+      if(act>est) overCount++;
+      else if(act>0&&act<est) underCount++;
+      const pct=est>0?Math.min(100,Math.round(act/est*100)):0;
+      const barClr=pct>=100?'var(--red)':pct>70?'var(--amber)':'var(--green)';
+      const proj=DB.projects.find(p=>Object.values(p.buckets).flat().some(tt=>tt.id===t.id));
+      return `<div class="aht-row">
+        <div class="aht-task">
+          <div>${t.title}</div>
+          <div style="font-size:9px;color:var(--muted)">${proj?.name||''}</div>
+          <div class="over-bar" style="width:${pct}%;background:${barClr}"></div>
+        </div>
+        <div style="font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace;text-align:right">${est}h</div>
+        <div style="font-size:11px;font-family:'JetBrains Mono',monospace;text-align:right;color:${act>est?'var(--red)':act===0?'var(--muted)':'var(--accent)'};font-weight:700">${act.toFixed(1)}h</div>
+        <div style="font-size:11px;font-family:'JetBrains Mono',monospace;text-align:right;color:${diff>0?'var(--red)':diff<0?'var(--amber)':'var(--green)'};font-weight:700">${diff>0?'+':''}${diff.toFixed(1)}</div>
+      </div>`;
+    }).join('');
+
+    return `<div class="aht-card">
+      <div class="aht-head">
+        <div class="aht-name"><div class="dc-av" style="background:${u.color}">${u.initials}</div>${u.name}</div>
+        <div class="aht-summary">
+          <span style="color:var(--muted)">Est: <span style="color:var(--text);font-family:'JetBrains Mono',monospace">${uEst}h</span></span>
+          <span style="color:var(--muted)">Actual: <span style="font-family:'JetBrains Mono',monospace;color:${uAct>uEst?'var(--red)':'var(--accent)'};font-weight:700">${uAct.toFixed(1)}h</span></span>
+        </div>
+      </div>
+      <div class="aht-head-row"><div>Task</div><div style="text-align:right">Est</div><div style="text-align:right">Actual</div><div style="text-align:right">Δ</div></div>
+      ${rows}
+    </div>`;
+  }).filter(Boolean).join('');
+
+  document.getElementById('hrsStats').innerHTML=`
+    <div class="sc sc-bl"><div class="sc-lbl">Total Est. Hours</div><div class="sc-val">${totalEst}</div><div class="sc-sub">Across all tasks</div></div>
+    <div class="sc sc-cy"><div class="sc-lbl">Actual Worked</div><div class="sc-val">${totalAct.toFixed(0)}</div><div class="sc-sub">${totalEst?Math.round(totalAct/totalEst*100):0}% utilisation</div></div>
+    <div class="sc sc-rd"><div class="sc-lbl">Over Estimate</div><div class="sc-val">${overCount}</div><div class="sc-sub">Tasks over allocated</div></div>
+    <div class="sc sc-am"><div class="sc-lbl">Under Estimate</div><div class="sc-val">${underCount}</div><div class="sc-sub">Tasks in progress</div></div>
+  `;
+}
+
+// ══════════════════════════════════════════════
+// RENDER: DAILY OVERVIEW
+// ══════════════════════════════════════════════
+function changeOvDay(dir){
+  if(ovDate==='all') ovDate=TODAY;
+  const d=new Date(ovDate+'T00:00:00'); d.setDate(d.getDate()+dir);
+  ovDate=d.toISOString().split('T')[0];
+  if(currentPage==='hours-report') renderHoursReport();
+  if(currentPage==='daily-overview') renderDailyOverview();
+}
+function renderDailyOverview(){
+  const lbl=new Date(ovDate+'T00:00:00').toLocaleDateString('en-US',{weekday:'long',month:'short',day:'numeric',year:'numeric'});
+  document.getElementById('ovDateLbl2').textContent=lbl;
+  const associates=currentUser.role==='lead'
+    ? USERS.filter(u=>u.role==='associate'&&DB.assocAssignments.some(a=>a.lead===currentUser.id&&a.associate===u.id))
+    : USERS.filter(u=>u.role==='associate');
+
+  document.getElementById('dailyGrid').innerHTML=associates.map(u=>{
+    const entries=DB.trackerEntries.filter(e=>e.userId===u.id&&e.date===ovDate&&e.submitted);
+    const total=entries.reduce((s,e)=>s+e.hours,0);
+    const rows=entries.map(e=>{
+      const found=findTask(e.taskId);
+      if(!found) return '';
+      const {task,project}=found;
+      return `<div class="dc-row">
+        <div class="dc-task">
+          <div>${task.title}</div>
+          <div style="margin-top:3px;display:flex;gap:5px;align-items:center">
+            <span class="badge ${bcls(e.status)}" style="font-size:9px">${e.status}</span>
+            <span style="font-size:9px;color:${project.color}">${project.name}</span>
+          </div>
+          ${e.remark?`<div style="font-size:10px;color:var(--muted);margin-top:2px">${e.remark}</div>`:''}
+        </div>
+        <div class="dc-hrs-box">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--accent)">${e.hours}h</div>
+          <div style="font-size:9px;color:var(--muted);margin-top:2px">${e.submitted?'✓ submitted':''}</div>
+        </div>
+      </div>`;
+    }).join('');
+
+    return `<div class="daily-card">
+      <div class="dc-head">
+        <div class="dc-name"><div class="dc-av" style="background:${u.color}">${u.initials}</div>${u.name}</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:var(--accent)">${total.toFixed(1)}h</div>
+      </div>
+      ${rows||'<div class="empty-state" style="padding:18px;font-size:11px">No entries for this date</div>'}
+      <div class="dc-foot">
+        <span style="color:var(--muted)">${entries.length} task${entries.length!==1?'s':''} logged</span>
+        <span style="color:${total>=8?'var(--green)':total>=4?'var(--amber)':'var(--red)'};font-weight:700">${total>=8?'✓ Full Day':total>=4?'Half Day':'Low Hours'}</span>
+      </div>
+    </div>`;
+  }).join('')||'<div class="empty-state">No associates found</div>';
+}
+
+// ══════════════════════════════════════════════
+// RENDER: LEAD DASHBOARD
+// ══════════════════════════════════════════════
+function renderLeadDashboard(){
+  const projs=myProjects(currentUser);
+  const tasks=myTasks(currentUser);
+  const done=tasks.filter(t=>t.status==='Completed').length;
+  const ip=tasks.filter(t=>t.status==='In Progress').length;
+  const late=tasks.filter(t=>isLate(t.due)&&t.status!=='Completed').length;
+  const estH=tasks.reduce((s,t)=>s+(t.hours||0),0);
+  const actH=tasks.reduce((s,t)=>s+getActualHours(t.id),0);
+
+  document.getElementById('leadStats').innerHTML=`
+    <div class="sc sc-bl"><div class="sc-lbl">My Projects</div><div class="sc-val">${projs.length}</div></div>
+    <div class="sc sc-vl"><div class="sc-lbl">My Tasks</div><div class="sc-val">${tasks.length}</div></div>
+    <div class="sc sc-gn"><div class="sc-lbl">Completed</div><div class="sc-val">${done}</div></div>
+    <div class="sc sc-am"><div class="sc-lbl">In Progress</div><div class="sc-val">${ip}</div></div>
+    <div class="sc sc-rd"><div class="sc-lbl">Overdue</div><div class="sc-val">${late}</div></div>
+    <div class="sc sc-cy"><div class="sc-lbl">Est. vs Actual</div><div class="sc-val">${actH.toFixed(0)}</div><div class="sc-sub">of ${estH}h est.</div></div>
+  `;
+
+  document.getElementById('leadProjCards').innerHTML=projs.map(p=>{
+    const pt=Object.values(p.buckets).flat().filter(t=>t.assignedLead===currentUser.id);
+    const pd=pt.filter(t=>t.status==='Completed').length;
+    const pct=pt.length?Math.round(pd/pt.length*100):0;
+    const actH=pt.reduce((s,t)=>s+getActualHours(t.id),0);
+    const estH=pt.reduce((s,t)=>s+(t.hours||0),0);
+    return `<div class="proj-card">
+      <div style="display:flex;align-items:center;gap:7px;margin-bottom:8px">
+        <div style="width:8px;height:8px;border-radius:50%;background:${p.color}"></div>
+        <div style="font-size:13px;font-weight:700;color:var(--white)">${p.name}</div>
+      </div>
+      <div style="font-size:10px;color:var(--muted);margin-bottom:7px">${p.account} · Due ${fmt(p.due)}</div>
+      <div style="display:flex;justify-content:space-between;font-size:10px;margin-bottom:4px">
+        <span style="color:var(--muted)">My tasks: ${pt.length} (${pd} done)</span><span style="color:${pct>=100?'var(--green)':'var(--amber)'}">${pct}%</span>
+      </div>
+      <div class="pb-wrap"><div class="pb-fill" style="width:${pct}%;background:${p.color}"></div></div>
+      <div style="margin-top:7px;font-size:10px;color:var(--muted)">Est: ${estH}h · Actual: <span style="color:${actH>estH?'var(--red)':'var(--accent)'}">${actH.toFixed(1)}h</span></div>
+    </div>`;
+  }).join('')||'<div class="empty-state" style="padding:20px">No projects assigned yet</div>';
+
+  const psel=document.getElementById('leadBoardProjSel');
+  psel.innerHTML=projs.map(p=>`<option value="${p.id}">${p.name}</option>`).join('');
+  if(projs.length) renderLeadBoard();
+}
+function renderLeadBoard(){
+  const pid=document.getElementById('leadBoardProjSel').value;
+  renderKanban('leadKanban',pid,false);
+}
+
+// ══════════════════════════════════════════════
+// RENDER: ASSOC ASSIGNMENT TABLE (Lead → Associate)
+// ══════════════════════════════════════════════
+function renderAssocAssignPage(){
+  const rows=DB.assocAssignments.filter(a=>currentUser.role==='manager'||a.lead===currentUser.id);
+  document.getElementById('aaEmpty').style.display=rows.length?'none':'block';
+  document.getElementById('assocAssignTbl').innerHTML=rows.map((r,i)=>{
+    const proj=getProject(r.project);
+    const assoc=getUser(r.associate);
+    const lead=getUser(r.lead);
+    const found=findTask(r.task);
+    const task=found?.task;
+    const act=task?getActualHours(r.task):0;
+    const est=task?.hours||0;
+    return `<tr>
+      <td style="color:var(--muted);font-size:10px">${i+1}</td>
+      <td style="font-size:10px">${fmt(r.date)}</td>
+      <td>${proj?`<span class="badge" style="background:${proj.color}22;color:${proj.color}">${proj.name}</span>`:'—'}</td>
+      <td style="font-size:12px;font-weight:600;color:var(--white)">${task?.title||r.task}</td>
+      <td>${assoc?avatarChip(assoc):avEmpty()}</td>
+      <td>${lead?avatarChip(lead):avEmpty()}</td>
+      <td style="font-size:10px;color:${isLate(task?.due)?'var(--red)':'var(--muted)'}">${fmt(task?.due)}</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted)">${est}h</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:11px;color:${act>est?'var(--red)':'var(--accent)'}">${act.toFixed(1)}h</td>
+      <td><span class="badge ${bcls(task?.status||r.status)}">${task?.status||r.status}</span></td>
+      <td style="font-size:10px;color:var(--muted)">${r.remark||'—'}</td>
+      <td><select class="tbl-sel" onchange="updateAaStatus('${r.id}',this.value)">
+        ${['Assigned','In Progress','On Hold','Completed'].map(s=>`<option ${(task?.status||r.status)===s?'selected':''}>${s}</option>`).join('')}
+      </select></td>
+    </tr>`;
+  }).join('');
+}
+function updateAaStatus(id,status){
+  const r=DB.assocAssignments.find(x=>x.id===id); if(!r) return;
+  r.status=status;
+  mutateTask(r.task,{status});
+  refreshAll(); toast('Status updated');
+}
+
+// ══════════════════════════════════════════════
+// RENDER: MY TASKS (Associate view)
+// ══════════════════════════════════════════════
+function renderMyTasks(){
+  const tasks=myTasks(currentUser);
+  const done=tasks.filter(t=>t.status==='Completed').length;
+  const ip=tasks.filter(t=>t.status==='In Progress').length;
+  const late=tasks.filter(t=>isLate(t.due)&&t.status!=='Completed').length;
+  const totalEst=tasks.reduce((s,t)=>s+(t.hours||0),0);
+  const totalAct=tasks.reduce((s,t)=>s+getActualHours(t.id),0);
+
+  document.getElementById('assocStats').innerHTML=`
+    <div class="sc sc-bl"><div class="sc-lbl">My Tasks</div><div class="sc-val">${tasks.length}</div></div>
+    <div class="sc sc-am"><div class="sc-lbl">In Progress</div><div class="sc-val">${ip}</div></div>
+    <div class="sc sc-gn"><div class="sc-lbl">Completed</div><div class="sc-val">${done}</div></div>
+    <div class="sc sc-rd"><div class="sc-lbl">Overdue</div><div class="sc-val">${late}</div></div>
+    <div class="sc sc-cy"><div class="sc-lbl">Actual / Est</div><div class="sc-val">${totalAct.toFixed(0)}</div><div class="sc-sub">of ${totalEst}h assigned</div></div>
+  `;
+
+  // Group by status buckets
+  const buckets={'Not Started':[],'In Progress':[],'Review':[],'Completed':[],'On Hold':[]};
+  tasks.forEach(t=>{ (buckets[t.status]||buckets['Not Started']).push({task:t}); });
+
+  document.getElementById('assocKanban').innerHTML=Object.entries(buckets).map(([status,items])=>{
+    const bc=STATUS_CLR[status]||'#475569';
+    return `<div class="kb-col">
+      <div class="kb-head"><div class="kb-title-row"><div class="kb-dot" style="background:${bc}"></div>${status}</div><div class="kb-cnt">${items.length}</div></div>
+      <div class="kb-body">
+        ${items.map(({task:t})=>{
+          const proj=DB.projects.find(p=>Object.values(p.buckets).flat().some(tt=>tt.id===t.id));
+          if(!proj) return '';
+          return taskCardHTML(t,proj,false);
+        }).join('')}
+        ${!items.length?'<div style="font-size:11px;color:var(--muted);padding:14px;text-align:center">Empty</div>':''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════
+// TASK DETAIL MODAL — updates propagate everywhere
+// ══════════════════════════════════════════════
+function openTaskDetail(taskId){
+  const found=findTask(taskId); if(!found) return;
+  selectedTaskId=taskId;
+  const {task,project}=found;
+  const lead=getUser(task.assignedLead);
+  const assoc=getUser(task.assignedAssociate);
+  const act=getActualHours(taskId);
+  const est=task.hours||0;
+  const diff=act-est;
+  const pct=est>0?Math.min(100,Math.round(act/est*100)):0;
+  const barClr=pct>=100?'var(--red)':pct>70?'var(--amber)':'var(--green)';
+
+  document.getElementById('tdm_title').textContent=task.title;
+  document.getElementById('tdm_info').innerHTML=`
+    <div class="info-row"><strong>Project:</strong><span class="badge" style="background:${project.color}22;color:${project.color}">${project.name}</span></div>
+    <div class="info-row"><strong>Type:</strong>${task.type||'PR'}</div>
+    ${task.initiated?`<div class="info-row"><strong>Initiated:</strong>${task.initiated}</div>`:''}
+    ${lead?`<div class="info-row"><strong>Lead:</strong><span style="color:${lead.color}">${lead.name}</span></div>`:''}
+    ${assoc?`<div class="info-row"><strong>Associate:</strong><span style="color:${assoc.color}">${assoc.name}</span></div>`:''}
+    <div class="info-row"><strong>Due:</strong><span style="color:${isLate(task.due)&&task.status!=='Completed'?'var(--red)':'inherit'}">${fmt(task.due)}</span></div>
+    ${task.desc?`<div class="info-row"><strong>Desc:</strong>${task.desc}</div>`:''}
+    ${task.leadRemark?`<div class="info-row"><strong>Lead note:</strong>${task.leadRemark}</div>`:''}
+    <div class="info-row"><strong>Status:</strong><span class="badge ${bcls(task.status)}">${task.status}</span></div>
+    <div style="margin-top:10px;padding:10px;background:var(--navy3);border-radius:8px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:11px">
+        <span style="color:var(--muted)">Hours Progress</span>
+        <span style="font-family:'JetBrains Mono',monospace;font-weight:700;color:${diff>0?'var(--red)':diff<0?'var(--amber)':'var(--green)'}">
+          ${act.toFixed(1)}h actual / ${est}h assigned (${diff>0?'+':''}${diff.toFixed(1)}h)
+        </span>
+      </div>
+      <div class="hrs-bar-wrap" style="height:6px"><div class="hrs-bar-fill" style="width:${pct}%;background:${barClr}"></div></div>
+    </div>
+  `;
+  document.getElementById('tdm_status').value=task.status;
+  document.getElementById('tdm_hours').value='';
+  document.getElementById('tdm_remark').value=task.userRemark||'';
+  document.getElementById('tdm_hrs_summary').innerHTML='';
+  openModal('taskDetailModal');
+}
+
+function submitTaskUpdate(){
+  const found=findTask(selectedTaskId); if(!found) return;
+  const {task}=found;
+  const newStatus=document.getElementById('tdm_status').value;
+  const hours=parseFloat(document.getElementById('tdm_hours').value)||0;
+  const remark=document.getElementById('tdm_remark').value.trim();
+
+  mutateTask(selectedTaskId,{
+    status:newStatus,
+    userRemark:remark||undefined,
+    hoursToAdd:hours>0?hours:undefined,
+    submittedByUserId:currentUser.id
+  });
+
+  closeModal('taskDetailModal');
+  toast(`Updated → ${newStatus} ${hours>0?`(+${hours}h logged)`:''} `, STATUS_CLR[newStatus]||'var(--teal)');
+  refreshAll();
+}
+
+// ══════════════════════════════════════════════
+// DAILY TRACKER (Associate)
+// ══════════════════════════════════════════════
+function renderTracker(){
+  const projs=myProjects(currentUser);
+  document.getElementById('trackDate').value=TODAY;
+  document.getElementById('trackAssoc').value=currentUser.name;
+  const psel=document.getElementById('trackProj');
+  psel.innerHTML=projs.map(p=>`<option value="${p.id}">${p.name}</option>`).join('');
+  populateTrackTask();
+  renderSubmittedTrackerRows();
+}
+function populateTrackTask(){
+  const pid=document.getElementById('trackProj')?.value; if(!pid) return;
+  const tasks=myTasks(currentUser).filter(t=>{
+    const p=DB.projects.find(x=>Object.values(x.buckets).flat().some(tt=>tt.id===t.id));
+    return p?.id===pid;
+  });
+  document.getElementById('trackTask').innerHTML=tasks.map(t=>`<option value="${t.id}">${t.title}</option>`).join('')||'<option value="">No tasks</option>';
+}
+function addTrackerRow(){
+  const pid=document.getElementById('trackProj').value;
+  const taskId=document.getElementById('trackTask').value;
+  if(!taskId){toast('Select a task','var(--amber)');return;}
+  const found=findTask(taskId); if(!found) return;
+  const {task,project}=found;
+  const rowId=uid();
+  const tbody=document.getElementById('trackerTbl');
+  const prevRows=tbody.querySelectorAll('tr[data-new]').length;
+  const tr=document.createElement('tr'); tr.id='tr-'+rowId; tr.setAttribute('data-new','1');
+  tr.innerHTML=`
+    <td style="color:var(--muted);font-size:10px;font-family:'JetBrains Mono',monospace">${tbody.children.length+1}</td>
+    <td><div style="font-size:12px;font-weight:600;color:var(--white)">${task.title}</div><div style="font-size:9px;color:var(--muted)">Est: ${task.hours||0}h</div></td>
+    <td><span class="badge" style="background:${project.color}22;color:${project.color}">${project.name}</span></td>
+    <td style="font-size:10px;color:var(--muted)">${task.initiated||'—'}</td>
+    <td style="font-size:10px;white-space:nowrap">${fmt(task.start)}</td>
+    <td style="font-size:10px;white-space:nowrap;color:${isLate(task.due)?'var(--red)':'var(--muted)'}">${fmt(task.due)}</td>
+    <td style="font-size:11px">${currentUser.name}</td>
+    <td><input class="tbl-inp hrs-inp" type="number" min="0" max="24" step="0.5" placeholder="0" data-taskid="${taskId}" data-rowid="${rowId}" oninput="recalcHrs()"></td>
+    <td><select class="tbl-sel" data-taskid="${taskId}" data-rowid="${rowId}" style="min-width:120px">
+      <option ${task.status==='Not Started'?'selected':''}>Not Started</option>
+      <option ${task.status==='In Progress'?'selected':''}>In Progress</option>
+      <option ${task.status==='Completed'?'selected':''}>Completed</option>
+      <option ${task.status==='On Hold'?'selected':''}>On Hold</option>
+    </select></td>
+    <td><input class="tbl-inp" placeholder="What did you work on?" style="min-width:130px"></td>
+    <td><button class="btn-success" onclick="submitTrackerRow(this,'${rowId}','${taskId}','${pid}')">Submit</button></td>
+  `;
+  tbody.appendChild(tr);
+  recalcHrs();
+}
+function renderSubmittedTrackerRows(){
+  const entries=DB.trackerEntries.filter(e=>e.userId===currentUser.id&&e.date===TODAY&&e.submitted);
+  const tbody=document.getElementById('trackerTbl');
+  // Remove old submitted rows
+  tbody.querySelectorAll('tr[data-submitted]').forEach(r=>r.remove());
+  // Prepend submitted rows at top
+  entries.forEach((e,i)=>{
+    const found=findTask(e.taskId); if(!found) return;
+    const {task,project}=found;
+    const tr=document.createElement('tr'); tr.setAttribute('data-submitted','1');
+    tr.innerHTML=`
+      <td style="color:var(--muted);font-size:10px;font-family:'JetBrains Mono',monospace">✓</td>
+      <td style="font-size:12px;font-weight:600;color:var(--white)">${task.title}<div style="font-size:9px;color:var(--muted)">Est: ${task.hours||0}h</div></td>
+      <td><span class="badge" style="background:${project.color}22;color:${project.color}">${project.name}</span></td>
+      <td style="font-size:10px;color:var(--muted)">${task.initiated||'—'}</td>
+      <td style="font-size:10px">${fmt(task.start)}</td>
+      <td style="font-size:10px;color:${isLate(task.due)?'var(--red)':'var(--muted)'}">${fmt(task.due)}</td>
+      <td style="font-size:11px">${currentUser.name}</td>
+      <td style="font-family:'JetBrains Mono',monospace;color:var(--accent);font-weight:700">${e.hours}h</td>
+      <td><span class="badge ${bcls(e.status)}">${e.status}</span></td>
+      <td style="font-size:10px;color:var(--muted)">${e.remark||'—'}</td>
+      <td><span style="color:var(--green);font-size:12px;font-weight:700">✓ Submitted</span></td>
+    `;
+    tbody.insertBefore(tr, tbody.firstChild);
+  });
+  recalcHrs();
+}
+function submitTrackerRow(btn,rowId,taskId,projId){
+  const row=document.getElementById('tr-'+rowId); if(!row) return;
+  const hrsInp=row.querySelector('.hrs-inp');
+  const statusSel=row.querySelector('select');
+  const remarkInp=row.querySelector('input:not(.hrs-inp)');
+  const hours=parseFloat(hrsInp?.value)||0;
+  const status=statusSel?.value||'In Progress';
+  const remark=remarkInp?.value||'';
+
+  // Core mutation — updates task status, actualHours, assocAssignments, leadAssignments, creates tracker entry
+  mutateTask(taskId,{
+    status, userRemark:remark||undefined,
+    hoursToAdd:hours, submittedByUserId:currentUser.id
+  });
+
+  // Lock row UI
+  row.querySelectorAll('input,select').forEach(el=>{el.disabled=true;});
+  btn.textContent='✓ Submitted'; btn.disabled=true; btn.style.background='rgba(34,197,94,.08)';
+  toast('Logged & synced to lead + manager ✓','var(--green)');
+  recalcHrs();
+}
+function recalcHrs(){
+  let newHrs=0;
+  document.querySelectorAll('.hrs-inp').forEach(inp=>{
+    const v=parseFloat(inp.value)||0; newHrs+=v;
+    inp.classList.toggle('hrs-low',v>0&&v<4);
+  });
+  const submittedHrs=DB.trackerEntries.filter(e=>e.userId===currentUser?.id&&e.date===TODAY&&e.submitted).reduce((s,e)=>s+e.hours,0);
+  const done=DB.trackerEntries.filter(e=>e.userId===currentUser?.id&&e.date===TODAY&&e.status==='Completed').length;
+  const subCount=DB.trackerEntries.filter(e=>e.userId===currentUser?.id&&e.date===TODAY&&e.submitted).length;
+  document.getElementById('totalHrs').textContent=(newHrs+submittedHrs).toFixed(1);
+  document.getElementById('completedCnt').textContent=done;
+  document.getElementById('submittedCnt').textContent=subCount;
+}
+
+// ══════════════════════════════════════════════
+// RENDER: TEAM
+// ══════════════════════════════════════════════
+function renderTeam(){
+  document.getElementById('teamGrid').innerHTML=USERS.map(u=>{
+    const tasks=myTasks(u);
+    const done=tasks.filter(t=>t.status==='Completed').length;
+    const totalAct=tasks.reduce((s,t)=>s+getActualHours(t.id),0);
+    const totalEst=tasks.reduce((s,t)=>s+(t.hours||0),0);
+    const subCount=DB.trackerEntries.filter(e=>e.userId===u.id&&e.submitted).length;
+    return `<div class="team-card">
+      <div class="tc-head">
+        <div class="tc-avt" style="background:${u.color}">${u.initials}</div>
+        <div><div style="font-size:13px;font-weight:700;color:var(--white)">${u.name}</div><div style="margin-top:3px"><span class="role-tag role-${u.role}">${u.role}</span></div></div>
+      </div>
+      ${tasks.slice(0,3).map(t=>{
+        const act=getActualHours(t.id);
+        const est=t.hours||0;
+        return `<div style="display:flex;align-items:center;gap:5px;padding:5px 0;border-bottom:1px solid rgba(30,58,95,.28);font-size:11px">
+          <div style="width:5px;height:5px;border-radius:50%;background:${STATUS_CLR[t.status]||'#475569'};flex-shrink:0"></div>
+          <span style="flex:1;color:var(--text)">${t.title}</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted)">${act.toFixed(0)}/${est}h</span>
+          <span class="badge ${bcls(t.status)}" style="font-size:9px">${t.status}</span>
+        </div>`;
+      }).join('')}
+      ${tasks.length>3?`<div style="font-size:9px;color:var(--muted);padding:4px 0">+${tasks.length-3} more</div>`:''}
+      <div class="tc-metrics">
+        <div><div class="tc-met-val" style="color:var(--teal)">${tasks.length}</div><div class="tc-met-lbl">Assigned</div></div>
+        <div><div class="tc-met-val" style="color:var(--green)">${done}</div><div class="tc-met-lbl">Done</div></div>
+        <div><div class="tc-met-val" style="color:${totalAct>totalEst?'var(--red)':'var(--accent)'}">${totalAct.toFixed(0)}h</div><div class="tc-met-lbl">Actual</div></div>
+        <div><div class="tc-met-val" style="color:var(--muted)">${totalEst}h</div><div class="tc-met-lbl">Est.</div></div>
+        <div><div class="tc-met-val" style="color:var(--amber)">${subCount}</div><div class="tc-met-lbl">Logged</div></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════
+// MODALS
+// ══════════════════════════════════════════════
+let selClr=COLORS[0];
+
+function openModal(id){ document.getElementById(id).classList.add('open'); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+function bgClose(e,id){ if(e.target.id===id) closeModal(id); }
+
+// Project
+function openProjModal(){
+  selClr=COLORS[0];
+  ['pm_name','pm_account','pm_desc','pm_start','pm_due'].forEach(x=>{ const el=document.getElementById(x); if(el) el.value=''; });
+  document.getElementById('pm_colors').innerHTML=COLORS.map(c=>`<div class="clr ${c===selClr?'sel':''}" style="background:${c}" onclick="selClr='${c}';document.querySelectorAll('.clr').forEach(x=>x.classList.remove('sel'));this.classList.add('sel')"></div>`).join('');
+  document.getElementById('pm_leads').innerHTML=USERS.filter(u=>u.role==='lead').map(u=>`<option value="${u.id}">${u.name}</option>`).join('');
+  openModal('projModal');
+}
+function saveProject(){
+  const name=document.getElementById('pm_name').value.trim();
+  if(!name){toast('Name required','var(--red)');return;}
+  const leads=Array.from(document.getElementById('pm_leads').selectedOptions).map(o=>o.value);
+  const id=uid();
+  DB.projects.push({id,name,account:document.getElementById('pm_account').value,type:document.getElementById('pm_type').value,desc:document.getElementById('pm_desc').value,color:selClr,start:document.getElementById('pm_start').value,due:document.getElementById('pm_due').value,assignedLeads:leads,buckets:{'To Do':[],'In Progress':[],'Review':[],'Done':[],'On Hold':[]}});
+  saveDB(); closeModal('projModal'); curPlannerProj=id;
+  toast(`Project "${name}" created`,'var(--green)'); refreshAll();
+}
+
+// Task
+let editingBucket=null;
+function openTaskModal(bucket, existingTask){
+  editingTaskId=existingTask?.id||null; editingBucket=bucket||null;
+  document.getElementById('taskModalTitle').textContent=existingTask?'✏️ Edit Task':'📝 New Task';
+  document.getElementById('tm_title').value=existingTask?.title||'';
+  document.getElementById('tm_initiated').value=existingTask?.initiated||currentUser.name;
+  document.getElementById('tm_start').value=existingTask?.start||'';
+  document.getElementById('tm_due').value=existingTask?.due||'';
+  document.getElementById('tm_desc').value=existingTask?.desc||'';
+  document.getElementById('tm_leadRemark').value=existingTask?.leadRemark||'';
+  document.getElementById('tm_userRemark').value=existingTask?.userRemark||'';
+  document.getElementById('tm_hours').value=existingTask?.hours||'';
+  document.getElementById('tm_status').value=existingTask?.status||'Not Started';
+  document.getElementById('tm_priority').value=existingTask?.priority||'Medium';
+  document.getElementById('tm_type').value=existingTask?.type||'PR';
+  const avail=currentUser.role==='manager'?DB.projects:myProjects(currentUser);
+  const pSel=document.getElementById('tm_proj');
+  pSel.innerHTML=avail.map(p=>`<option value="${p.id}">${p.name}</option>`).join('');
+  if(curPlannerProj) pSel.value=curPlannerProj;
+  if(existingTask){ const p=findTask(existingTask.id)?.project; if(p) pSel.value=p.id; }
+  document.getElementById('tm_lead').innerHTML='<option value="">None</option>'+USERS.filter(u=>u.role==='lead').map(u=>`<option value="${u.id}">${u.name}</option>`).join('');
+  document.getElementById('tm_assoc').innerHTML='<option value="">None</option>'+USERS.filter(u=>u.role==='associate').map(u=>`<option value="${u.id}">${u.name}</option>`).join('');
+  if(existingTask?.assignedLead) document.getElementById('tm_lead').value=existingTask.assignedLead;
+  if(existingTask?.assignedAssociate) document.getElementById('tm_assoc').value=existingTask.assignedAssociate;
+  onTaskProjChange();
+  if(bucket){ const bSel=document.getElementById('tm_bucket'); for(const o of bSel.options) if(o.value===bucket) o.selected=true; }
+  openModal('taskModal');
+}
+function onTaskProjChange(){
+  const pid=document.getElementById('tm_proj').value;
+  const proj=getProject(pid);
+  document.getElementById('tm_bucket').innerHTML=proj?Object.keys(proj.buckets).map(b=>`<option value="${b}">${b}</option>`).join(''):'';
+}
+function saveTask(){
+  const title=document.getElementById('tm_title').value.trim();
+  if(!title){toast('Title required','var(--red)');return;}
+  const pid=document.getElementById('tm_proj').value;
+  const bucket=document.getElementById('tm_bucket').value;
+  const proj=getProject(pid);
+  if(!proj||!proj.buckets[bucket]){toast('Invalid project/bucket','var(--red)');return;}
+  const leadId=document.getElementById('tm_lead').value||null;
+  const assocId=document.getElementById('tm_assoc').value||null;
+  const data={title,initiated:document.getElementById('tm_initiated').value,start:document.getElementById('tm_start').value,due:document.getElementById('tm_due').value,assignedLead:leadId,assignedAssociate:assocId,desc:document.getElementById('tm_desc').value,leadRemark:document.getElementById('tm_leadRemark').value,userRemark:document.getElementById('tm_userRemark').value,status:document.getElementById('tm_status').value,priority:document.getElementById('tm_priority').value,hours:parseInt(document.getElementById('tm_hours').value)||0,type:document.getElementById('tm_type').value};
+  if(editingTaskId){
+    DB.projects.forEach(p=>Object.values(p.buckets).forEach(tasks=>{const i=tasks.findIndex(t=>t.id===editingTaskId);if(i!==-1){const old=tasks[i];Object.assign(tasks[i],data);tasks[i].actualHours=old.actualHours||0;}}));
+    toast('Task updated','var(--green)');
+  } else {
+    data.id=uid(); data.actualHours=0;
+    proj.buckets[bucket].push(data);
+    curPlannerProj=pid;
+    // Auto-create lead/assoc assignments
+    if(leadId) DB.leadAssignments.unshift({id:uid(),date:TODAY,initiated:currentUser.name,project:pid,task:data.id,assignedLead:leadId,status:'Assigned',remark:''});
+    if(assocId) DB.assocAssignments.unshift({id:uid(),date:TODAY,lead:leadId||currentUser.id,project:pid,task:data.id,associate:assocId,status:'Assigned',remark:''});
+    toast('Task created & assignments synced','var(--green)');
+  }
+  saveDB(); closeModal('taskModal'); refreshAll();
+}
+
+// Assign Project to Lead
+function openAssignProjModal(){
+  document.getElementById('ap_proj').innerHTML=DB.projects.map(p=>`<option value="${p.id}">${p.name}</option>`).join('');
+  document.getElementById('ap_leads').innerHTML=USERS.filter(u=>u.role==='lead').map(u=>`<option value="${u.id}">${u.name}</option>`).join('');
+  document.getElementById('ap_remark').value='';
+  openModal('assignProjModal');
+}
+function saveAssignProj(){
+  const pid=document.getElementById('ap_proj').value;
+  const leads=Array.from(document.getElementById('ap_leads').selectedOptions).map(o=>o.value);
+  if(!leads.length){toast('Select at least one lead','var(--amber)');return;}
+  const proj=getProject(pid); if(!proj) return;
+  proj.assignedLeads=[...new Set([...(proj.assignedLeads||[]),...leads])];
+  saveDB(); closeModal('assignProjModal'); toast('Project assigned to lead(s)','var(--green)'); refreshAll();
+}
+
+// Lead Assignment (Manager → Lead)
+function openLeadAssignModal(){
+  document.getElementById('la_initiated').value=currentUser.name;
+  document.getElementById('la_date').value=TODAY;
+  document.getElementById('la_proj').innerHTML=DB.projects.map(p=>`<option value="${p.id}">${p.name}</option>`).join('');
+  document.getElementById('la_lead').innerHTML=USERS.filter(u=>u.role==='lead').map(u=>`<option value="${u.id}">${u.name}</option>`).join('');
+  populateLaTask(); openModal('leadAssignModal');
+}
+function populateLaTask(){
+  const pid=document.getElementById('la_proj').value;
+  const tasks=Object.values(getProject(pid)?.buckets||{}).flat();
+  document.getElementById('la_task').innerHTML=tasks.map(t=>`<option value="${t.id}">${t.title}</option>`).join('')||'<option value="">No tasks</option>';
+}
+function saveLeadAssign(){
+  const pid=document.getElementById('la_proj').value;
+  const tid=document.getElementById('la_task').value;
+  const leadId=document.getElementById('la_lead').value;
+  if(!tid||!leadId){toast('Fill all fields','var(--amber)');return;}
+  // Update task's assignedLead
+  const found=findTask(tid);
+  if(found){ found.task.assignedLead=leadId; }
+  // Remove existing la for this task and re-add
+  DB.leadAssignments=DB.leadAssignments.filter(a=>a.task!==tid);
+  DB.leadAssignments.unshift({id:uid(),date:document.getElementById('la_date').value,initiated:currentUser.name,project:pid,task:tid,assignedLead:leadId,status:document.getElementById('la_status').value,remark:document.getElementById('la_remark').value});
+  saveDB(); closeModal('leadAssignModal'); toast('Assigned to lead & synced','var(--green)'); refreshAll();
+}
+
+// Associate Assignment (Lead → Associate)
+function openAssocAssignModal(){
+  document.getElementById('aa_lead').value=currentUser.name;
+  document.getElementById('aa_date').value=TODAY;
+  const myP=myProjects(currentUser);
+  document.getElementById('aa_proj').innerHTML=myP.map(p=>`<option value="${p.id}">${p.name}</option>`).join('');
+  document.getElementById('aa_assoc').innerHTML=USERS.filter(u=>u.role==='associate').map(u=>`<option value="${u.id}">${u.name}</option>`).join('');
+  populateAaTask(); openModal('assocAssignModal');
+}
+function populateAaTask(){
+  const pid=document.getElementById('aa_proj').value;
+  const myT=myTasks(currentUser).filter(t=>{
+    const p=DB.projects.find(x=>Object.values(x.buckets).flat().some(tt=>tt.id===t.id));
+    return p?.id===pid;
+  });
+  document.getElementById('aa_task').innerHTML=myT.map(t=>`<option value="${t.id}">${t.title}</option>`).join('')||'<option value="">No tasks</option>';
+}
+function saveAssocAssign(){
+  const pid=document.getElementById('aa_proj').value;
+  const tid=document.getElementById('aa_task').value;
+  const assocId=document.getElementById('aa_assoc').value;
+  if(!tid||!assocId){toast('Fill all fields','var(--amber)');return;}
+  // Update task's assignedAssociate
+  const found=findTask(tid);
+  if(found){ found.task.assignedAssociate=assocId; }
+  // Remove old aa for this task+assoc and re-add
+  DB.assocAssignments=DB.assocAssignments.filter(a=>!(a.task===tid&&a.associate===assocId));
+  DB.assocAssignments.unshift({id:uid(),date:document.getElementById('aa_date').value,lead:currentUser.id,project:pid,task:tid,associate:assocId,status:document.getElementById('aa_status').value,remark:document.getElementById('aa_remark').value});
+  saveDB(); closeModal('assocAssignModal'); toast('Assigned to associate & synced','var(--green)'); refreshAll();
+}
+
+// ══════════════════════════════════════════════
+// INIT — handled by initDB() above (async, calls buildCredList when ready)
+// ══════════════════════════════════════════════
+
+</script>
+</body>
+</html>
