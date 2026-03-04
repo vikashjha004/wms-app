@@ -235,6 +235,11 @@ select.ctrl option{background:var(--navy)}
 .proj-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:12px;margin-bottom:22px}
 .proj-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px;cursor:pointer;transition:all .15s}
 .proj-card:hover{border-color:rgba(14,165,233,.3);transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.35)}
+
+/* Account-Project tree */
+.acct-proj-item:hover{background:rgba(14,165,233,.06)!important;border-color:rgba(14,165,233,.2)!important}
+#page-planner{overflow:hidden!important;display:flex;flex-direction:column}
+#page-planner>div:last-child{flex:1;min-height:0;overflow:hidden}
 </style>
 </head>
 <body>
@@ -313,20 +318,26 @@ select.ctrl option{background:var(--navy)}
         <div class="tbl-wrap"><table class="tbl"><thead><tr><th>#</th><th>Task</th><th>Project</th><th>Lead</th><th>Associate</th><th>Status</th><th>Due</th><th>Est.Hrs</th><th>Actual Hrs</th><th>Δ</th></tr></thead><tbody id="dashTasksTbl"></tbody></table></div>
       </div>
 
-      <!-- PROJECT PLANNING (Manager) -->
+      <!-- PROJECT PLANNING — Account > Project tree -->
       <div class="page" id="page-planner">
-        <div class="sec-head"><div><div class="sec-title">Project Planning</div><div class="sec-sub">Create projects, tasks, assign to leads</div></div>
+        <div class="sec-head" style="flex-shrink:0"><div><div class="sec-title">Project Planning</div><div class="sec-sub">Account › Project › Tasks — select from sidebar</div></div>
           <div style="display:flex;gap:7px">
             <button class="btn btn-primary btn-sm" onclick="openProjModal()">+ Project</button>
-            <button class="btn btn-ghost btn-sm" onclick="openTaskModal()">+ Task</button>
-            <button class="btn btn-ghost btn-sm" onclick="addBucketPrompt()">+ Bucket</button>
+            <button class="btn btn-ghost btn-sm" onclick="openAssignProjModal()">Assign to Lead</button>
           </div>
         </div>
-        <div class="board-bar">
-          <div><label class="ctrl-lbl">Project</label><select class="ctrl" id="plannerProjSel" onchange="onPlannerProjChange()"></select></div>
-          <div style="align-self:flex-end"><button class="btn btn-violet btn-sm" onclick="openAssignProjModal()">Assign Project to Lead →</button></div>
+        <div style="display:flex;gap:14px;flex:1;min-height:0;overflow:hidden">
+          <div style="width:250px;flex-shrink:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow-y:auto;padding:10px">
+            <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text-dim);padding:4px 6px 10px">Accounts &amp; Projects</div>
+            <div id="accountTree"></div>
+          </div>
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:10px;overflow:hidden">
+            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;flex-shrink:0" id="plannerProjTitle">
+              <span style="font-size:12px;color:var(--muted)">&#x2190; Select a project</span>
+            </div>
+            <div class="kanban" id="kanbanBoard" style="flex:1;overflow-x:auto;min-height:360px"></div>
+          </div>
         </div>
-        <div class="kanban" id="kanbanBoard"></div>
       </div>
 
       <!-- LEAD TASK ASSIGNMENT (Manager → Lead) -->
@@ -381,34 +392,57 @@ select.ctrl option{background:var(--navy)}
         <div class="empty-state" id="aaEmpty"><div style="font-size:28px;margin-bottom:8px">👤</div>No associate assignments yet</div></div>
       </div>
 
-      <!-- MY TASKS (Associate) -->
+      <!-- MY TASKS (All roles) -->
       <div class="page" id="page-my-tasks">
-        <div class="sec-head"><div><div class="sec-title">My Tasks</div><div class="sec-sub">Click any task to update status or log time</div></div></div>
+        <div class="sec-head">
+          <div><div class="sec-title" id="myTasksTitle">My Tasks</div><div class="sec-sub" id="myTasksSub">Your assigned tasks</div></div>
+          <div style="display:flex;gap:7px" id="myTasksActions"></div>
+        </div>
+        <div id="myTasksFilter" style="display:none;margin-bottom:14px;flex-wrap:wrap;gap:10px;align-items:flex-end">
+          <div><label class="ctrl-lbl">Person</label><select class="ctrl" id="myTasksUserSel" onchange="renderMyTasks()" style="width:160px"><option value="all">Everyone</option></select></div>
+          <div><label class="ctrl-lbl">Project</label><select class="ctrl" id="myTasksProjSel" onchange="renderMyTasks()" style="width:180px"><option value="all">All Projects</option></select></div>
+          <div><label class="ctrl-lbl">Status</label><select class="ctrl" id="myTasksStatusSel" onchange="renderMyTasks()" style="width:140px"><option value="all">All Statuses</option><option>Not Started</option><option>In Progress</option><option>Review</option><option>Completed</option><option>On Hold</option></select></div>
+        </div>
         <div class="stats-grid" id="assocStats"></div>
-        <div class="notice">📌 Click any task card to update status (In Progress → Completed) and log your hours. Changes reflect immediately to your lead and manager.</div>
+        <div id="myTasksNotice" class="notice">&#x1F4CC; Click any task card to update status and log your hours.</div>
         <div class="kanban" id="assocKanban"></div>
       </div>
 
-      <!-- DAILY TRACKER (Associate) -->
+      <!-- DAILY TRACKER (All roles) -->
       <div class="page" id="page-tracker">
-        <div class="sec-head"><div><div class="sec-title">Daily Task Tracker</div><div class="sec-sub">Log your daily hours and progress</div></div>
+        <div class="sec-head"><div><div class="sec-title">Daily Task Tracker</div><div class="sec-sub">Log hours &mdash; pick assigned task or create your own entry</div></div>
           <button class="btn btn-green btn-sm" onclick="addTrackerRow()">+ Add Entry</button>
         </div>
         <div style="display:flex;align-items:flex-end;gap:10px;margin-bottom:16px;flex-wrap:wrap">
           <div><label class="ctrl-lbl">Date</label><input class="ctrl" type="date" id="trackDate"></div>
-          <div><label class="ctrl-lbl">Associate</label><input class="ctrl" id="trackAssoc" readonly></div>
-          <div><label class="ctrl-lbl">Project</label><select class="ctrl" id="trackProj" onchange="populateTrackTask()"></select></div>
-          <div><label class="ctrl-lbl">Task</label><select class="ctrl" id="trackTask"></select></div>
+          <div><label class="ctrl-lbl">User</label><input class="ctrl" id="trackAssoc" readonly style="width:160px"></div>
+          <div><label class="ctrl-lbl">Task Type</label>
+            <select class="ctrl" id="trackMode" onchange="onTrackModeChange()" style="width:180px">
+              <option value="assigned">&#x1F4CB; Assigned Task</option>
+              <option value="own">&#x270F; My Own Task</option>
+            </select>
+          </div>
+          <div id="trackAssignedControls" style="display:flex;gap:10px;flex-wrap:wrap">
+            <div><label class="ctrl-lbl">Project</label><select class="ctrl" id="trackProj" onchange="populateTrackTask()" style="width:180px"></select></div>
+            <div><label class="ctrl-lbl">Task</label><select class="ctrl" id="trackTask" style="width:200px"></select></div>
+          </div>
+          <div id="trackOwnControls" style="display:none;flex-wrap:wrap;gap:10px">
+            <div><label class="ctrl-lbl">Task Title *</label><input class="ctrl" id="ownTaskTitle" placeholder="What are you working on?" style="width:200px"></div>
+            <div><label class="ctrl-lbl">Account</label><select class="ctrl" id="ownTaskAccount" onchange="populateOwnProjects()" style="width:150px"></select></div>
+            <div><label class="ctrl-lbl">Project</label><select class="ctrl" id="ownTaskProject" style="width:180px"></select></div>
+            <div><label class="ctrl-lbl">Priority</label><select class="ctrl" id="ownTaskPriority" style="width:110px"><option>Medium</option><option>High</option><option>Low</option></select></div>
+          </div>
         </div>
         <div class="tbl-wrap">
           <table class="tbl">
-            <thead><tr><th>#</th><th>Task</th><th>Project</th><th>Initiated By</th><th>Start</th><th>Due</th><th>Assigned To</th><th>Est. Hrs</th><th>Hours Worked</th><th>Status</th><th>Remarks</th><th>Submit</th></tr></thead>
+            <thead><tr><th>#</th><th>Task</th><th>Project</th><th>Account</th><th>Due</th><th>Assigned To</th><th>Est.Hrs</th><th>Hours Worked</th><th>Status</th><th>Remarks</th><th>Action</th></tr></thead>
             <tbody id="trackerTbl"></tbody>
           </table>
           <div class="total-bar">
             <span class="tbar-lbl">Total Today:</span><span class="tbar-val" id="totalHrs">0</span><span class="tbar-lbl">hrs</span>
-            <span class="tbar-lbl" style="margin-left:12px">Completed Tasks:</span><span class="tbar-val" style="color:var(--green);font-size:16px" id="completedCnt">0</span>
+            <span class="tbar-lbl" style="margin-left:12px">Completed:</span><span class="tbar-val" style="color:var(--green);font-size:16px" id="completedCnt">0</span>
             <span class="tbar-lbl" style="margin-left:12px">Submitted:</span><span class="tbar-val" style="color:var(--amber);font-size:16px" id="submittedCnt">0</span>
+            <span class="tbar-lbl" style="margin-left:12px">&#128336; Avg Task Time:</span><span class="tbar-val" style="color:var(--teal);font-size:16px" id="avgElapsedLbl">&mdash;</span>
           </div>
         </div>
       </div>
@@ -950,7 +984,20 @@ function mutateTask(taskId, {status, userRemark, leadRemark, hoursToAdd, submitt
   const {task} = found;
 
   if(status !== undefined) {
+    const prevStatus = task.status;
     task.status = status;
+    // Track when task started (In Progress) for elapsed time calculation
+    if(status === 'In Progress' && prevStatus !== 'In Progress' && !task.startedAt) {
+      task.startedAt = new Date().toISOString();
+    }
+    // Track when task was completed + calculate elapsed time
+    if(status === 'Completed' && prevStatus !== 'Completed') {
+      task.completedAt = new Date().toISOString();
+      if(task.startedAt) {
+        const ms = new Date(task.completedAt) - new Date(task.startedAt);
+        task.elapsedMinutes = Math.round(ms / 60000);
+      }
+    }
     // Sync assocAssignments status
     DB.assocAssignments.filter(a=>a.task===taskId).forEach(a=>a.status=status);
     // Sync leadAssignments status
@@ -992,6 +1039,23 @@ function moveToBucketByStatus(found, newStatus){
 // HELPERS
 // ══════════════════════════════════════════════
 const uid = () => '_'+Math.random().toString(36).substr(2,9);
+function fmtElapsed(mins){
+  if(!mins||mins<=0) return null;
+  if(mins<60) return mins+'m';
+  const h=Math.floor(mins/60), m=mins%60;
+  return m>0?`${h}h ${m}m`:`${h}h`;
+}
+function getLiveElapsed(task){
+  if(task.completedAt && task.startedAt){
+    const ms=new Date(task.completedAt)-new Date(task.startedAt);
+    return Math.round(ms/60000);
+  }
+  if(task.startedAt && task.status==='In Progress'){
+    const ms=Date.now()-new Date(task.startedAt);
+    return Math.round(ms/60000);
+  }
+  return task.elapsedMinutes||0;
+}
 const fmt = d => { if(!d) return '—'; try{return new Date(d+'T00:00:00').toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});}catch{return d;} };
 const isLate = d => d && d < TODAY;
 const getUser = id => USERS.find(u=>u.id===id);
@@ -1011,24 +1075,24 @@ function findTask(taskId){
   return null;
 }
 function myProjects(user){
-  if(user.role==='manager') return DB.projects;
+  if(!user) return [];
+  if(user.role==='admin'||user.role==='manager') return DB.projects;
   if(user.role==='lead') return DB.projects.filter(p=>(p.assignedLeads||[]).includes(user.id));
   if(user.role==='associate'){
     const myIds=new Set(DB.assocAssignments.filter(a=>a.associate===user.id).map(a=>a.task));
     return DB.projects.filter(p=>Object.values(p.buckets).flat().some(t=>t.assignedAssociate===user.id||myIds.has(t.id)));
   }
-  return [];
+  return DB.projects;
 }
 function myTasks(user){
-  if(user.role==='manager') return allTasks();
-  if(user.role==='lead'){
-    return myProjects(user).flatMap(p=>Object.values(p.buckets).flat().filter(t=>t.assignedLead===user.id));
-  }
+  if(!user) return [];
+  if(user.role==='admin'||user.role==='manager') return allTasks();
+  if(user.role==='lead') return myProjects(user).flatMap(p=>Object.values(p.buckets).flat());
   if(user.role==='associate'){
     const myIds=new Set(DB.assocAssignments.filter(a=>a.associate===user.id).map(a=>a.task));
     return allTasks().filter(t=>t.assignedAssociate===user.id||myIds.has(t.id));
   }
-  return [];
+  return allTasks();
 }
 
 // Actual hours for a task = sum of all tracker entries for that task
@@ -1129,7 +1193,7 @@ function loginAs(u){
   const rm=ROLE_META[u.role]||ROLE_META.associate;
   const p=document.getElementById('rolePill'); p.textContent=rm.label; p.style.background=rm.bg; p.style.color=rm.c;
   buildNav();
-  const firstPage={admin:'admin',manager:'dashboard',lead:'lead-dashboard',associate:'my-tasks'}[u.role]||'dashboard';
+  const firstPage={admin:'dashboard',manager:'dashboard',lead:'lead-dashboard',associate:'my-tasks'}[u.role]||'dashboard';
   showPage(firstPage);
 }
 function logout(){
@@ -1146,10 +1210,10 @@ function logout(){
 // NAVIGATION
 // ══════════════════════════════════════════════
 const NAV={
-  admin:    [{id:'admin',         l:'⚙️ User Management'}],
-  manager:  [{id:'dashboard',     l:'📊 Dashboard'},{id:'planner',l:'🗂 Planning'},{id:'lead-assign',l:'📋 Lead Assignment'},{id:'hours-report',l:'⏱ Hours Report'},{id:'daily-overview',l:'📅 Daily Overview'},{id:'team',l:'👥 Team'}],
-  lead:     [{id:'lead-dashboard',l:'🗂 My Projects'},{id:'assoc-assign',l:'📋 Associate Assignment'},{id:'daily-overview',l:'📅 Daily Overview'},{id:'team',l:'👥 Team'}],
-  associate:[{id:'my-tasks',      l:'✅ My Tasks'},{id:'tracker',l:'⏱ Task Tracker'},{id:'team',l:'👥 Team'}]
+  admin:    [{id:'dashboard',l:'📊 Dashboard'},{id:'planner',l:'🗂 Planning'},{id:'lead-assign',l:'📋 Lead Assignment'},{id:'hours-report',l:'⏱ Hours Report'},{id:'daily-overview',l:'📅 Daily Overview'},{id:'my-tasks',l:'✅ My Tasks'},{id:'tracker',l:'📅 Daily Tracker'},{id:'team',l:'👥 Team'},{id:'admin',l:'⚙️ Users'}],
+  manager:  [{id:'dashboard',l:'📊 Dashboard'},{id:'planner',l:'🗂 Planning'},{id:'lead-assign',l:'📋 Lead Assignment'},{id:'hours-report',l:'⏱ Hours Report'},{id:'daily-overview',l:'📅 Daily Overview'},{id:'my-tasks',l:'✅ My Tasks'},{id:'tracker',l:'📅 Daily Tracker'},{id:'team',l:'👥 Team'}],
+  lead:     [{id:'lead-dashboard',l:'🗂 My Projects'},{id:'assoc-assign',l:'📋 Associate Assignment'},{id:'daily-overview',l:'📅 Daily Overview'},{id:'my-tasks',l:'✅ My Tasks'},{id:'tracker',l:'📅 Daily Tracker'},{id:'team',l:'👥 Team'}],
+  associate:[{id:'my-tasks',l:'✅ My Tasks'},{id:'tracker',l:'📅 Daily Tracker'},{id:'team',l:'👥 Team'}]
 };
 function buildNav(){
   document.getElementById('topNav').innerHTML=(NAV[currentUser.role]||[]).map(n=>`<button class="tnav" data-page="${n.id}" onclick="showPage('${n.id}')">${n.l}</button>`).join('');
@@ -1440,24 +1504,57 @@ function renderManagerDashboard(){
   }).join('');
 }
 
-// ══════════════════════════════════════════════
-// RENDER: KANBAN (Manager Planner)
-// ══════════════════════════════════════════════
+// ===============================
+// PLANNER — Account > Project tree
+// ===============================
 function renderPlanner(){
-  const sel=document.getElementById('plannerProjSel');
-  sel.innerHTML=DB.projects.map(p=>`<option value="${p.id}">${p.name}</option>`).join('');
-  if(curPlannerProj) sel.value=curPlannerProj; else curPlannerProj=sel.value;
-  renderKanban('kanbanBoard', curPlannerProj, true);
+  buildAccountTree();
+  if(!curPlannerProj && DB.projects.length) curPlannerProj=DB.projects[0].id;
+  if(curPlannerProj) selectPlannerProject(curPlannerProj);
 }
-function onPlannerProjChange(){ curPlannerProj=document.getElementById('plannerProjSel').value; renderKanban('kanbanBoard',curPlannerProj,true); }
+function buildAccountTree(){
+  const accounts={};
+  DB.projects.forEach(p=>{const acc=p.account||'Unassigned';if(!accounts[acc])accounts[acc]=[];accounts[acc].push(p);});
+  const canEdit=['admin','manager'].includes(currentUser.role);
+  let html='';
+  Object.entries(accounts).sort(([a],[b])=>a.localeCompare(b)).forEach(([acc,projs])=>{
+    html+=`<div style="margin-bottom:6px"><div style="padding:6px 8px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.7px;color:var(--teal);display:flex;align-items:center;gap:6px">&#127970; ${acc}<span style="margin-left:auto;font-size:9px;background:rgba(14,165,233,.12);color:var(--teal);padding:1px 6px;border-radius:8px">${projs.length}</span></div>`;
+    projs.forEach(p=>{
+      const tasks=Object.values(p.buckets).flat();
+      const done=tasks.filter(t=>t.status==='Completed').length;
+      const pct=tasks.length?Math.round(done/tasks.length*100):0;
+      const isActive=curPlannerProj===p.id;
+      html+=`<div class="acct-proj-item" onclick="selectPlannerProject('${p.id}')" style="padding:8px 10px 8px 20px;border-radius:8px;margin-bottom:2px;cursor:pointer;border:1px solid ${isActive?'rgba(14,165,233,.3)':'transparent'};background:${isActive?'rgba(14,165,233,.08)':'transparent'};transition:all .15s"><div style="display:flex;align-items:center;gap:6px"><div style="width:7px;height:7px;border-radius:50%;background:${p.color};flex-shrink:0"></div><div style="flex:1;min-width:0"><div style="font-size:11px;font-weight:600;color:${isActive?'var(--white)':'var(--text)'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.name}</div><div style="font-size:9px;color:var(--text-dim);margin-top:1px">${done}/${tasks.length} tasks &middot; ${pct}%</div></div>${canEdit?`<div style="display:flex;gap:2px;flex-shrink:0"><button onclick="event.stopPropagation();openProjModal('${p.id}')" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:10px;padding:1px 3px">&#9998;</button><button onclick="event.stopPropagation();deleteProject('${p.id}')" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:10px;padding:1px 3px">&#128465;</button></div>`:''}</div><div style="margin-top:4px;height:2px;border-radius:1px;background:var(--border)"><div style="height:2px;border-radius:1px;background:${p.color};width:${pct}%"></div></div></div>`;
+    });
+    html+='</div>';
+  });
+  if(!html) html='<div style="font-size:11px;color:var(--text-dim);padding:12px;text-align:center">No projects yet.<br>Click + Project.</div>';
+  document.getElementById('accountTree').innerHTML=html;
+}
+function selectPlannerProject(projId){
+  curPlannerProj=projId;
+  const proj=getProject(projId);if(!proj)return;
+  const canEdit=['admin','manager'].includes(currentUser.role);
+  const canAddTask=['admin','manager','lead'].includes(currentUser.role);
+  const hdr=document.getElementById('plannerProjTitle');
+  if(hdr) hdr.innerHTML=`<div style="width:10px;height:10px;border-radius:50%;background:${proj.color}"></div><span style="font-size:13px;font-weight:700;color:var(--white)">${proj.name}</span><span style="font-size:10px;color:var(--muted)">${proj.account||''} &middot; Due ${fmt(proj.due)}</span>${canEdit?`<button onclick="openProjModal('${proj.id}')" style="background:none;border:1px solid var(--border);border-radius:5px;color:var(--muted);cursor:pointer;font-size:10px;padding:2px 8px;margin-left:6px">&#9998; Edit</button>`:''} ${canAddTask?`<button onclick="openTaskModal('To Do','${proj.id}')" style="background:rgba(14,165,233,.12);border:1px solid rgba(14,165,233,.3);border-radius:5px;color:var(--teal);cursor:pointer;font-size:10px;padding:2px 10px;margin-left:4px">+ Task</button>`:''}`;
+  buildAccountTree();
+  renderKanban('kanbanBoard',projId,canAddTask);
+}
+function deleteProject(projId){
+  if(!confirm('Delete this project and all its tasks?'))return;
+  DB.projects=DB.projects.filter(p=>p.id!==projId);
+  if(curPlannerProj===projId) curPlannerProj=DB.projects[0]?.id||null;
+  saveDB();renderPlanner();toast('Project deleted','var(--red)');
+}
+function onPlannerProjChange(){curPlannerProj=document.getElementById('plannerProjSel')?.value;renderKanban('kanbanBoard',curPlannerProj,true);}
 
 function renderKanban(containerId, projId, managerMode){
   const proj=getProject(projId);
   const el=document.getElementById(containerId);
   if(!proj){el.innerHTML='<div class="empty-state">No project selected</div>';return;}
-  const filterLeadId=(!managerMode && currentUser.role==='lead') ? currentUser.id : null;
-  el.innerHTML=Object.entries(proj.buckets).map(([bucket,allT])=>{
-    const tasks=filterLeadId?allT.filter(t=>t.assignedLead===filterLeadId):allT;
+  const canEditKB=['admin','manager','lead'].includes(currentUser.role);
+  el.innerHTML=Object.entries(proj.buckets).map(([bucket,tasks])=>{
     const bc=BUCKET_CLR[bucket]||'#475569';
     return `<div class="kb-col" ondragover="event.preventDefault()" ondrop="dropTask(event,'${esc(bucket)}','${projId}','${containerId}')">
       <div class="kb-head">
@@ -1465,8 +1562,8 @@ function renderKanban(containerId, projId, managerMode){
         <div class="kb-cnt">${tasks.length}</div>
       </div>
       <div class="kb-body">
-        ${tasks.map(t=>taskCardHTML(t,proj,managerMode)).join('')}
-        ${managerMode?`<button class="kb-add-btn" onclick="openTaskModal('${esc(bucket)}')">+ Add task</button>`:''}
+        ${tasks.map(t=>taskCardHTML(t,proj,canEditKB)).join('')}
+        ${canEditKB?`<button class="kb-add-btn" onclick="openTaskModal('${esc(bucket)}','${projId}')">+ Add task</button>`:''}
       </div>
     </div>`;
   }).join('');
@@ -1498,12 +1595,13 @@ function taskCardHTML(t, project, editable){
         <span class="hrs-assigned">${est}h est</span>
         <span style="color:var(--text-dim)">·</span>
         <span class="hrs-actual ${act>est?'hrs-over':act===est&&act>0?'hrs-exact':'hrs-under'}">${act.toFixed(1)}h actual</span>
+        ${(()=>{const el=getLiveElapsed(t);return el>0?`<span style="color:var(--text-dim)">·</span><span style="color:${t.status==='Completed'?'var(--green)':'var(--amber)'};font-size:10px">&#128336; ${fmtElapsed(el)}</span>`:''})()}
       </div>
     </div>
     <div class="hrs-bar-wrap"><div class="hrs-bar-fill" style="width:${pct}%;background:${barColor}"></div></div>
-    ${editable&&currentUser.role==='manager'?`<div style="display:flex;gap:4px;margin-top:7px">
-      <button class="btn-success" style="font-size:9px;padding:2px 8px" onclick="event.stopPropagation();editTask('${t.id}')">Edit</button>
-      <button class="btn-danger" style="font-size:9px;padding:2px 8px" onclick="event.stopPropagation();deleteTask('${t.id}')">Del</button>
+    ${['admin','manager','lead'].includes(currentUser.role)?`<div style="display:flex;gap:4px;margin-top:7px" onclick="event.stopPropagation()">
+      <button class="btn-success" style="font-size:9px;padding:2px 8px" onclick="editTask('${t.id}')">&#9998; Edit</button>
+      <button class="btn-danger" style="font-size:9px;padding:2px 8px" onclick="deleteTask('${t.id}')">&#128465; Del</button>
     </div>`:''}
   </div>`;
 }
@@ -1800,34 +1898,57 @@ function updateAaStatus(id,status){
 // RENDER: MY TASKS (Associate view)
 // ══════════════════════════════════════════════
 function renderMyTasks(){
-  const tasks=myTasks(currentUser);
+  const canManage=['admin','manager','lead'].includes(currentUser.role);
+  document.getElementById('myTasksTitle').textContent=canManage?'Team Tasks':'My Tasks';
+  document.getElementById('myTasksSub').textContent=canManage?'View & edit team tasks with filters':'Your assigned tasks — click to update or log time';
+  document.getElementById('myTasksActions').innerHTML=canManage?`<button class="btn btn-primary btn-sm" onclick="openTaskModal()">+ Task</button>`:
+    `<button class="btn btn-ghost btn-sm" onclick="showPage('tracker')">&#x1F4C5; Log Hours</button>`;
+  const filterEl=document.getElementById('myTasksFilter');
+  filterEl.style.display=canManage?'flex':'none';
+  if(canManage){
+    const uSel=document.getElementById('myTasksUserSel');
+    const pSel=document.getElementById('myTasksProjSel');
+    const curU=uSel.value||'all'; const curP=pSel.value||'all';
+    uSel.innerHTML='<option value="all">Everyone</option>'+USERS.filter(u=>u.role!=='admin').map(u=>`<option value="${u.id}" ${curU===u.id?'selected':''}>${u.name} (${u.role})</option>`).join('');
+    pSel.innerHTML='<option value="all">All Projects</option>'+DB.projects.map(p=>`<option value="${p.id}" ${curP===p.id?'selected':''}>${p.account?p.account+' > ':''} ${p.name}</option>`).join('');
+    uSel.value=curU; pSel.value=curP;
+  }
+  let tasks;
+  if(canManage){
+    const uV=document.getElementById('myTasksUserSel')?.value||'all';
+    const pV=document.getElementById('myTasksProjSel')?.value||'all';
+    const sV=document.getElementById('myTasksStatusSel')?.value||'all';
+    tasks=allTasks();
+    if(pV!=='all') tasks=tasks.filter(t=>{const p=DB.projects.find(x=>Object.values(x.buckets).flat().some(tt=>tt.id===t.id));return p?.id===pV;});
+    if(uV!=='all') tasks=tasks.filter(t=>t.assignedAssociate===uV||t.assignedLead===uV);
+    if(sV!=='all') tasks=tasks.filter(t=>t.status===sV);
+  } else {
+    tasks=myTasks(currentUser);
+  }
   const done=tasks.filter(t=>t.status==='Completed').length;
   const ip=tasks.filter(t=>t.status==='In Progress').length;
   const late=tasks.filter(t=>isLate(t.due)&&t.status!=='Completed').length;
   const totalEst=tasks.reduce((s,t)=>s+(t.hours||0),0);
   const totalAct=tasks.reduce((s,t)=>s+getActualHours(t.id),0);
-
   document.getElementById('assocStats').innerHTML=`
-    <div class="sc sc-bl"><div class="sc-lbl">My Tasks</div><div class="sc-val">${tasks.length}</div></div>
+    <div class="sc sc-bl"><div class="sc-lbl">${canManage?'Total':'My'} Tasks</div><div class="sc-val">${tasks.length}</div></div>
     <div class="sc sc-am"><div class="sc-lbl">In Progress</div><div class="sc-val">${ip}</div></div>
-    <div class="sc sc-gn"><div class="sc-lbl">Completed</div><div class="sc-val">${done}</div></div>
+    <div class="sc sc-gn"><div class="sc-lbl">Completed</div><div class="sc-val">${done}</div><div class="sc-sub">${tasks.length?Math.round(done/tasks.length*100):0}%</div></div>
     <div class="sc sc-rd"><div class="sc-lbl">Overdue</div><div class="sc-val">${late}</div></div>
-    <div class="sc sc-cy"><div class="sc-lbl">Actual / Est</div><div class="sc-val">${totalAct.toFixed(0)}</div><div class="sc-sub">of ${totalEst}h assigned</div></div>
+    <div class="sc sc-cy"><div class="sc-lbl">Actual/Est</div><div class="sc-val">${totalAct.toFixed(0)}</div><div class="sc-sub">of ${totalEst}h</div></div>
   `;
-
-  // Group by status buckets
+  document.getElementById('myTasksNotice').style.display=canManage?'none':'';
   const buckets={'Not Started':[],'In Progress':[],'Review':[],'Completed':[],'On Hold':[]};
-  tasks.forEach(t=>{ (buckets[t.status]||buckets['Not Started']).push({task:t}); });
-
+  tasks.forEach(t=>{(buckets[t.status]||buckets['Not Started']).push(t);});
   document.getElementById('assocKanban').innerHTML=Object.entries(buckets).map(([status,items])=>{
     const bc=STATUS_CLR[status]||'#475569';
     return `<div class="kb-col">
       <div class="kb-head"><div class="kb-title-row"><div class="kb-dot" style="background:${bc}"></div>${status}</div><div class="kb-cnt">${items.length}</div></div>
       <div class="kb-body">
-        ${items.map(({task:t})=>{
+        ${items.map(t=>{
           const proj=DB.projects.find(p=>Object.values(p.buckets).flat().some(tt=>tt.id===t.id));
           if(!proj) return '';
-          return taskCardHTML(t,proj,false);
+          return taskCardHTML(t,proj,canManage);
         }).join('')}
         ${!items.length?'<div style="font-size:11px;color:var(--muted);padding:14px;text-align:center">Empty</div>':''}
       </div>
@@ -1861,6 +1982,7 @@ function openTaskDetail(taskId){
     ${task.desc?`<div class="info-row"><strong>Desc:</strong>${task.desc}</div>`:''}
     ${task.leadRemark?`<div class="info-row"><strong>Lead note:</strong>${task.leadRemark}</div>`:''}
     <div class="info-row"><strong>Status:</strong><span class="badge ${bcls(task.status)}">${task.status}</span></div>
+    ${(()=>{const el=getLiveElapsed(task);return el>0?`<div class="info-row"><strong>Time Tracked:</strong><span style="font-family:'JetBrains Mono',monospace;font-weight:700;color:${task.status==='Completed'?'var(--green)':'var(--amber)'}">&#128336; ${fmtElapsed(el)}</span><span style="font-size:9px;color:var(--text-dim);margin-left:6px">${task.startedAt?'started '+new Date(task.startedAt).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}):''}${task.completedAt?' &rarr; done '+new Date(task.completedAt).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}):' (live)'}</span></div>`:''})()}
     <div style="margin-top:10px;padding:10px;background:var(--navy3);border-radius:8px">
       <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:11px">
         <span style="color:var(--muted)">Hours Progress</span>
@@ -1897,55 +2019,83 @@ function submitTaskUpdate(){
   refreshAll();
 }
 
-// ══════════════════════════════════════════════
-// DAILY TRACKER (Associate)
-// ══════════════════════════════════════════════
+// ===============================
+// DAILY TRACKER (All roles)
+// ===============================
 function renderTracker(){
-  const projs=myProjects(currentUser);
   document.getElementById('trackDate').value=TODAY;
   document.getElementById('trackAssoc').value=currentUser.name;
+  const projs=myProjects(currentUser);
   const psel=document.getElementById('trackProj');
-  psel.innerHTML=projs.map(p=>`<option value="${p.id}">${p.name}</option>`).join('');
+  psel.innerHTML=projs.map(p=>`<option value="${p.id}">${p.account?p.account+' > ':''} ${p.name}</option>`).join('')||'<option value="">No projects</option>';
   populateTrackTask();
+  const accounts=[...new Set(DB.projects.map(p=>p.account||'Unassigned'))].sort();
+  const accSel=document.getElementById('ownTaskAccount');
+  if(accSel){accSel.innerHTML=accounts.map(a=>`<option value="${a}">${a}</option>`).join('');populateOwnProjects();}
   renderSubmittedTrackerRows();
+  startElapsedTimer();
+}
+function onTrackModeChange(){
+  const mode=document.getElementById('trackMode').value;
+  document.getElementById('trackAssignedControls').style.display=mode==='assigned'?'flex':'none';
+  document.getElementById('trackOwnControls').style.display=mode==='own'?'flex':'none';
+}
+function populateOwnProjects(){
+  const acc=document.getElementById('ownTaskAccount')?.value;
+  const projs=DB.projects.filter(p=>(p.account||'Unassigned')===acc);
+  const sel=document.getElementById('ownTaskProject');
+  if(sel) sel.innerHTML=projs.map(p=>`<option value="${p.id}">${p.name}</option>`).join('')||'<option value="">No projects</option>';
 }
 function populateTrackTask(){
-  const pid=document.getElementById('trackProj')?.value; if(!pid) return;
-  const tasks=myTasks(currentUser).filter(t=>{
-    const p=DB.projects.find(x=>Object.values(x.buckets).flat().some(tt=>tt.id===t.id));
-    return p?.id===pid;
-  });
+  const pid=document.getElementById('trackProj')?.value;if(!pid)return;
+  const proj=getProject(pid);if(!proj)return;
+  const tasks=Object.values(proj.buckets).flat().filter(t=>t.status!=='Completed');
   document.getElementById('trackTask').innerHTML=tasks.map(t=>`<option value="${t.id}">${t.title}</option>`).join('')||'<option value="">No tasks</option>';
 }
 function addTrackerRow(){
-  const pid=document.getElementById('trackProj').value;
-  const taskId=document.getElementById('trackTask').value;
-  if(!taskId){toast('Select a task','var(--amber)');return;}
-  const found=findTask(taskId); if(!found) return;
-  const {task,project}=found;
+  const mode=document.getElementById('trackMode')?.value||'assigned';
+  let taskId,task,project;
+  if(mode==='own'){
+    const title=document.getElementById('ownTaskTitle').value.trim();
+    if(!title){toast('Enter a task title','var(--amber)');return;}
+    const projId=document.getElementById('ownTaskProject').value;
+    project=getProject(projId);
+    const priority=document.getElementById('ownTaskPriority').value||'Medium';
+    taskId=uid();
+    task={id:taskId,title,initiated:currentUser.name,status:'In Progress',priority,assignedAssociate:currentUser.id,assignedLead:null,hours:0,actualHours:0,start:TODAY,due:TODAY,desc:'',leadRemark:'',userRemark:''};
+    if(project){project.buckets['In Progress'].push(task);saveDB();toast(`Task "${title}" created`,'var(--green)');}
+    document.getElementById('ownTaskTitle').value='';
+  } else {
+    taskId=document.getElementById('trackTask').value;
+    if(!taskId){toast('Select a task','var(--amber)');return;}
+    const found=findTask(taskId);if(!found)return;
+    task=found.task;project=found.project;
+  }
   const rowId=uid();
   const tbody=document.getElementById('trackerTbl');
-  const prevRows=tbody.querySelectorAll('tr[data-new]').length;
-  const tr=document.createElement('tr'); tr.id='tr-'+rowId; tr.setAttribute('data-new','1');
+  const tr=document.createElement('tr');tr.id='tr-'+rowId;tr.setAttribute('data-new','1');
   tr.innerHTML=`
     <td style="color:var(--muted);font-size:10px;font-family:'JetBrains Mono',monospace">${tbody.children.length+1}</td>
-    <td><div style="font-size:12px;font-weight:600;color:var(--white)">${task.title}</div><div style="font-size:9px;color:var(--muted)">Est: ${task.hours||0}h</div></td>
-    <td><span class="badge" style="background:${project.color}22;color:${project.color}">${project.name}</span></td>
-    <td style="font-size:10px;color:var(--muted)">${task.initiated||'—'}</td>
-    <td style="font-size:10px;white-space:nowrap">${fmt(task.start)}</td>
-    <td style="font-size:10px;white-space:nowrap;color:${isLate(task.due)?'var(--red)':'var(--muted)'}">${fmt(task.due)}</td>
+    <td><div style="font-size:12px;font-weight:600;color:var(--white)">${task.title}</div><div style="font-size:9px;color:var(--muted)">${mode==='own'?'<span style="color:var(--violet2)">Own task</span>':'Est: '+(task.hours||0)+'h'}</div></td>
+    <td><span class="badge" style="background:${project?.color||'#475569'}22;color:${project?.color||'#94a3b8'}">${project?.name||'&mdash;'}</span></td>
+    <td style="font-size:10px;color:var(--muted)">${project?.account||'&mdash;'}</td>
+    <td style="font-size:10px;white-space:nowrap;color:${isLate(task.due)?'var(--red)':'var(--muted)'}">${fmt(task.due)||'&mdash;'}</td>
     <td style="font-size:11px">${currentUser.name}</td>
+    <td style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted)">${task.hours||0}h</td>
     <td><input class="tbl-inp hrs-inp" type="number" min="0" max="24" step="0.5" placeholder="0" data-taskid="${taskId}" data-rowid="${rowId}" oninput="recalcHrs()"></td>
-    <td><select class="tbl-sel" data-taskid="${taskId}" data-rowid="${rowId}" style="min-width:120px">
+    <td><select class="tbl-sel" data-taskid="${taskId}" data-rowid="${rowId}" style="min-width:110px">
       <option ${task.status==='Not Started'?'selected':''}>Not Started</option>
-      <option ${task.status==='In Progress'?'selected':''}>In Progress</option>
+      <option ${task.status==='In Progress'||task.status===undefined?'selected':''}>In Progress</option>
       <option ${task.status==='Completed'?'selected':''}>Completed</option>
       <option ${task.status==='On Hold'?'selected':''}>On Hold</option>
     </select></td>
     <td><input class="tbl-inp" placeholder="What did you work on?" style="min-width:130px"></td>
-    <td><button class="btn-success" onclick="submitTrackerRow(this,'${rowId}','${taskId}','${pid}')">Submit</button></td>
+    <td><button class="btn-success" onclick="submitTrackerRow(this,'${rowId}','${taskId}','${project?.id||''}')">&#9654; Submit</button></td>
   `;
-  tbody.appendChild(tr);
+  // New entries go to TOP (above any submitted rows)
+  const firstSubmitted=tbody.querySelector('tr[data-submitted]');
+  if(firstSubmitted) tbody.insertBefore(tr, firstSubmitted);
+  else tbody.insertBefore(tr, tbody.firstChild);
   recalcHrs();
 }
 function renderSubmittedTrackerRows(){
@@ -1953,25 +2103,36 @@ function renderSubmittedTrackerRows(){
   const tbody=document.getElementById('trackerTbl');
   // Remove old submitted rows
   tbody.querySelectorAll('tr[data-submitted]').forEach(r=>r.remove());
-  // Prepend submitted rows at top
+  // Append submitted rows at BOTTOM (completed tasks sink to bottom)
   entries.forEach((e,i)=>{
     const found=findTask(e.taskId); if(!found) return;
     const {task,project}=found;
-    const tr=document.createElement('tr'); tr.setAttribute('data-submitted','1');
+    // Calculate total time tracked on this task across all entries
+    const allEntries=DB.trackerEntries.filter(x=>x.taskId===e.taskId&&x.submitted);
+    const totalTrackedHrs=allEntries.reduce((s,x)=>s+x.hours,0);
+    const isCompleted=e.status==='Completed'||task.status==='Completed';
+    const tr=document.createElement('tr');
+    tr.setAttribute('data-submitted','1');
+    tr.style.opacity=isCompleted?'0.7':'1';
     tr.innerHTML=`
-      <td style="color:var(--muted);font-size:10px;font-family:'JetBrains Mono',monospace">✓</td>
-      <td style="font-size:12px;font-weight:600;color:var(--white)">${task.title}<div style="font-size:9px;color:var(--muted)">Est: ${task.hours||0}h</div></td>
+      <td style="color:var(--green);font-size:12px">&#10003;</td>
+      <td style="font-size:12px;font-weight:600;color:var(--white)">${task.title}
+        <div style="font-size:9px;color:var(--muted)">
+          Est: ${task.hours||0}h
+          ${totalTrackedHrs>0?`&nbsp;<span style="color:var(--teal);font-family:'JetBrains Mono',monospace">&#128336; ${totalTrackedHrs.toFixed(1)}h total</span>`:''}
+        </div>
+      </td>
       <td><span class="badge" style="background:${project.color}22;color:${project.color}">${project.name}</span></td>
-      <td style="font-size:10px;color:var(--muted)">${task.initiated||'—'}</td>
-      <td style="font-size:10px">${fmt(task.start)}</td>
+      <td style="font-size:10px;color:var(--muted)">${project.account||'&mdash;'}</td>
       <td style="font-size:10px;color:${isLate(task.due)?'var(--red)':'var(--muted)'}">${fmt(task.due)}</td>
       <td style="font-size:11px">${currentUser.name}</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted)">${task.hours||0}h</td>
       <td style="font-family:'JetBrains Mono',monospace;color:var(--accent);font-weight:700">${e.hours}h</td>
       <td><span class="badge ${bcls(e.status)}">${e.status}</span></td>
-      <td style="font-size:10px;color:var(--muted)">${e.remark||'—'}</td>
-      <td><span style="color:var(--green);font-size:12px;font-weight:700">✓ Submitted</span></td>
+      <td style="font-size:10px;color:var(--muted)">${e.remark||'&mdash;'}</td>
+      <td><span style="color:var(--green);font-size:11px;font-weight:700">&#10003; Submitted</span></td>
     `;
-    tbody.insertBefore(tr, tbody.firstChild);
+    tbody.appendChild(tr); // append to BOTTOM
   });
   recalcHrs();
 }
@@ -2002,12 +2163,26 @@ function recalcHrs(){
     const v=parseFloat(inp.value)||0; newHrs+=v;
     inp.classList.toggle('hrs-low',v>0&&v<4);
   });
-  const submittedHrs=DB.trackerEntries.filter(e=>e.userId===currentUser?.id&&e.date===TODAY&&e.submitted).reduce((s,e)=>s+e.hours,0);
-  const done=DB.trackerEntries.filter(e=>e.userId===currentUser?.id&&e.date===TODAY&&e.status==='Completed').length;
-  const subCount=DB.trackerEntries.filter(e=>e.userId===currentUser?.id&&e.date===TODAY&&e.submitted).length;
+  const todayEntries=DB.trackerEntries.filter(e=>e.userId===currentUser?.id&&e.date===TODAY&&e.submitted);
+  const submittedHrs=todayEntries.reduce((s,e)=>s+e.hours,0);
+  const done=todayEntries.filter(e=>e.status==='Completed').length;
+  const subCount=todayEntries.length;
   document.getElementById('totalHrs').textContent=(newHrs+submittedHrs).toFixed(1);
   document.getElementById('completedCnt').textContent=done;
   document.getElementById('submittedCnt').textContent=subCount;
+  // Avg elapsed time across tasks worked today
+  const taskIds=[...new Set(todayEntries.map(e=>e.taskId))];
+  const elapsedMins=taskIds.map(id=>{const t=findTask(id)?.task;return t?getLiveElapsed(t):0;}).filter(m=>m>0);
+  const avgEl=document.getElementById('avgElapsedLbl');
+  if(avgEl) avgEl.textContent=elapsedMins.length?fmtElapsed(Math.round(elapsedMins.reduce((a,b)=>a+b,0)/elapsedMins.length)):'—';
+}
+// Live elapsed timer — refresh every 60s so "In Progress" times stay current
+let _elapsedTimer=null;
+function startElapsedTimer(){
+  if(_elapsedTimer) clearInterval(_elapsedTimer);
+  _elapsedTimer=setInterval(()=>{
+    if(document.getElementById('trackerTbl')) recalcHrs();
+  },60000);
 }
 
 // ══════════════════════════════════════════════
@@ -2057,26 +2232,45 @@ function closeModal(id){ document.getElementById(id).classList.remove('open'); }
 function bgClose(e,id){ if(e.target.id===id) closeModal(id); }
 
 // Project
-function openProjModal(){
-  selClr=COLORS[0];
-  ['pm_name','pm_account','pm_desc','pm_start','pm_due'].forEach(x=>{ const el=document.getElementById(x); if(el) el.value=''; });
+let editingProjectId=null;
+function openProjModal(projId){
+  editingProjectId=projId||null;
+  const p=projId?DB.projects.find(x=>x.id===projId):null;
+  selClr=p?.color||COLORS[0];
+  const titleEl=document.querySelector('#projModal .modal-title');
+  if(titleEl) titleEl.textContent=p?'&#9998; Edit Project':'&#128193; New Project';
+  const saveBtnEl=document.querySelector('#projModal .btn-primary');
+  if(saveBtnEl) saveBtnEl.textContent=p?'Save Changes':'Create Project';
+  const fmap={pm_name:'name',pm_account:'account',pm_desc:'desc',pm_start:'start',pm_due:'due'};
+  Object.entries(fmap).forEach(([id,key])=>{const el=document.getElementById(id);if(el)el.value=p?p[key]||'':'';});
+  if(p) document.getElementById('pm_type').value=p.type||'PR';
   document.getElementById('pm_colors').innerHTML=COLORS.map(c=>`<div class="clr ${c===selClr?'sel':''}" style="background:${c}" onclick="selClr='${c}';document.querySelectorAll('.clr').forEach(x=>x.classList.remove('sel'));this.classList.add('sel')"></div>`).join('');
-  document.getElementById('pm_leads').innerHTML=USERS.filter(u=>u.role==='lead').map(u=>`<option value="${u.id}">${u.name}</option>`).join('');
+  document.getElementById('pm_leads').innerHTML=USERS.filter(u=>u.role==='lead').map(u=>`<option value="${u.id}" ${p&&p.assignedLeads?.includes(u.id)?'selected':''}>${u.name}</option>`).join('');
   openModal('projModal');
 }
 function saveProject(){
   const name=document.getElementById('pm_name').value.trim();
   if(!name){toast('Name required','var(--red)');return;}
   const leads=Array.from(document.getElementById('pm_leads').selectedOptions).map(o=>o.value);
-  const id=uid();
-  DB.projects.push({id,name,account:document.getElementById('pm_account').value,type:document.getElementById('pm_type').value,desc:document.getElementById('pm_desc').value,color:selClr,start:document.getElementById('pm_start').value,due:document.getElementById('pm_due').value,assignedLeads:leads,buckets:{'To Do':[],'In Progress':[],'Review':[],'Done':[],'On Hold':[]}});
-  saveDB(); closeModal('projModal'); curPlannerProj=id;
-  toast(`Project "${name}" created`,'var(--green)'); refreshAll();
+  const data={name,account:document.getElementById('pm_account').value,type:document.getElementById('pm_type').value,desc:document.getElementById('pm_desc').value,color:selClr,start:document.getElementById('pm_start').value,due:document.getElementById('pm_due').value,assignedLeads:leads};
+  if(editingProjectId){
+    const p=DB.projects.find(x=>x.id===editingProjectId);
+    if(p){Object.assign(p,data);toast(`Project "${name}" updated`,'var(--green)');}
+  } else {
+    const id=uid();
+    DB.projects.push({id,...data,buckets:{'To Do':[],'In Progress':[],'Review':[],'Done':[],'On Hold':[]}});
+    curPlannerProj=id;
+    toast(`Project "${name}" created`,'var(--green)');
+  }
+  saveDB();closeModal('projModal');refreshAll();
 }
 
 // Task
 let editingBucket=null;
-function openTaskModal(bucket, existingTask){
+function openTaskModal(bucket, projIdOrTask){
+  const existingTask=(projIdOrTask&&typeof projIdOrTask==='object')?projIdOrTask:null;
+  const forceProjId=(projIdOrTask&&typeof projIdOrTask==='string')?projIdOrTask:null;
+  if(forceProjId&&!curPlannerProj) curPlannerProj=forceProjId;
   editingTaskId=existingTask?.id||null; editingBucket=bucket||null;
   document.getElementById('taskModalTitle').textContent=existingTask?'✏️ Edit Task':'📝 New Task';
   document.getElementById('tm_title').value=existingTask?.title||'';
@@ -2090,11 +2284,11 @@ function openTaskModal(bucket, existingTask){
   document.getElementById('tm_status').value=existingTask?.status||'Not Started';
   document.getElementById('tm_priority').value=existingTask?.priority||'Medium';
   document.getElementById('tm_type').value=existingTask?.type||'PR';
-  const avail=currentUser.role==='manager'?DB.projects:myProjects(currentUser);
+  const avail=myProjects(currentUser);
   const pSel=document.getElementById('tm_proj');
-  pSel.innerHTML=avail.map(p=>`<option value="${p.id}">${p.name}</option>`).join('');
-  if(curPlannerProj) pSel.value=curPlannerProj;
-  if(existingTask){ const p=findTask(existingTask.id)?.project; if(p) pSel.value=p.id; }
+  pSel.innerHTML=avail.map(p=>`<option value="${p.id}">${p.account?p.account+' > ':''} ${p.name}</option>`).join('');
+  const selProj=curPlannerProj||(existingTask?findTask(existingTask.id)?.project?.id:null);
+  if(selProj) pSel.value=selProj;
   document.getElementById('tm_lead').innerHTML='<option value="">None</option>'+USERS.filter(u=>u.role==='lead').map(u=>`<option value="${u.id}">${u.name}</option>`).join('');
   document.getElementById('tm_assoc').innerHTML='<option value="">None</option>'+USERS.filter(u=>u.role==='associate').map(u=>`<option value="${u.id}">${u.name}</option>`).join('');
   if(existingTask?.assignedLead) document.getElementById('tm_lead').value=existingTask.assignedLead;
