@@ -284,30 +284,24 @@ select.ctrl option{background:var(--navy)}
 
 <!-- ══════════ LOGIN ══════════ -->
 <div id="loginScreen">
-  <div style="display:flex;gap:28px;align-items:flex-start;max-width:860px;width:100%;padding:20px">
-    <!-- Login Form -->
-    <div class="login-card" style="width:360px;flex-shrink:0">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:28px">
-        <div class="logo-mark">W</div>
-        <div><div style="font-size:20px;font-weight:800;color:var(--white)">WMS</div><div style="font-size:11px;color:var(--muted)">Workforce Management System</div></div>
-      </div>
-      <label style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text-dim);display:block;margin-bottom:5px">Email Address</label>
-      <input class="login-inp" id="loginEmail" type="email" placeholder="you@company.com" onkeydown="if(event.key==='Enter')doLogin()">
-      <label style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text-dim);display:block;margin-bottom:5px;margin-top:12px">Password</label>
-      <div style="position:relative">
-        <input class="login-inp" id="loginPassword" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
-        <button onclick="togglePwd()" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);cursor:pointer;font-size:13px" id="pwdToggleBtn">👁</button>
-      </div>
-      <div id="loginError" style="color:var(--red);font-size:11px;margin-top:8px;display:none"></div>
-      <button class="login-btn" onclick="doLogin()">Sign In →</button>
-      <div style="margin-top:14px;text-align:center;font-size:10px;color:var(--text-dim)">Contact your admin to get access</div>
+  <div class="login-card">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:28px">
+      <div class="logo-mark">W</div>
+      <div><div style="font-size:20px;font-weight:800;color:var(--white)">WMS</div><div style="font-size:11px;color:var(--muted)">Workforce Management System</div></div>
     </div>
-    <!-- Credentials hint panel -->
-    <div style="flex:1;background:var(--navy2);border:1px solid var(--border);border-radius:16px;padding:22px;box-shadow:var(--shadow)">
-      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text-dim);margin-bottom:14px">Demo Credentials — click to auto-fill</div>
-      <div id="credList" style="display:flex;flex-direction:column;gap:4px;max-height:420px;overflow-y:auto;padding-right:4px"></div>
+    <label style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text-dim);display:block;margin-bottom:5px">Email Address</label>
+    <input class="login-inp" id="loginEmail" type="email" placeholder="you@company.com" onkeydown="if(event.key==='Enter')doLogin()">
+    <label style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text-dim);display:block;margin-bottom:5px;margin-top:12px">Password</label>
+    <div style="position:relative">
+      <input class="login-inp" id="loginPassword" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+      <button onclick="togglePwd()" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);cursor:pointer;font-size:13px" id="pwdToggleBtn">👁</button>
     </div>
+    <div id="loginError" style="color:var(--red);font-size:11px;margin-top:8px;display:none"></div>
+    <button class="login-btn" onclick="doLogin()">Sign In →</button>
+    <div style="margin-top:14px;text-align:center;font-size:10px;color:var(--text-dim)">Contact your admin to get access</div>
   </div>
+  <!-- hidden element kept so buildCredList() doesn't error -->
+  <div id="credList" style="display:none"></div>
 </div>
 
 <!-- ══════════ APP ══════════ -->
