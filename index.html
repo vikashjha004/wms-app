@@ -208,7 +208,7 @@ select.fc option{background:var(--navy)}
 .b-hold{background:rgba(245,158,11,.15);color:var(--amber)}
 .b-done{background:rgba(34,197,94,.15);color:var(--green)}
 .b-rev{background:rgba(59,130,246,.15);color:#60a5fa}
-.b-asgn{background:rgba(14,165,233,.15);color:var(--teal)}
+.b-asgn{background:rgba(14,165,233,.15);color:var(--teal)}.b-rd{background:rgba(239,68,68,.15);color:var(--red)}
 
 /* MISC */
 .notice{background:rgba(14,165,233,.07);border:1px solid rgba(14,165,233,.18);border-radius:8px;padding:9px 14px;font-size:11px;color:var(--accent);margin-bottom:16px;display:flex;align-items:center;gap:7px}
@@ -240,6 +240,36 @@ select.ctrl option{background:var(--navy)}
 .acct-proj-item:hover{background:rgba(14,165,233,.06)!important;border-color:rgba(14,165,233,.2)!important}
 #page-planner{overflow:hidden!important;display:flex;flex-direction:column}
 #page-planner>div:last-child{flex:1;min-height:0;overflow:hidden}
+
+/* ── Excel-style Assignment Sheet ── */
+.sheet-wrap{overflow:auto;border:1px solid var(--border);border-radius:var(--r);background:var(--surface)}
+.sheet-tbl{border-collapse:collapse;min-width:100%;font-size:11px;white-space:nowrap}
+.sheet-tbl th{position:sticky;top:0;z-index:10;background:var(--navy2);border:1px solid var(--border);padding:0;min-width:80px;user-select:none}
+.sh-th-inner{display:flex;flex-direction:column;gap:0}
+.sh-th-label{display:flex;align-items:center;justify-content:space-between;padding:6px 8px;cursor:pointer;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text-dim);gap:4px;transition:background .1s}
+.sh-th-label:hover{background:rgba(14,165,233,.08);color:var(--white)}
+.sh-th-label.sorted-asc .sh-sort-icon::after{content:'▲';color:var(--teal)}
+.sh-th-label.sorted-desc .sh-sort-icon::after{content:'▼';color:var(--teal)}
+.sh-th-label:not(.sorted-asc):not(.sorted-desc) .sh-sort-icon::after{content:'⇅';color:var(--text-dim);font-size:8px}
+.sh-filter{border:none;border-top:1px solid var(--border);background:var(--navy3);width:100%;padding:3px 6px;font-family:'Sora',sans-serif;font-size:10px;color:var(--text);outline:none;transition:border-color .15s}
+.sh-filter:focus{border-color:var(--teal);background:var(--navy2)}
+.sh-filter option{background:var(--navy)}
+.sheet-tbl td{border:1px solid rgba(30,58,85,.4);padding:5px 8px;vertical-align:middle;background:transparent;transition:background .1s}
+.sheet-tbl tr:hover td{background:rgba(14,165,233,.04)}
+.sheet-tbl tr.row-completed td{opacity:.65}
+.sheet-tbl tr.row-break td{background:rgba(239,68,68,.04)}
+.sh-sn{color:var(--muted);font-size:9px;font-family:'JetBrains Mono',monospace;min-width:30px;text-align:center}
+.sh-date{font-size:10px;color:var(--text-dim);white-space:nowrap}
+.sh-name{font-size:11px;font-weight:600;color:var(--white)}
+.sh-acct{font-size:11px;font-weight:700;color:var(--teal)}
+.sh-hrs{font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--accent);text-align:center}
+.sh-loc{display:inline-block;font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;background:rgba(14,165,233,.12);color:var(--teal)}
+.sh-status-pill{display:inline-block;font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px;white-space:nowrap}
+.sheet-filter-bar{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;margin-bottom:12px;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r)}
+.sheet-stats{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:12px;padding:10px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);font-size:11px}
+.sh-stat{display:flex;flex-direction:column;align-items:center;gap:1px}
+.sh-stat-val{font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700}
+.sh-stat-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
 </style>
 </head>
 <body>
@@ -340,13 +370,39 @@ select.ctrl option{background:var(--navy)}
         </div>
       </div>
 
-      <!-- LEAD TASK ASSIGNMENT (Manager → Lead) -->
+      <!-- TASK ASSIGNMENT SHEET (All assignments in one place) -->
       <div class="page" id="page-lead-assign">
-        <div class="sec-head"><div><div class="sec-title">Lead Task Assignment</div><div class="sec-sub">Manager assigns tasks to leads</div></div>
-          <button class="btn btn-primary btn-sm" onclick="openLeadAssignModal()">+ Assign to Lead</button>
+        <div class="sec-head" style="flex-shrink:0">
+          <div><div class="sec-title">Task Assignment Sheet</div><div class="sec-sub" id="laSheetSub">All ongoing assignments — sortable &amp; filterable</div></div>
+          <div style="display:flex;gap:7px">
+            <button class="btn btn-primary btn-sm" onclick="openLeadAssignModal()">+ Lead Assignment</button>
+            <button class="btn btn-violet btn-sm" onclick="openAssocAssignModal()">+ Associate Assignment</button>
+            <button class="btn btn-ghost btn-sm" onclick="exportSheetCSV()">&#x2913; Export CSV</button>
+          </div>
         </div>
-        <div class="tbl-wrap"><table class="tbl"><thead><tr><th>#</th><th>Date</th><th>Project</th><th>Task</th><th>Lead</th><th>Initiated By</th><th>Due</th><th>Est.Hrs</th><th>Actual Hrs</th><th>Status</th><th>Remarks</th><th>Update</th></tr></thead><tbody id="leadAssignTbl"></tbody></table>
-        <div class="empty-state" id="laEmpty"><div style="font-size:28px;margin-bottom:8px">📋</div>No lead assignments yet</div></div>
+        <!-- Stats bar -->
+        <div class="sheet-stats" id="laSheetStats"></div>
+        <!-- Quick filters bar -->
+        <div class="sheet-filter-bar" id="laQuickFilters">
+          <div><label class="ctrl-lbl">Lead</label><select class="ctrl" id="qfLead" onchange="renderAssignSheet()" style="width:160px"><option value="">All Leads</option></select></div>
+          <div><label class="ctrl-lbl">Account</label><select class="ctrl" id="qfAccount" onchange="renderAssignSheet()" style="width:120px"><option value="">All Accounts</option></select></div>
+          <div><label class="ctrl-lbl">Project</label><select class="ctrl" id="qfProject" onchange="renderAssignSheet()" style="width:160px"><option value="">All Projects</option></select></div>
+          <div><label class="ctrl-lbl">Stage</label><select class="ctrl" id="qfStage" onchange="renderAssignSheet()" style="width:160px"><option value="">All Stages</option></select></div>
+          <div><label class="ctrl-lbl">Task</label><select class="ctrl" id="qfTask" onchange="renderAssignSheet()" style="width:150px"><option value="">All Tasks</option></select></div>
+          <div><label class="ctrl-lbl">Work Type</label><select class="ctrl" id="qfWorkType" onchange="renderAssignSheet()" style="width:150px"><option value="">All Types</option></select></div>
+          <div><label class="ctrl-lbl">Assigned To</label><select class="ctrl" id="qfAssignedTo" onchange="renderAssignSheet()" style="width:160px"><option value="">Everyone</option></select></div>
+          <div><label class="ctrl-lbl">Location</label><select class="ctrl" id="qfLocation" onchange="renderAssignSheet()" style="width:90px"><option value="">All</option></select></div>
+          <div><label class="ctrl-lbl">Status</label><select class="ctrl" id="qfStatus" onchange="renderAssignSheet()" style="width:130px"><option value="">All Statuses</option></select></div>
+          <button class="btn btn-ghost btn-sm" onclick="clearSheetFilters()" style="align-self:flex-end">&#x2715; Clear</button>
+        </div>
+        <!-- Sheet table -->
+        <div class="sheet-wrap" id="laSheetWrap">
+          <table class="sheet-tbl" id="laSheet">
+            <thead id="laSheetHead"></thead>
+            <tbody id="laSheetBody"></tbody>
+          </table>
+          <div class="empty-state" id="laEmpty" style="display:none"><div style="font-size:28px;margin-bottom:8px">&#x1F4CB;</div>No assignments yet. Use the buttons above to add.</div>
+        </div>
       </div>
 
       <!-- ASSOCIATE HOURS OVERVIEW (Manager) -->
@@ -383,13 +439,10 @@ select.ctrl option{background:var(--navy)}
         <div class="kanban" id="leadKanban"></div>
       </div>
 
-      <!-- ASSOCIATE ASSIGNMENT (Lead → Associate) -->
-      <div class="page" id="page-assoc-assign">
-        <div class="sec-head"><div><div class="sec-title">Associate Task Assignment</div><div class="sec-sub">Lead assigns tasks to associates</div></div>
-          <button class="btn btn-violet btn-sm" onclick="openAssocAssignModal()">+ Assign to Associate</button>
-        </div>
-        <div class="tbl-wrap"><table class="tbl"><thead><tr><th>#</th><th>Date</th><th>Project</th><th>Task</th><th>Associate</th><th>Lead</th><th>Due</th><th>Est.Hrs</th><th>Actual Hrs</th><th>Status</th><th>Remarks</th><th>Update</th></tr></thead><tbody id="assocAssignTbl"></tbody></table>
-        <div class="empty-state" id="aaEmpty"><div style="font-size:28px;margin-bottom:8px">👤</div>No associate assignments yet</div></div>
+      <!-- ASSOCIATE ASSIGNMENT page (hidden — merged into lead-assign sheet) -->
+      <div class="page" id="page-assoc-assign" style="display:none!important">
+        <div class="empty-state" id="aaEmpty" style="display:none"></div>
+        <table style="display:none"><tbody id="assocAssignTbl"></tbody></table>
       </div>
 
       <!-- MY TASKS (All roles) -->
@@ -423,19 +476,25 @@ select.ctrl option{background:var(--navy)}
             </select>
           </div>
           <div id="trackAssignedControls" style="display:flex;gap:10px;flex-wrap:wrap">
-            <div><label class="ctrl-lbl">Project</label><select class="ctrl" id="trackProj" onchange="populateTrackTask()" style="width:180px"></select></div>
-            <div><label class="ctrl-lbl">Task</label><select class="ctrl" id="trackTask" style="width:200px"></select></div>
+            <div><label class="ctrl-lbl">Account</label><select class="ctrl" id="trackAccount" onchange="populateTrackProjByAccount()" style="width:140px"></select></div>
+            <div><label class="ctrl-lbl">Project</label><select class="ctrl" id="trackProj" onchange="populateTrackTask()" style="width:170px"></select></div>
+            <div><label class="ctrl-lbl">Task</label><select class="ctrl" id="trackTask" style="width:180px"></select></div>
+            <div><label class="ctrl-lbl">Stage</label><select class="ctrl" id="trackStage" style="width:160px"></select></div>
+            <div><label class="ctrl-lbl">Work Type</label><select class="ctrl" id="trackWorkType" style="width:150px"></select></div>
+            <div><label class="ctrl-lbl">Location</label><select class="ctrl" id="trackLocation" style="width:100px"></select></div>
           </div>
           <div id="trackOwnControls" style="display:none;flex-wrap:wrap;gap:10px">
             <div><label class="ctrl-lbl">Task Title *</label><input class="ctrl" id="ownTaskTitle" placeholder="What are you working on?" style="width:200px"></div>
-            <div><label class="ctrl-lbl">Account</label><select class="ctrl" id="ownTaskAccount" onchange="populateOwnProjects()" style="width:150px"></select></div>
-            <div><label class="ctrl-lbl">Project</label><select class="ctrl" id="ownTaskProject" style="width:180px"></select></div>
-            <div><label class="ctrl-lbl">Priority</label><select class="ctrl" id="ownTaskPriority" style="width:110px"><option>Medium</option><option>High</option><option>Low</option></select></div>
+            <div><label class="ctrl-lbl">Account</label><select class="ctrl" id="ownTaskAccount" onchange="populateOwnProjects()" style="width:140px"></select></div>
+            <div><label class="ctrl-lbl">Project</label><select class="ctrl" id="ownTaskProject" style="width:170px"></select></div>
+            <div><label class="ctrl-lbl">Stage</label><select class="ctrl" id="ownTaskStage" style="width:160px"></select></div>
+            <div><label class="ctrl-lbl">Work Type</label><select class="ctrl" id="ownTaskWorkType" style="width:150px"></select></div>
+            <div><label class="ctrl-lbl">Location</label><select class="ctrl" id="ownTaskLocation" style="width:100px"></select></div>
           </div>
         </div>
         <div class="tbl-wrap">
           <table class="tbl">
-            <thead><tr><th>#</th><th>Task</th><th>Project</th><th>Account</th><th>Due</th><th>Assigned To</th><th>Est.Hrs</th><th>Hours Worked</th><th>Status</th><th>Remarks</th><th>Action</th></tr></thead>
+            <thead><tr><th>#</th><th>Task</th><th>Project</th><th>Account</th><th>Stage</th><th>Work Type</th><th>Location</th><th>Assigned To</th><th>Assigned Hrs</th><th>Start Time</th><th>End Time</th><th>Total Time</th><th>Worked Hrs</th><th>Status</th><th>Remarks</th><th>Action</th></tr></thead>
             <tbody id="trackerTbl"></tbody>
           </table>
           <div class="total-bar">
@@ -554,30 +613,40 @@ select.ctrl option{background:var(--navy)}
 
 <!-- Lead Assignment Modal (Manager → Lead) -->
 <div class="overlay" id="leadAssignModal" onclick="bgClose(event,'leadAssignModal')">
-  <div class="modal">
-    <div class="modal-title">📋 Assign Task to Lead</div>
+  <div class="modal" style="width:600px">
+    <div class="modal-title">&#x1F4CB; Assign Task to Lead</div>
     <div class="fr"><div class="fg"><label class="fl">Date</label><input class="fc" id="la_date" type="date"></div>
-      <div class="fg"><label class="fl">Initiated By</label><input class="fc" id="la_initiated" readonly></div></div>
-    <div class="fr"><div class="fg"><label class="fl">Project</label><select class="fc" id="la_proj" onchange="populateLaTask()"></select></div>
-      <div class="fg"><label class="fl">Task</label><select class="fc" id="la_task"></select></div></div>
+      <div class="fg"><label class="fl">Lead (Assigned By)</label><input class="fc" id="la_initiated" readonly></div></div>
+    <div class="fr"><div class="fg"><label class="fl">Account</label><select class="fc" id="la_account" onchange="populateLaProj()"></select></div>
+      <div class="fg"><label class="fl">Project</label><select class="fc" id="la_proj" onchange="populateLaTask()"></select></div></div>
+    <div class="fr"><div class="fg"><label class="fl">Stage</label><select class="fc" id="la_stage"></select></div>
+      <div class="fg"><label class="fl">Task</label><select class="fc" id="la_task_type"></select></div></div>
+    <div class="fr"><div class="fg"><label class="fl">Work Type</label><select class="fc" id="la_work_type"></select></div>
+      <div class="fg"><label class="fl">Location</label><select class="fc" id="la_location"></select></div></div>
     <div class="fr"><div class="fg"><label class="fl">Assign to Lead</label><select class="fc" id="la_lead"></select></div>
-      <div class="fg"><label class="fl">Status</label><select class="fc" id="la_status"><option>Assigned</option><option>In Progress</option><option>On Hold</option></select></div></div>
-    <div class="fg"><label class="fl">Remarks</label><input class="fc" id="la_remark" placeholder="Optional…"></div>
+      <div class="fg"><label class="fl">Assigned Hours</label><input class="fc" id="la_hours" type="number" min="0" step="0.5" placeholder="e.g. 45"></div></div>
+    <div class="fr"><div class="fg"><label class="fl">Final Status</label><select class="fc" id="la_status"></select></div>
+      <div class="fg"><label class="fl">Remarks</label><input class="fc" id="la_remark" placeholder="e.g. S4 Stage"></div></div>
     <div class="fa"><button class="btn btn-ghost" onclick="closeModal('leadAssignModal')">Cancel</button><button class="btn btn-primary" onclick="saveLeadAssign()">Assign to Lead</button></div>
   </div>
 </div>
 
 <!-- Associate Assignment Modal (Lead → Associate) -->
 <div class="overlay" id="assocAssignModal" onclick="bgClose(event,'assocAssignModal')">
-  <div class="modal">
-    <div class="modal-title">👤 Assign Task to Associate</div>
+  <div class="modal" style="width:600px">
+    <div class="modal-title">&#x1F464; Assign Task to Associate</div>
     <div class="fr"><div class="fg"><label class="fl">Date</label><input class="fc" id="aa_date" type="date"></div>
-      <div class="fg"><label class="fl">Lead</label><input class="fc" id="aa_lead" readonly></div></div>
-    <div class="fr"><div class="fg"><label class="fl">Project</label><select class="fc" id="aa_proj" onchange="populateAaTask()"></select></div>
-      <div class="fg"><label class="fl">Task</label><select class="fc" id="aa_task"></select></div></div>
+      <div class="fg"><label class="fl">Lead Name</label><input class="fc" id="aa_lead" readonly></div></div>
+    <div class="fr"><div class="fg"><label class="fl">Account</label><select class="fc" id="aa_account" onchange="populateAaProj()"></select></div>
+      <div class="fg"><label class="fl">Project</label><select class="fc" id="aa_proj" onchange="populateAaTask()"></select></div></div>
+    <div class="fr"><div class="fg"><label class="fl">Stage</label><select class="fc" id="aa_stage"></select></div>
+      <div class="fg"><label class="fl">Task</label><select class="fc" id="aa_task_type"></select></div></div>
+    <div class="fr"><div class="fg"><label class="fl">Work Type</label><select class="fc" id="aa_work_type"></select></div>
+      <div class="fg"><label class="fl">Location</label><select class="fc" id="aa_location"></select></div></div>
     <div class="fr"><div class="fg"><label class="fl">Assign to Associate</label><select class="fc" id="aa_assoc"></select></div>
-      <div class="fg"><label class="fl">Status</label><select class="fc" id="aa_status"><option>Assigned</option><option>In Progress</option><option>On Hold</option></select></div></div>
-    <div class="fg"><label class="fl">Instructions / Remarks</label><textarea class="fc" id="aa_remark" placeholder="Instructions for associate…"></textarea></div>
+      <div class="fg"><label class="fl">Assigned Hours</label><input class="fc" id="aa_hours" type="number" min="0" step="0.5" placeholder="e.g. 45"></div></div>
+    <div class="fr"><div class="fg"><label class="fl">Final Status</label><select class="fc" id="aa_status"></select></div>
+      <div class="fg"><label class="fl">Remarks</label><input class="fc" id="aa_remark" placeholder="e.g. S4 Stage"></div></div>
     <div class="fa"><button class="btn btn-ghost" onclick="closeModal('assocAssignModal')">Cancel</button><button class="btn btn-violet" onclick="saveAssocAssign()">Assign to Associate</button></div>
   </div>
 </div>
@@ -691,7 +760,13 @@ const ROLE_META={
   lead:     {label:'Lead',     bg:'rgba(124,58,237,.15)', c:'#a78bfa', order:2},
   associate:{label:'Associate',bg:'rgba(34,197,94,.15)',  c:'#22c55e', order:3},
 };
-const STATUS_CLR={'Not Started':'#475569','In Progress':'#7c3aed','On Hold':'#f59e0b','Completed':'#22c55e','Review':'#3b82f6','Assigned':'#0ea5e9'};
+const STATUS_CLR={'Not Started':'#475569','In Progress':'#7c3aed','On Hold':'#f59e0b','Completed':'#22c55e','Review':'#3b82f6','Assigned':'#0ea5e9','Hold':'#f59e0b','Under Review':'#3b82f6','Not Started Yet':'#475569','BREAK':'#ef4444'};
+const WMS_STAGES=['Schematic Design','Design Development','Construction Document','Permit Set','Dedicated','Flexy Hous','As Built','Red Line Markup','Internal Training','On Job Training','Unplanned','Client Assignment','QC'];
+const WMS_WORK_TYPES=['Initial Work','Revision 1','Revision 2','Revision 3','Revision 4','Revision 5','Scope Change 1','Scope Change 2','Scope Change 3','Scope Change 4','Scope Change 5','Internal Training','On Job Training','Unplanned','Client Assignment','QC'];
+const WMS_TASKS=['3D Modeling','2D Detailing','Design & Calculation','Red Line Markup','Internal Training','On Job Training','Unplanned','Client Assignment','QC'];
+const WMS_LOCATIONS=['OFS','ONS','WFH'];
+const WMS_STATUSES=['In Progress','Completed','Hold','Under Review','Not Started Yet','BREAK'];
+function mkOpts(arr,sel=''){return arr.map(v=>`<option value="${v}" ${sel===v?'selected':''}>${v}</option>`).join('');}
 const BUCKET_CLR={'To Do':'#475569','In Progress':'#7c3aed','Review':'#3b82f6','Done':'#22c55e','On Hold':'#f59e0b'};
 const BUCKET_STATUS={'To Do':'Not Started','In Progress':'In Progress','Review':'Review','Done':'Completed','On Hold':'On Hold'};
 const TODAY='2026-03-01';
@@ -1018,7 +1093,9 @@ function mutateTask(taskId, {status, userRemark, leadRemark, hoursToAdd, submitt
       DB.trackerEntries.push({
         id: uid(), date: TODAY, userId: submittedByUserId,
         projectId: projId, taskId, hours: hoursToAdd,
-        status: task.status, remark: task.userRemark||'', submitted: true
+        status: task.status, remark: task.userRemark||'', submitted: true,
+        stage: task._stage||'', workType: task._workType||'', location: task._location||'',
+        startTime: task._startTime||'', endTime: task._endTime||'', totalTime: task._totalTime||''
       });
     }
   }
@@ -1060,7 +1137,7 @@ const fmt = d => { if(!d) return '—'; try{return new Date(d+'T00:00:00').toLoc
 const isLate = d => d && d < TODAY;
 const getUser = id => USERS.find(u=>u.id===id);
 const getProject = id => DB.projects.find(p=>p.id===id);
-const bcls = s => ({'Not Started':'b-ns','In Progress':'b-ip','On Hold':'b-hold','Completed':'b-done','Review':'b-rev','Assigned':'b-asgn'})[s]||'b-ns';
+const bcls = s => ({'Not Started':'b-ns','Not Started Yet':'b-ns','In Progress':'b-ip','On Hold':'b-hold','Hold':'b-hold','Completed':'b-done','Review':'b-rev','Under Review':'b-rev','Assigned':'b-asgn','BREAK':'b-rd'})[s]||'b-ns';
 const initials = n => (n||'').split(' ').map(x=>x[0]).slice(0,2).join('').toUpperCase();
 const esc = s => (s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
 
@@ -1212,7 +1289,7 @@ function logout(){
 const NAV={
   admin:    [{id:'dashboard',l:'📊 Dashboard'},{id:'planner',l:'🗂 Planning'},{id:'lead-assign',l:'📋 Lead Assignment'},{id:'hours-report',l:'⏱ Hours Report'},{id:'daily-overview',l:'📅 Daily Overview'},{id:'my-tasks',l:'✅ My Tasks'},{id:'tracker',l:'📅 Daily Tracker'},{id:'team',l:'👥 Team'},{id:'admin',l:'⚙️ Users'}],
   manager:  [{id:'dashboard',l:'📊 Dashboard'},{id:'planner',l:'🗂 Planning'},{id:'lead-assign',l:'📋 Lead Assignment'},{id:'hours-report',l:'⏱ Hours Report'},{id:'daily-overview',l:'📅 Daily Overview'},{id:'my-tasks',l:'✅ My Tasks'},{id:'tracker',l:'📅 Daily Tracker'},{id:'team',l:'👥 Team'}],
-  lead:     [{id:'lead-dashboard',l:'🗂 My Projects'},{id:'assoc-assign',l:'📋 Associate Assignment'},{id:'daily-overview',l:'📅 Daily Overview'},{id:'my-tasks',l:'✅ My Tasks'},{id:'tracker',l:'📅 Daily Tracker'},{id:'team',l:'👥 Team'}],
+  lead:     [{id:'lead-dashboard',l:'🗂 My Projects'},{id:'lead-assign',l:'📋 Task Assignment'},{id:'daily-overview',l:'📅 Daily Overview'},{id:'my-tasks',l:'✅ My Tasks'},{id:'tracker',l:'📅 Daily Tracker'},{id:'team',l:'👥 Team'}],
   associate:[{id:'my-tasks',l:'✅ My Tasks'},{id:'tracker',l:'📅 Daily Tracker'},{id:'team',l:'👥 Team'}]
 };
 function buildNav(){
@@ -1656,40 +1733,220 @@ function addBucketPrompt(){
 // ══════════════════════════════════════════════
 // RENDER: LEAD ASSIGN TABLE (Manager → Lead)
 // ══════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
+// ASSIGNMENT SHEET — unified Excel-style table
+// ═══════════════════════════════════════════════════
+let _sheetSort={col:'date',dir:'desc'};
+
+function getAllAssignments(){
+  // Combine lead + assoc assignments into one flat list
+  const lead=DB.leadAssignments.map(r=>({...r,_type:'lead',assignedToId:r.assignedLead,assignedToName:getUser(r.assignedLead)?.name||r.initiated||'—',leadName:getUser(r.assignedLead)?.name||r.initiated||'—'}));
+  const assoc=DB.assocAssignments.map(r=>({...r,_type:'assoc',assignedToId:r.associate,assignedToName:getUser(r.associate)?.name||'—',leadName:getUser(r.lead)?.name||'—'}));
+  return [...lead,...assoc];
+}
+
 function renderLeadAssignPage(){
-  const rows=DB.leadAssignments;
-  document.getElementById('laEmpty').style.display=rows.length?'none':'block';
-  document.getElementById('leadAssignTbl').innerHTML=rows.map((r,i)=>{
+  renderAssignSheet();
+}
+function renderAssocAssignPage(){ renderAssignSheet(); }
+
+function renderAssignSheet(){
+  const allRows=getAllAssignments();
+  // Populate filter dropdowns
+  function populateFilter(id, vals){
+    const el=document.getElementById(id); if(!el) return;
+    const cur=el.value;
+    const first=el.options[0].outerHTML;
+    el.innerHTML=first+[...new Set(vals.filter(Boolean).sort())].map(v=>`<option value="${v}" ${cur===v?'selected':''}>${v}</option>`).join('');
+    el.value=cur;
+  }
+  populateFilter('qfLead', allRows.map(r=>r.leadName));
+  populateFilter('qfAccount', allRows.map(r=>r.account||getProject(r.project)?.account||''));
+  populateFilter('qfProject', allRows.map(r=>getProject(r.project)?.name||''));
+  populateFilter('qfStage', allRows.map(r=>r.stage||''));
+  populateFilter('qfTask', allRows.map(r=>r.taskType||''));
+  populateFilter('qfWorkType', allRows.map(r=>r.workType||''));
+  populateFilter('qfAssignedTo', allRows.map(r=>r.assignedToName));
+  populateFilter('qfLocation', allRows.map(r=>r.location||''));
+  populateFilter('qfStatus', allRows.map(r=>r.finalStatus||r.status||''));
+
+  // Apply filters
+  const fLead=document.getElementById('qfLead')?.value||'';
+  const fAcct=document.getElementById('qfAccount')?.value||'';
+  const fProj=document.getElementById('qfProject')?.value||'';
+  const fStage=document.getElementById('qfStage')?.value||'';
+  const fTask=document.getElementById('qfTask')?.value||'';
+  const fWT=document.getElementById('qfWorkType')?.value||'';
+  const fTo=document.getElementById('qfAssignedTo')?.value||'';
+  const fLoc=document.getElementById('qfLocation')?.value||'';
+  const fSt=document.getElementById('qfStatus')?.value||'';
+
+  let rows=allRows.filter(r=>{
     const proj=getProject(r.project);
-    const lead=getUser(r.assignedLead);
-    const found=findTask(r.task);
-    const task=found?.task;
-    const act=task?getActualHours(r.task):0;
-    const est=task?.hours||0;
-    const delta=act-est;
-    return `<tr>
-      <td style="color:var(--muted);font-size:10px">${i+1}</td>
-      <td style="font-size:10px">${fmt(r.date)}</td>
-      <td>${proj?`<span class="badge" style="background:${proj.color}22;color:${proj.color}">${proj.name}</span>`:'—'}</td>
-      <td style="font-size:12px;font-weight:600;color:var(--white)">${task?.title||r.task}</td>
-      <td>${lead?avatarChip(lead):avEmpty()}</td>
-      <td style="font-size:10px;color:var(--muted)">${r.initiated||'—'}</td>
-      <td style="font-size:10px;color:${isLate(task?.due)?'var(--red)':'var(--muted)'}">${fmt(task?.due)}</td>
-      <td style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted)">${est}h</td>
-      <td style="font-family:'JetBrains Mono',monospace;font-size:11px;color:${act>est?'var(--red)':'var(--accent)'}">${act.toFixed(1)}h</td>
-      <td><span class="badge ${bcls(task?.status||r.status)}">${task?.status||r.status}</span></td>
-      <td style="font-size:10px;color:var(--muted);max-width:120px">${r.remark||'—'}</td>
-      <td><select class="tbl-sel" onchange="updateLaStatus('${r.id}',this.value)">
-        ${['Assigned','In Progress','On Hold','Completed'].map(s=>`<option ${(task?.status||r.status)===s?'selected':''}>${s}</option>`).join('')}
-      </select></td>
-    </tr>`;
+    const acct=r.account||proj?.account||'';
+    const projName=proj?.name||'';
+    const st=r.finalStatus||r.status||'';
+    return (!fLead||r.leadName===fLead)&&
+           (!fAcct||acct===fAcct)&&
+           (!fProj||projName===fProj)&&
+           (!fStage||r.stage===fStage)&&
+           (!fTask||r.taskType===fTask)&&
+           (!fWT||r.workType===fWT)&&
+           (!fTo||r.assignedToName===fTo)&&
+           (!fLoc||r.location===fLoc)&&
+           (!fSt||st===fSt);
+  });
+
+  // Sort
+  const {col,dir}=_sheetSort;
+  rows.sort((a,b)=>{
+    let av='',bv='';
+    if(col==='sn'){av=0;bv=0;}
+    else if(col==='date'){av=a.date||'';bv=b.date||'';}
+    else if(col==='lead'){av=a.leadName;bv=b.leadName;}
+    else if(col==='account'){av=a.account||getProject(a.project)?.account||'';bv=b.account||getProject(b.project)?.account||'';}
+    else if(col==='project'){av=getProject(a.project)?.name||'';bv=getProject(b.project)?.name||'';}
+    else if(col==='stage'){av=a.stage||'';bv=b.stage||'';}
+    else if(col==='task'){av=a.taskType||'';bv=b.taskType||'';}
+    else if(col==='worktype'){av=a.workType||'';bv=b.workType||'';}
+    else if(col==='assignedto'){av=a.assignedToName;bv=b.assignedToName;}
+    else if(col==='location'){av=a.location||'';bv=b.location||'';}
+    else if(col==='hours'){av=+(a.assignedHours||0);bv=+(b.assignedHours||0);}
+    else if(col==='status'){av=a.finalStatus||a.status||'';bv=b.finalStatus||b.status||'';}
+    else if(col==='remarks'){av=a.remark||'';bv=b.remark||'';}
+    if(typeof av==='number') return dir==='asc'?av-bv:bv-av;
+    return dir==='asc'?av.localeCompare(bv):bv.localeCompare(av);
+  });
+
+  // Stats
+  const total=rows.length;
+  const completed=rows.filter(r=>(r.finalStatus||r.status)==='Completed').length;
+  const inProg=rows.filter(r=>(r.finalStatus||r.status)==='In Progress').length;
+  const totalHrs=rows.reduce((s,r)=>s+(+(r.assignedHours||0)),0);
+  document.getElementById('laSheetStats').innerHTML=`
+    <div class="sh-stat"><div class="sh-stat-val" style="color:var(--teal)">${total}</div><div class="sh-stat-lbl">Total</div></div>
+    <div style="width:1px;background:var(--border)"></div>
+    <div class="sh-stat"><div class="sh-stat-val" style="color:var(--violet2)">${inProg}</div><div class="sh-stat-lbl">In Progress</div></div>
+    <div class="sh-stat"><div class="sh-stat-val" style="color:var(--green)">${completed}</div><div class="sh-stat-lbl">Completed</div></div>
+    <div class="sh-stat"><div class="sh-stat-val" style="color:var(--amber)">${total-completed-inProg}</div><div class="sh-stat-lbl">Other</div></div>
+    <div style="width:1px;background:var(--border)"></div>
+    <div class="sh-stat"><div class="sh-stat-val" style="color:var(--accent)">${totalHrs}</div><div class="sh-stat-lbl">Total Hrs</div></div>
+    <div style="margin-left:auto;font-size:10px;color:var(--text-dim);align-self:center">Showing <strong style="color:var(--white)">${rows.length}</strong> of <strong style="color:var(--white)">${allRows.length}</strong> rows</div>
+  `;
+
+  // Build header with sort + filter
+  const COLS=[
+    {key:'sn',label:'Sl.No',w:'44px',nosort:true},
+    {key:'date',label:'Date',w:'90px'},
+    {key:'lead',label:'Lead',w:'140px'},
+    {key:'account',label:'Account',w:'80px'},
+    {key:'project',label:'Project',w:'120px'},
+    {key:'stage',label:'Stages',w:'150px'},
+    {key:'task',label:'Task',w:'130px'},
+    {key:'worktype',label:'Work Type',w:'120px'},
+    {key:'assignedto',label:'Assigned To',w:'150px'},
+    {key:'location',label:'Location',w:'75px'},
+    {key:'hours',label:'Assigned Hours',w:'90px'},
+    {key:'status',label:'Final Status',w:'120px'},
+    {key:'remarks',label:'Remarks',w:'120px'},
+    {key:'_action',label:'Update',w:'120px',nosort:true},
+  ];
+
+  document.getElementById('laSheetHead').innerHTML='<tr>'+COLS.map(function(c){
+    const sorted=_sheetSort.col===c.key;
+    const dir=sorted?_sheetSort.dir:'';
+    const sortCls=sorted?'sorted-'+dir:'';
+    const clickAttr=c.nosort?'':'onclick="sortSheet(\''+c.key+'\')"';
+    const sortIcon=c.nosort?'':'<span class="sh-sort-icon"></span>';
+    return '<th style="width:'+c.w+';min-width:'+c.w+'">'
+      +'<div class="sh-th-inner">'
+      +'<div class="sh-th-label '+sortCls+'" '+clickAttr+'>'
+      +'<span>'+c.label+'</span>'+sortIcon
+      +'</div></div></th>';
+  }).join('')+'</tr>';
+
+  // Empty state
+  document.getElementById('laEmpty').style.display=rows.length?'none':'block';
+
+  // Render body — no nested backticks
+  function avatarCell(user, fallback){
+    if(!user) return fallback||'—';
+    return '<div style="display:flex;align-items:center;gap:5px">'
+      +'<div style="width:20px;height:20px;border-radius:50%;background:'+user.color+';display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#fff;flex-shrink:0">'+user.initials+'</div>'
+      +'<span style="font-size:11px;font-weight:600;color:var(--white)">'+user.name+'</span></div>';
+  }
+  function projCell(proj){
+    if(!proj) return '—';
+    return '<span style="display:inline-block;font-size:10px;padding:2px 8px;border-radius:4px;background:'+proj.color+'22;color:'+proj.color+';font-weight:600">'+proj.name+'</span>';
+  }
+  document.getElementById('laSheetBody').innerHTML=rows.map(function(r,i){
+    const proj=getProject(r.project);
+    const acct=r.account||proj?.account||'—';
+    const curStatus=r.finalStatus||r.status||'In Progress';
+    const stClr=STATUS_CLR[curStatus]||'#475569';
+    const rowCls=(curStatus==='Completed')?'row-completed':(curStatus==='BREAK')?'row-break':'';
+    const assignedUser=getUser(r.assignedToId);
+    const leadUser=r._type==='lead'?getUser(r.assignedLead):getUser(r.lead);
+    const statusOpts=WMS_STATUSES.map(function(s){return '<option'+(curStatus===s?' selected':'')+'>'+s+'</option>';}).join('');
+    return '<tr class="'+rowCls+'">'
+      +'<td class="sh-sn">'+(i+1)+'</td>'
+      +'<td class="sh-date">'+(r.date||'—')+'</td>'
+      +'<td class="sh-name">'+avatarCell(leadUser, r.leadName||'—')+'</td>'
+      +'<td class="sh-acct">'+acct+'</td>'
+      +'<td>'+projCell(proj)+'</td>'
+      +'<td style="font-size:10px;color:var(--text)">'+(r.stage||'—')+'</td>'
+      +'<td style="font-size:11px;font-weight:600;color:var(--white)">'+(r.taskType||'—')+'</td>'
+      +'<td style="font-size:10px;color:var(--muted)">'+(r.workType||'—')+'</td>'
+      +'<td>'+avatarCell(assignedUser, r.assignedToName||'—')+'</td>'
+      +'<td><span class="sh-loc">'+(r.location||'—')+'</span></td>'
+      +'<td class="sh-hrs">'+(r.assignedHours||0)+'</td>'
+      +'<td><span class="sh-status-pill" style="background:'+stClr+'22;color:'+stClr+'">'+curStatus+'</span></td>'
+      +'<td style="font-size:10px;color:var(--muted);max-width:120px;overflow:hidden;text-overflow:ellipsis" title="'+(r.remark||'')+'">'+(r.remark||'—')+'</td>'
+      +'<td><select class="tbl-sel" onchange="updateSheetStatus(\''+r.id+'\',\''+r._type+'\',this.value)" style="min-width:115px">'+statusOpts+'</select></td>'
+      +'</tr>';
   }).join('');
 }
-function updateLaStatus(id,status){
-  const r=DB.leadAssignments.find(x=>x.id===id); if(!r) return;
-  r.status=status;
-  mutateTask(r.task,{status});
-  refreshAll(); toast('Status updated');
+
+function sortSheet(col){
+  if(_sheetSort.col===col) _sheetSort.dir=_sheetSort.dir==='asc'?'desc':'asc';
+  else{_sheetSort.col=col;_sheetSort.dir='asc';}
+  renderAssignSheet();
+}
+function clearSheetFilters(){
+  ['qfLead','qfAccount','qfProject','qfStage','qfTask','qfWorkType','qfAssignedTo','qfLocation','qfStatus'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.value='';
+  });
+  renderAssignSheet();
+}
+function updateSheetStatus(id,type,status){
+  if(type==='lead'){
+    const r=DB.leadAssignments.find(x=>x.id===id);
+    if(r){r.status=status;r.finalStatus=status;}
+  } else {
+    const r=DB.assocAssignments.find(x=>x.id===id);
+    if(r){r.status=status;r.finalStatus=status;}
+  }
+  saveDB(); renderAssignSheet(); toast('Status updated','var(--green)');
+}
+function updateLaStatus(id,status){ updateSheetStatus(id,'lead',status); }
+function updateAaStatus(id,status){ updateSheetStatus(id,'assoc',status); }
+function exportSheetCSV(){
+  const rows=getAllAssignments();
+  const headers=['Sl.No','Date','Lead','Account','Project','Stage','Task','Work Type','Assigned To','Location','Assigned Hours','Final Status','Remarks'];
+  const lines=[headers.join(',')];
+  rows.forEach((r,i)=>{
+    const proj=getProject(r.project);
+    const acct=r.account||proj?.account||'';
+    lines.push([
+      i+1, r.date||'', r.leadName||'', acct, proj?.name||'',
+      r.stage||'', r.taskType||'', r.workType||'', r.assignedToName||'',
+      r.location||'', r.assignedHours||0, r.finalStatus||r.status||'', (r.remark||'').replace(/,/g,';')
+    ].join(','));
+  });
+  const blob=new Blob([lines.join('\n')],{type:'text/csv'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='task-assignments-'+TODAY+'.csv';a.click();
+  toast('CSV exported','var(--green)');
 }
 
 // ══════════════════════════════════════════════
@@ -1858,41 +2115,7 @@ function renderLeadBoard(){
 // ══════════════════════════════════════════════
 // RENDER: ASSOC ASSIGNMENT TABLE (Lead → Associate)
 // ══════════════════════════════════════════════
-function renderAssocAssignPage(){
-  const rows=DB.assocAssignments.filter(a=>currentUser.role==='manager'||a.lead===currentUser.id);
-  document.getElementById('aaEmpty').style.display=rows.length?'none':'block';
-  document.getElementById('assocAssignTbl').innerHTML=rows.map((r,i)=>{
-    const proj=getProject(r.project);
-    const assoc=getUser(r.associate);
-    const lead=getUser(r.lead);
-    const found=findTask(r.task);
-    const task=found?.task;
-    const act=task?getActualHours(r.task):0;
-    const est=task?.hours||0;
-    return `<tr>
-      <td style="color:var(--muted);font-size:10px">${i+1}</td>
-      <td style="font-size:10px">${fmt(r.date)}</td>
-      <td>${proj?`<span class="badge" style="background:${proj.color}22;color:${proj.color}">${proj.name}</span>`:'—'}</td>
-      <td style="font-size:12px;font-weight:600;color:var(--white)">${task?.title||r.task}</td>
-      <td>${assoc?avatarChip(assoc):avEmpty()}</td>
-      <td>${lead?avatarChip(lead):avEmpty()}</td>
-      <td style="font-size:10px;color:${isLate(task?.due)?'var(--red)':'var(--muted)'}">${fmt(task?.due)}</td>
-      <td style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted)">${est}h</td>
-      <td style="font-family:'JetBrains Mono',monospace;font-size:11px;color:${act>est?'var(--red)':'var(--accent)'}">${act.toFixed(1)}h</td>
-      <td><span class="badge ${bcls(task?.status||r.status)}">${task?.status||r.status}</span></td>
-      <td style="font-size:10px;color:var(--muted)">${r.remark||'—'}</td>
-      <td><select class="tbl-sel" onchange="updateAaStatus('${r.id}',this.value)">
-        ${['Assigned','In Progress','On Hold','Completed'].map(s=>`<option ${(task?.status||r.status)===s?'selected':''}>${s}</option>`).join('')}
-      </select></td>
-    </tr>`;
-  }).join('');
-}
-function updateAaStatus(id,status){
-  const r=DB.assocAssignments.find(x=>x.id===id); if(!r) return;
-  r.status=status;
-  mutateTask(r.task,{status});
-  refreshAll(); toast('Status updated');
-}
+// renderAssocAssignPage is now merged into renderAssignSheet above
 
 // ══════════════════════════════════════════════
 // RENDER: MY TASKS (Associate view)
@@ -2025,15 +2248,28 @@ function submitTaskUpdate(){
 function renderTracker(){
   document.getElementById('trackDate').value=TODAY;
   document.getElementById('trackAssoc').value=currentUser.name;
-  const projs=myProjects(currentUser);
-  const psel=document.getElementById('trackProj');
-  psel.innerHTML=projs.map(p=>`<option value="${p.id}">${p.account?p.account+' > ':''} ${p.name}</option>`).join('')||'<option value="">No projects</option>';
-  populateTrackTask();
+  // Populate account dropdown
   const accounts=[...new Set(DB.projects.map(p=>p.account||'Unassigned'))].sort();
-  const accSel=document.getElementById('ownTaskAccount');
-  if(accSel){accSel.innerHTML=accounts.map(a=>`<option value="${a}">${a}</option>`).join('');populateOwnProjects();}
+  const accEl=document.getElementById('trackAccount');
+  if(accEl){accEl.innerHTML=accounts.map(a=>`<option value="${a}">${a}</option>`).join('');populateTrackProjByAccount();}
+  // WMS dropdowns
+  const stEl=document.getElementById('trackStage'); if(stEl) stEl.innerHTML=mkOpts(WMS_STAGES);
+  const wtEl=document.getElementById('trackWorkType'); if(wtEl) wtEl.innerHTML=mkOpts(WMS_WORK_TYPES);
+  const locEl=document.getElementById('trackLocation'); if(locEl) locEl.innerHTML=mkOpts(WMS_LOCATIONS);
+  // Own task dropdowns
+  const ownAccSel=document.getElementById('ownTaskAccount');
+  if(ownAccSel){ownAccSel.innerHTML=accounts.map(a=>`<option value="${a}">${a}</option>`).join('');populateOwnProjects();}
+  const ownStEl=document.getElementById('ownTaskStage'); if(ownStEl) ownStEl.innerHTML=mkOpts(WMS_STAGES);
+  const ownWtEl=document.getElementById('ownTaskWorkType'); if(ownWtEl) ownWtEl.innerHTML=mkOpts(WMS_WORK_TYPES);
+  const ownLocEl=document.getElementById('ownTaskLocation'); if(ownLocEl) ownLocEl.innerHTML=mkOpts(WMS_LOCATIONS);
   renderSubmittedTrackerRows();
   startElapsedTimer();
+}
+function populateTrackProjByAccount(){
+  const acc=document.getElementById('trackAccount')?.value;
+  const projs=DB.projects.filter(p=>(p.account||'Unassigned')===acc);
+  const psel=document.getElementById('trackProj');
+  if(psel){psel.innerHTML=projs.map(p=>`<option value="${p.id}">${p.name}</option>`).join('')||'<option value="">No projects</option>';populateTrackTask();}
 }
 function onTrackModeChange(){
   const mode=document.getElementById('trackMode').value;
@@ -2052,17 +2288,57 @@ function populateTrackTask(){
   const tasks=Object.values(proj.buckets).flat().filter(t=>t.status!=='Completed');
   document.getElementById('trackTask').innerHTML=tasks.map(t=>`<option value="${t.id}">${t.title}</option>`).join('')||'<option value="">No tasks</option>';
 }
+function fmtTime(dt){if(!dt)return '&mdash;';const d=new Date(dt);return d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit'});}
+function fmtDuration(ms){if(!ms||ms<0)return '&mdash;';const s=Math.floor(ms/1000),h=Math.floor(s/3600),m=Math.floor((s%3600)/60),ss=s%60;return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(ss).padStart(2,'0')}`;}
+const _rowTimers={};
+function tickRow(rowId){
+  const el=document.getElementById('tt-'+rowId);
+  const startEl=document.getElementById('ts-'+rowId);
+  if(!el||!startEl) return;
+  const start=parseInt(startEl.dataset.start||0);
+  const extra=parseInt(startEl.dataset.extra||0);
+  if(!start) return;
+  const elapsed=Date.now()-start+extra;
+  el.textContent=fmtDuration(elapsed);
+  const wh=document.getElementById('wh-'+rowId);
+  if(wh&&!wh.value) wh.placeholder=(elapsed/3600000).toFixed(2);
+}
+function startRowTimer(rowId){
+  const startEl=document.getElementById('ts-'+rowId); if(!startEl) return;
+  startEl.dataset.start=Date.now();
+  if(_rowTimers[rowId]) clearInterval(_rowTimers[rowId]);
+  _rowTimers[rowId]=setInterval(()=>tickRow(rowId),1000);
+}
+function pauseRowTimer(rowId,btn){
+  const startEl=document.getElementById('ts-'+rowId); if(!startEl) return;
+  const elapsed=Date.now()-parseInt(startEl.dataset.start||Date.now());
+  startEl.dataset.extra=(parseInt(startEl.dataset.extra||0)+elapsed);
+  startEl.dataset.start=0;
+  clearInterval(_rowTimers[rowId]);
+  btn.textContent='&#9654; Resume'; btn.onclick=()=>resumeRowTimer(rowId,btn);
+  const lrEl=document.getElementById('lr-'+rowId); if(lrEl) lrEl.textContent='—';
+}
+function resumeRowTimer(rowId,btn){
+  const startEl=document.getElementById('ts-'+rowId); if(!startEl) return;
+  startEl.dataset.start=Date.now();
+  const lrEl=document.getElementById('lr-'+rowId); if(lrEl) lrEl.textContent=new Date().toLocaleTimeString('en-GB');
+  if(_rowTimers[rowId]) clearInterval(_rowTimers[rowId]);
+  _rowTimers[rowId]=setInterval(()=>tickRow(rowId),1000);
+  btn.textContent='&#9646;&#9646; Break'; btn.onclick=()=>pauseRowTimer(rowId,btn);
+}
 function addTrackerRow(){
   const mode=document.getElementById('trackMode')?.value||'assigned';
-  let taskId,task,project;
+  let taskId,task,project,stage,workType,location;
   if(mode==='own'){
     const title=document.getElementById('ownTaskTitle').value.trim();
     if(!title){toast('Enter a task title','var(--amber)');return;}
     const projId=document.getElementById('ownTaskProject').value;
     project=getProject(projId);
-    const priority=document.getElementById('ownTaskPriority').value||'Medium';
+    stage=document.getElementById('ownTaskStage')?.value||'';
+    workType=document.getElementById('ownTaskWorkType')?.value||'';
+    location=document.getElementById('ownTaskLocation')?.value||'';
     taskId=uid();
-    task={id:taskId,title,initiated:currentUser.name,status:'In Progress',priority,assignedAssociate:currentUser.id,assignedLead:null,hours:0,actualHours:0,start:TODAY,due:TODAY,desc:'',leadRemark:'',userRemark:''};
+    task={id:taskId,title,initiated:currentUser.name,status:'In Progress',priority:'Medium',assignedAssociate:currentUser.id,assignedLead:null,hours:0,actualHours:0,start:TODAY,due:TODAY,desc:'',leadRemark:'',userRemark:''};
     if(project){project.buckets['In Progress'].push(task);saveDB();toast(`Task "${title}" created`,'var(--green)');}
     document.getElementById('ownTaskTitle').value='';
   } else {
@@ -2070,33 +2346,61 @@ function addTrackerRow(){
     if(!taskId){toast('Select a task','var(--amber)');return;}
     const found=findTask(taskId);if(!found)return;
     task=found.task;project=found.project;
+    stage=document.getElementById('trackStage')?.value||'';
+    workType=document.getElementById('trackWorkType')?.value||'';
+    location=document.getElementById('trackLocation')?.value||'';
   }
   const rowId=uid();
+  const startTs=Date.now();
+  const startTimeStr=new Date().toLocaleTimeString('en-GB');
   const tbody=document.getElementById('trackerTbl');
   const tr=document.createElement('tr');tr.id='tr-'+rowId;tr.setAttribute('data-new','1');
   tr.innerHTML=`
     <td style="color:var(--muted);font-size:10px;font-family:'JetBrains Mono',monospace">${tbody.children.length+1}</td>
-    <td><div style="font-size:12px;font-weight:600;color:var(--white)">${task.title}</div><div style="font-size:9px;color:var(--muted)">${mode==='own'?'<span style="color:var(--violet2)">Own task</span>':'Est: '+(task.hours||0)+'h'}</div></td>
+    <td><div style="font-size:12px;font-weight:600;color:var(--white)">${task.title}</div><div style="font-size:9px;color:${mode==='own'?'var(--violet2)':'var(--muted)'}">${mode==='own'?'Own task':'Est: '+(task.hours||0)+'h'}</div></td>
     <td><span class="badge" style="background:${project?.color||'#475569'}22;color:${project?.color||'#94a3b8'}">${project?.name||'&mdash;'}</span></td>
-    <td style="font-size:10px;color:var(--muted)">${project?.account||'&mdash;'}</td>
-    <td style="font-size:10px;white-space:nowrap;color:${isLate(task.due)?'var(--red)':'var(--muted)'}">${fmt(task.due)||'&mdash;'}</td>
+    <td style="font-size:10px;color:var(--teal);font-weight:600">${project?.account||'&mdash;'}</td>
+    <td style="font-size:10px;color:var(--text-dim)">${stage||'&mdash;'}</td>
+    <td style="font-size:10px;color:var(--muted)">${workType||'&mdash;'}</td>
+    <td><span style="font-size:10px;padding:1px 7px;border-radius:4px;background:rgba(14,165,233,.1);color:var(--teal)">${location||'&mdash;'}</span></td>
     <td style="font-size:11px">${currentUser.name}</td>
     <td style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted)">${task.hours||0}h</td>
-    <td><input class="tbl-inp hrs-inp" type="number" min="0" max="24" step="0.5" placeholder="0" data-taskid="${taskId}" data-rowid="${rowId}" oninput="recalcHrs()"></td>
-    <td><select class="tbl-sel" data-taskid="${taskId}" data-rowid="${rowId}" style="min-width:110px">
-      <option ${task.status==='Not Started'?'selected':''}>Not Started</option>
-      <option ${task.status==='In Progress'||task.status===undefined?'selected':''}>In Progress</option>
-      <option ${task.status==='Completed'?'selected':''}>Completed</option>
-      <option ${task.status==='On Hold'?'selected':''}>On Hold</option>
+    <td style="font-size:10px;color:var(--green);font-family:'JetBrains Mono',monospace">${startTimeStr}</td>
+    <td style="font-size:10px;color:var(--muted);font-family:'JetBrains Mono',monospace" id="et-${rowId}">&mdash;</td>
+    <td style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:var(--teal)" id="tt-${rowId}">00:00:00</td>
+    <td><input id="wh-${rowId}" class="tbl-inp hrs-inp" type="number" min="0" max="24" step="0.5" placeholder="0.00" data-taskid="${taskId}" data-rowid="${rowId}" oninput="recalcHrs()"></td>
+    <td><select class="tbl-sel" id="st-${rowId}" data-taskid="${taskId}" data-rowid="${rowId}" style="min-width:120px" onchange="onTrackerStatusChange('${rowId}',this.value)">
+      ${WMS_STATUSES.map(s=>`<option ${s==='In Progress'?'selected':''}>${s}</option>`).join('')}
     </select></td>
-    <td><input class="tbl-inp" placeholder="What did you work on?" style="min-width:130px"></td>
-    <td><button class="btn-success" onclick="submitTrackerRow(this,'${rowId}','${taskId}','${project?.id||''}')">&#9654; Submit</button></td>
+    <td><input class="tbl-inp" id="rm-${rowId}" placeholder="Remarks…" style="min-width:130px"></td>
+    <td style="white-space:nowrap">
+      <button class="btn-success" style="margin-bottom:3px" onclick="pauseRowTimer('${rowId}',this)">&#9646;&#9646; Break</button><br>
+      <button class="btn-success" onclick="submitTrackerRow(this,'${rowId}','${taskId}','${project?.id||''}')">&#9654; Submit</button>
+    </td>
+    <span id="ts-${rowId}" data-start="${startTs}" data-extra="0" style="display:none"></span>
+    <span id="lr-${rowId}" style="display:none">${startTimeStr}</span>
   `;
-  // New entries go to TOP (above any submitted rows)
   const firstSubmitted=tbody.querySelector('tr[data-submitted]');
   if(firstSubmitted) tbody.insertBefore(tr, firstSubmitted);
   else tbody.insertBefore(tr, tbody.firstChild);
+  startRowTimer(rowId);
   recalcHrs();
+}
+function onTrackerStatusChange(rowId, val){
+  if(val==='BREAK'){pauseRowTimer(rowId,document.querySelector(`#tr-${rowId} .btn-success`));}
+  else if(val==='Completed'){
+    const etEl=document.getElementById('et-'+rowId); if(etEl) etEl.textContent=new Date().toLocaleTimeString('en-GB');
+    clearInterval(_rowTimers[rowId]);
+    // auto-fill worked hours from timer
+    const ttEl=document.getElementById('tt-'+rowId);
+    const whEl=document.getElementById('wh-'+rowId);
+    if(ttEl&&whEl&&!whEl.value){
+      const startEl=document.getElementById('ts-'+rowId);
+      const extra=parseInt(startEl?.dataset.extra||0);
+      const elapsed=Date.now()-parseInt(startEl?.dataset.start||Date.now())+extra;
+      whEl.value=(elapsed/3600000).toFixed(2);recalcHrs();
+    }
+  }
 }
 function renderSubmittedTrackerRows(){
   const entries=DB.trackerEntries.filter(e=>e.userId===currentUser.id&&e.date===TODAY&&e.submitted);
@@ -2114,47 +2418,72 @@ function renderSubmittedTrackerRows(){
     const tr=document.createElement('tr');
     tr.setAttribute('data-submitted','1');
     tr.style.opacity=isCompleted?'0.7':'1';
+    const stClr=STATUS_CLR[e.status]||'#475569';
     tr.innerHTML=`
       <td style="color:var(--green);font-size:12px">&#10003;</td>
       <td style="font-size:12px;font-weight:600;color:var(--white)">${task.title}
         <div style="font-size:9px;color:var(--muted)">
-          Est: ${task.hours||0}h
-          ${totalTrackedHrs>0?`&nbsp;<span style="color:var(--teal);font-family:'JetBrains Mono',monospace">&#128336; ${totalTrackedHrs.toFixed(1)}h total</span>`:''}
+          ${totalTrackedHrs>0?`<span style="color:var(--teal);font-family:'JetBrains Mono',monospace">&#128336; ${totalTrackedHrs.toFixed(1)}h total</span>`:'Est: '+(task.hours||0)+'h'}
         </div>
       </td>
       <td><span class="badge" style="background:${project.color}22;color:${project.color}">${project.name}</span></td>
-      <td style="font-size:10px;color:var(--muted)">${project.account||'&mdash;'}</td>
-      <td style="font-size:10px;color:${isLate(task.due)?'var(--red)':'var(--muted)'}">${fmt(task.due)}</td>
+      <td style="font-size:10px;color:var(--teal);font-weight:600">${project.account||'&mdash;'}</td>
+      <td style="font-size:10px;color:var(--text-dim)">${e.stage||'&mdash;'}</td>
+      <td style="font-size:10px;color:var(--muted)">${e.workType||'&mdash;'}</td>
+      <td><span style="font-size:10px;padding:1px 7px;border-radius:4px;background:rgba(14,165,233,.1);color:var(--teal)">${e.location||'&mdash;'}</span></td>
       <td style="font-size:11px">${currentUser.name}</td>
       <td style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted)">${task.hours||0}h</td>
+      <td style="font-size:10px;color:var(--green);font-family:'JetBrains Mono',monospace">${e.startTime||'&mdash;'}</td>
+      <td style="font-size:10px;color:var(--muted);font-family:'JetBrains Mono',monospace">${e.endTime||'&mdash;'}</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--teal);font-weight:700">${e.totalTime||'&mdash;'}</td>
       <td style="font-family:'JetBrains Mono',monospace;color:var(--accent);font-weight:700">${e.hours}h</td>
-      <td><span class="badge ${bcls(e.status)}">${e.status}</span></td>
+      <td><span class="badge" style="background:${stClr}22;color:${stClr}">${e.status}</span></td>
       <td style="font-size:10px;color:var(--muted)">${e.remark||'&mdash;'}</td>
       <td><span style="color:var(--green);font-size:11px;font-weight:700">&#10003; Submitted</span></td>
     `;
-    tbody.appendChild(tr); // append to BOTTOM
+    tbody.appendChild(tr);
   });
   recalcHrs();
 }
 function submitTrackerRow(btn,rowId,taskId,projId){
   const row=document.getElementById('tr-'+rowId); if(!row) return;
-  const hrsInp=row.querySelector('.hrs-inp');
-  const statusSel=row.querySelector('select');
-  const remarkInp=row.querySelector('input:not(.hrs-inp)');
-  const hours=parseFloat(hrsInp?.value)||0;
+  const hrsInp=document.getElementById('wh-'+rowId)||row.querySelector('.hrs-inp');
+  const statusSel=document.getElementById('st-'+rowId)||row.querySelector('select');
+  const remarkInp=document.getElementById('rm-'+rowId)||row.querySelector('input:not(.hrs-inp)');
+  // Stop timer, capture end time
+  clearInterval(_rowTimers[rowId]);
+  const endTimeStr=new Date().toLocaleTimeString('en-GB');
+  const etEl=document.getElementById('et-'+rowId); if(etEl&&etEl.textContent==='—') etEl.textContent=endTimeStr;
+  // Calc total time from timer
+  const startEl=document.getElementById('ts-'+rowId);
+  const extra=parseInt(startEl?.dataset.extra||0);
+  const startTs=parseInt(startEl?.dataset.start||0);
+  const elapsed=startTs?(Date.now()-startTs+extra):extra;
+  const ttEl=document.getElementById('tt-'+rowId); if(ttEl&&elapsed>0) ttEl.textContent=fmtDuration(elapsed);
+  // Auto-fill hours if not filled
+  let hours=parseFloat(hrsInp?.value)||0;
+  if(!hours&&elapsed>0){hours=parseFloat((elapsed/3600000).toFixed(2));if(hrsInp)hrsInp.value=hours;}
   const status=statusSel?.value||'In Progress';
   const remark=remarkInp?.value||'';
-
-  // Core mutation — updates task status, actualHours, assocAssignments, leadAssignments, creates tracker entry
-  mutateTask(taskId,{
-    status, userRemark:remark||undefined,
-    hoursToAdd:hours, submittedByUserId:currentUser.id
-  });
-
-  // Lock row UI
-  row.querySelectorAll('input,select').forEach(el=>{el.disabled=true;});
-  btn.textContent='✓ Submitted'; btn.disabled=true; btn.style.background='rgba(34,197,94,.08)';
-  toast('Logged & synced to lead + manager ✓','var(--green)');
+  if(taskId){
+    const found2=findTask(taskId);
+    if(found2){
+      const row2=document.getElementById('tr-'+rowId);
+      const stageEl=row2?Array.from(row2.cells).find(c=>c.textContent&&c.style.color==='var(--text-dim)'):null;
+      const ttFinal=ttEl?ttEl.textContent:'';
+      const etFinal=etEl?etEl.textContent:'';
+      found2.task._stage=row2?.cells[4]?.textContent||'';
+      found2.task._workType=row2?.cells[5]?.textContent||'';
+      found2.task._location=row2?.cells[6]?.querySelector('span')?.textContent||'';
+      found2.task._startTime=row2?.cells[9]?.textContent||'';
+      found2.task._endTime=etFinal==='—'?new Date().toLocaleTimeString('en-GB'):etFinal;
+      found2.task._totalTime=ttFinal||'';
+    }
+    mutateTask(taskId,{status,userRemark:remark||undefined,hoursToAdd:hours,submittedByUserId:currentUser.id});
+  }
+  row.querySelectorAll('input,select,button').forEach(el=>{el.disabled=true;});
+  btn.textContent='&#10003; Submitted'; btn.disabled=true; btn.style.background='rgba(34,197,94,.08)';
+  toast('Logged ✓','var(--green)');
   recalcHrs();
 }
 function recalcHrs(){
@@ -2347,9 +2676,22 @@ function saveAssignProj(){
 function openLeadAssignModal(){
   document.getElementById('la_initiated').value=currentUser.name;
   document.getElementById('la_date').value=TODAY;
-  document.getElementById('la_proj').innerHTML=DB.projects.map(p=>`<option value="${p.id}">${p.name}</option>`).join('');
+  // Account dropdown
+  const accounts=[...new Set(DB.projects.map(p=>p.account||'Unassigned'))].sort();
+  document.getElementById('la_account').innerHTML=accounts.map(a=>`<option value="${a}">${a}</option>`).join('');
+  populateLaProj();
   document.getElementById('la_lead').innerHTML=USERS.filter(u=>u.role==='lead').map(u=>`<option value="${u.id}">${u.name}</option>`).join('');
-  populateLaTask(); openModal('leadAssignModal');
+  document.getElementById('la_stage').innerHTML=mkOpts(WMS_STAGES);
+  document.getElementById('la_task_type').innerHTML=mkOpts(WMS_TASKS);
+  document.getElementById('la_work_type').innerHTML=mkOpts(WMS_WORK_TYPES);
+  document.getElementById('la_location').innerHTML=mkOpts(WMS_LOCATIONS);
+  document.getElementById('la_status').innerHTML=mkOpts(WMS_STATUSES,'In Progress');
+  openModal('leadAssignModal');
+}
+function populateLaProj(){
+  const acc=document.getElementById('la_account').value;
+  const projs=DB.projects.filter(p=>(p.account||'Unassigned')===acc);
+  document.getElementById('la_proj').innerHTML=projs.map(p=>`<option value="${p.id}">${p.name}</option>`).join('')||'<option value="">No projects</option>';
 }
 function populateLaTask(){
   const pid=document.getElementById('la_proj').value;
@@ -2358,47 +2700,79 @@ function populateLaTask(){
 }
 function saveLeadAssign(){
   const pid=document.getElementById('la_proj').value;
-  const tid=document.getElementById('la_task').value;
   const leadId=document.getElementById('la_lead').value;
-  if(!tid||!leadId){toast('Fill all fields','var(--amber)');return;}
-  // Update task's assignedLead
-  const found=findTask(tid);
-  if(found){ found.task.assignedLead=leadId; }
-  // Remove existing la for this task and re-add
-  DB.leadAssignments=DB.leadAssignments.filter(a=>a.task!==tid);
-  DB.leadAssignments.unshift({id:uid(),date:document.getElementById('la_date').value,initiated:currentUser.name,project:pid,task:tid,assignedLead:leadId,status:document.getElementById('la_status').value,remark:document.getElementById('la_remark').value});
-  saveDB(); closeModal('leadAssignModal'); toast('Assigned to lead & synced','var(--green)'); refreshAll();
+  if(!pid||!leadId){toast('Fill all fields','var(--amber)');return;}
+  const acc=document.getElementById('la_account').value;
+  const proj=getProject(pid);
+  DB.leadAssignments.unshift({
+    id:uid(),
+    date:document.getElementById('la_date').value,
+    initiated:currentUser.name,
+    project:pid,
+    account:acc,
+    assignedLead:leadId,
+    assignedTo:leadId,
+    stage:document.getElementById('la_stage').value,
+    taskType:document.getElementById('la_task_type').value,
+    workType:document.getElementById('la_work_type').value,
+    location:document.getElementById('la_location').value,
+    assignedHours:parseFloat(document.getElementById('la_hours').value)||0,
+    finalStatus:document.getElementById('la_status').value,
+    status:document.getElementById('la_status').value,
+    remark:document.getElementById('la_remark').value
+  });
+  saveDB(); closeModal('leadAssignModal'); toast('Assigned to lead','var(--green)'); refreshAll();
 }
 
 // Associate Assignment (Lead → Associate)
 function openAssocAssignModal(){
   document.getElementById('aa_lead').value=currentUser.name;
   document.getElementById('aa_date').value=TODAY;
-  const myP=myProjects(currentUser);
-  document.getElementById('aa_proj').innerHTML=myP.map(p=>`<option value="${p.id}">${p.name}</option>`).join('');
+  const accounts=[...new Set(DB.projects.map(p=>p.account||'Unassigned'))].sort();
+  document.getElementById('aa_account').innerHTML=accounts.map(a=>`<option value="${a}">${a}</option>`).join('');
+  populateAaProj();
   document.getElementById('aa_assoc').innerHTML=USERS.filter(u=>u.role==='associate').map(u=>`<option value="${u.id}">${u.name}</option>`).join('');
+  document.getElementById('aa_stage').innerHTML=mkOpts(WMS_STAGES);
+  document.getElementById('aa_task_type').innerHTML=mkOpts(WMS_TASKS);
+  document.getElementById('aa_work_type').innerHTML=mkOpts(WMS_WORK_TYPES);
+  document.getElementById('aa_location').innerHTML=mkOpts(WMS_LOCATIONS);
+  document.getElementById('aa_status').innerHTML=mkOpts(WMS_STATUSES,'In Progress');
   populateAaTask(); openModal('assocAssignModal');
+}
+function populateAaProj(){
+  const acc=document.getElementById('aa_account').value;
+  const projs=DB.projects.filter(p=>(p.account||'Unassigned')===acc);
+  document.getElementById('aa_proj').innerHTML=projs.map(p=>`<option value="${p.id}">${p.name}</option>`).join('')||'<option value="">No projects</option>';
+  populateAaTask();
 }
 function populateAaTask(){
   const pid=document.getElementById('aa_proj').value;
-  const myT=myTasks(currentUser).filter(t=>{
-    const p=DB.projects.find(x=>Object.values(x.buckets).flat().some(tt=>tt.id===t.id));
-    return p?.id===pid;
-  });
-  document.getElementById('aa_task').innerHTML=myT.map(t=>`<option value="${t.id}">${t.title}</option>`).join('')||'<option value="">No tasks</option>';
+  const tasks=Object.values(getProject(pid)?.buckets||{}).flat();
+  document.getElementById('aa_task').innerHTML=tasks.map(t=>`<option value="${t.id}">${t.title}</option>`).join('')||'<option value="">No tasks</option>';
 }
 function saveAssocAssign(){
   const pid=document.getElementById('aa_proj').value;
-  const tid=document.getElementById('aa_task').value;
   const assocId=document.getElementById('aa_assoc').value;
-  if(!tid||!assocId){toast('Fill all fields','var(--amber)');return;}
-  // Update task's assignedAssociate
-  const found=findTask(tid);
-  if(found){ found.task.assignedAssociate=assocId; }
-  // Remove old aa for this task+assoc and re-add
-  DB.assocAssignments=DB.assocAssignments.filter(a=>!(a.task===tid&&a.associate===assocId));
-  DB.assocAssignments.unshift({id:uid(),date:document.getElementById('aa_date').value,lead:currentUser.id,project:pid,task:tid,associate:assocId,status:document.getElementById('aa_status').value,remark:document.getElementById('aa_remark').value});
-  saveDB(); closeModal('assocAssignModal'); toast('Assigned to associate & synced','var(--green)'); refreshAll();
+  if(!pid||!assocId){toast('Fill all fields','var(--amber)');return;}
+  const acc=document.getElementById('aa_account').value;
+  DB.assocAssignments.unshift({
+    id:uid(),
+    date:document.getElementById('aa_date').value,
+    lead:currentUser.id,
+    project:pid,
+    account:acc,
+    associate:assocId,
+    assignedTo:assocId,
+    stage:document.getElementById('aa_stage').value,
+    taskType:document.getElementById('aa_task_type').value,
+    workType:document.getElementById('aa_work_type').value,
+    location:document.getElementById('aa_location').value,
+    assignedHours:parseFloat(document.getElementById('aa_hours').value)||0,
+    finalStatus:document.getElementById('aa_status').value,
+    status:document.getElementById('aa_status').value,
+    remark:document.getElementById('aa_remark').value
+  });
+  saveDB(); closeModal('assocAssignModal'); toast('Assigned to associate','var(--green)'); refreshAll();
 }
 
 // ══════════════════════════════════════════════
