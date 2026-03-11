@@ -13,7 +13,7 @@
   --teal:#0ea5e9;--accent:#38bdf8;--violet:#7c3aed;--violet2:#a78bfa;
   --green:#22c55e;--amber:#f59e0b;--red:#ef4444;--pink:#ec4899;
   --cyan:#06b6d4;--orange:#f97316;
-  --r:12px;--shadow:0 8px 32px rgba(0,0,0,.5);
+  --r:12px;--shadow:0 8px 32px rgba(0,0,0,.5);--mono:'JetBrains Mono',monospace;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);overflow:hidden}
@@ -45,11 +45,27 @@ html,body{height:100%;font-family:'Sora',sans-serif;background:var(--bg);color:v
 .tl-mark{width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,#0ea5e9,#7c3aed);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px;color:#fff}
 .tl-brand{font-size:13px;font-weight:800;color:var(--white)}
 .tb-div{width:1px;height:22px;background:var(--border)}
-.topbar-nav{display:flex;gap:1px;flex:1;overflow-x:auto}
+.topbar-nav{display:flex;gap:1px;flex:1;overflow-x:auto;align-items:center}
 .topbar-nav::-webkit-scrollbar{height:0}
 .tnav{padding:5px 12px;border-radius:7px;cursor:pointer;font-size:11px;font-weight:600;color:var(--muted);border:none;background:transparent;font-family:'Sora',sans-serif;white-space:nowrap;transition:all .15s}
 .tnav:hover{color:var(--white);background:var(--surface2)}
 .tnav.active{background:rgba(14,165,233,.14);color:var(--accent);border:1px solid rgba(14,165,233,.2)}
+
+/* WORKFLOW STEP NAV */
+.wf-steps{display:flex;align-items:center;gap:0;flex:1;overflow-x:auto}
+.wf-steps::-webkit-scrollbar{height:0}
+.wf-group{display:flex;align-items:center;gap:0;position:relative}
+.wf-group-label{padding:4px 10px;font-size:10px;font-weight:700;color:var(--text-dim);background:var(--surface);border:1px solid var(--border);border-radius:6px 0 0 6px;white-space:nowrap;cursor:default;display:flex;align-items:center;gap:5px;border-right:none}
+.wf-group-label.wf-active{background:rgba(14,165,233,.1);border-color:rgba(14,165,233,.25);color:var(--accent)}
+.wf-group-label.wf-done{background:rgba(34,197,94,.08);border-color:rgba(34,197,94,.2);color:var(--green)}
+.wf-step-num{width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;background:var(--border);color:var(--muted);flex-shrink:0}
+.wf-group-label.wf-active .wf-step-num{background:var(--teal);color:#fff}
+.wf-group-label.wf-done .wf-step-num{background:var(--green);color:#fff}
+.wf-pages{display:flex;gap:0}
+.wf-pages .tnav{border-radius:0;border:1px solid var(--border);border-left:none;font-size:10px;padding:4px 10px}
+.wf-pages .tnav:last-child{border-radius:0 6px 6px 0}
+.wf-divider{width:20px;height:1px;background:var(--border);margin:0 4px;flex-shrink:0}
+.wf-sep{font-size:12px;color:var(--border);margin:0 3px;flex-shrink:0}
 .topbar-right{display:flex;align-items:center;gap:8px;margin-left:auto;flex-shrink:0}
 .role-pill{padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700}
 .user-av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff}
@@ -57,7 +73,7 @@ html,body{height:100%;font-family:'Sora',sans-serif;background:var(--bg);color:v
 .logout-btn{padding:4px 10px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-size:10px;font-family:'Sora',sans-serif;transition:all .15s}
 .logout-btn:hover{border-color:var(--red);color:var(--red)}
 .app-body{flex:1;overflow:hidden;display:flex}
-.page{display:none;flex:1;overflow-y:auto;padding:22px 26px}
+.page{display:none;flex:1;overflow-y:auto;padding:22px 26px;position:absolute;inset:0;top:0;left:0;right:0;bottom:0}
 .page::-webkit-scrollbar{width:5px}.page::-webkit-scrollbar-thumb{background:var(--navy3);border-radius:3px}
 .page.active{display:block}
 
@@ -73,7 +89,7 @@ html,body{height:100%;font-family:'Sora',sans-serif;background:var(--bg);color:v
 .sc::after{content:'';position:absolute;top:-20px;right:-20px;width:64px;height:64px;border-radius:50%;opacity:.09}
 .sc-bl::after{background:var(--teal)}.sc-vl::after{background:var(--violet)}.sc-gn::after{background:var(--green)}.sc-am::after{background:var(--amber)}.sc-rd::after{background:var(--red)}.sc-pk::after{background:var(--pink)}.sc-cy::after{background:var(--cyan)}
 .sc-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-dim);margin-bottom:7px}
-.sc-val{font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:700}
+.sc-val{font-family:var(--mono,monospace);font-size:26px;font-weight:700}
 .sc-bl .sc-val{color:var(--teal)}.sc-vl .sc-val{color:var(--violet2)}.sc-gn .sc-val{color:var(--green)}.sc-am .sc-val{color:var(--amber)}.sc-rd .sc-val{color:var(--red)}.sc-pk .sc-val{color:var(--pink)}.sc-cy .sc-val{color:var(--cyan)}
 .sc-sub{font-size:10px;color:var(--muted);margin-top:3px}
 
@@ -85,7 +101,7 @@ html,body{height:100%;font-family:'Sora',sans-serif;background:var(--bg);color:v
 .kb-head{padding:11px 13px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
 .kb-title-row{display:flex;align-items:center;gap:6px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px}
 .kb-dot{width:7px;height:7px;border-radius:50%}
-.kb-cnt{background:var(--navy3);color:var(--muted);font-size:10px;font-weight:700;padding:1px 7px;border-radius:10px;font-family:'JetBrains Mono',monospace}
+.kb-cnt{background:var(--navy3);color:var(--muted);font-size:10px;font-weight:700;padding:1px 7px;border-radius:10px;font-family:var(--mono,monospace)}
 .kb-body{padding:9px;flex:1;overflow-y:auto}
 .kb-body::-webkit-scrollbar{width:3px}.kb-body::-webkit-scrollbar-thumb{background:var(--navy3);border-radius:2px}
 .task-card{background:var(--surface2);border-radius:9px;padding:11px;border:1px solid var(--border);margin-bottom:7px;cursor:pointer;transition:all .15s}
@@ -119,7 +135,7 @@ html,body{height:100%;font-family:'Sora',sans-serif;background:var(--bg);color:v
 .hrs-low{border-color:var(--red)!important;background:rgba(239,68,68,.06)!important}
 
 /* HOURS COMPARISON */
-.hrs-compare{display:flex;align-items:center;gap:5px;font-family:'JetBrains Mono',monospace;font-size:11px}
+.hrs-compare{display:flex;align-items:center;gap:5px;font-family:var(--mono,monospace);font-size:11px}
 .hrs-assigned{color:var(--muted)}
 .hrs-actual{font-weight:700}
 .hrs-over{color:var(--red)}
@@ -129,7 +145,7 @@ html,body{height:100%;font-family:'Sora',sans-serif;background:var(--bg);color:v
 /* TOTAL BAR */
 .total-bar{display:flex;align-items:center;gap:16px;padding:11px 15px;background:var(--surface2);border-top:1px solid var(--border);flex-wrap:wrap}
 .tbar-lbl{font-size:10px;color:var(--muted)}
-.tbar-val{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:var(--accent)}
+.tbar-val{font-family:var(--mono,monospace);font-size:18px;font-weight:700;color:var(--accent)}
 
 /* DAILY OVERVIEW */
 .daily-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:12px}
@@ -150,7 +166,7 @@ html,body{height:100%;font-family:'Sora',sans-serif;background:var(--bg);color:v
 .tc-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
 .tc-avt{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;flex-shrink:0}
 .tc-metrics{display:flex;justify-content:space-between;padding-top:10px;border-top:1px solid var(--border);margin-top:10px}
-.tc-met-val{font-family:'JetBrains Mono',monospace;font-size:17px;font-weight:700;text-align:center}
+.tc-met-val{font-family:var(--mono,monospace);font-size:17px;font-weight:700;text-align:center}
 .tc-met-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-top:2px;text-align:center}
 
 /* ASSOC HOURS TABLE */
@@ -238,8 +254,11 @@ select.ctrl option{background:var(--navy)}
 
 /* Account-Project tree */
 .acct-proj-item:hover{background:rgba(14,165,233,.06)!important;border-color:rgba(14,165,233,.2)!important}
-#page-planner{overflow:hidden!important;display:flex;flex-direction:column}
+#page-planner{overflow:hidden!important;display:none;flex-direction:column}
+#page-planner.active{display:flex!important}
 #page-planner>div:last-child{flex:1;min-height:0;overflow:hidden}
+#page-hours-report{overflow:hidden!important;display:none;flex-direction:column}
+#page-hours-report.active{display:flex!important}
 
 /* ── Excel-style Assignment Sheet ── */
 .sheet-wrap{overflow:auto;border:1px solid var(--border);border-radius:var(--r);background:var(--surface)}
@@ -258,18 +277,41 @@ select.ctrl option{background:var(--navy)}
 .sheet-tbl tr:hover td{background:rgba(14,165,233,.04)}
 .sheet-tbl tr.row-completed td{opacity:.65}
 .sheet-tbl tr.row-break td{background:rgba(239,68,68,.04)}
-.sh-sn{color:var(--muted);font-size:9px;font-family:'JetBrains Mono',monospace;min-width:30px;text-align:center}
+.sh-sn{color:var(--muted);font-size:9px;font-family:var(--mono,monospace);min-width:30px;text-align:center}
 .sh-date{font-size:10px;color:var(--text-dim);white-space:nowrap}
 .sh-name{font-size:11px;font-weight:600;color:var(--white)}
 .sh-acct{font-size:11px;font-weight:700;color:var(--teal)}
-.sh-hrs{font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--accent);text-align:center}
+.sh-hrs{font-family:var(--mono,monospace);font-weight:700;color:var(--accent);text-align:center}
 .sh-loc{display:inline-block;font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;background:rgba(14,165,233,.12);color:var(--teal)}
 .sh-status-pill{display:inline-block;font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px;white-space:nowrap}
 .sheet-filter-bar{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;margin-bottom:12px;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r)}
 .sheet-stats{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:12px;padding:10px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);font-size:11px}
 .sh-stat{display:flex;flex-direction:column;align-items:center;gap:1px}
-.sh-stat-val{font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700}
+.sh-stat-val{font-family:var(--mono,monospace);font-size:16px;font-weight:700}
 .sh-stat-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+
+/* ── Timesheet ── */
+.ts-wrap{overflow:auto;border:1px solid var(--border);border-radius:var(--r);background:var(--surface);flex:1;min-height:0}
+.ts-tbl{border-collapse:collapse;min-width:100%;font-size:11px;white-space:nowrap}
+.ts-tbl th{position:sticky;top:0;z-index:10;background:#0f2336;border:1px solid var(--border);padding:7px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-dim);text-align:center}
+.ts-tbl th.day-th{min-width:44px;width:44px}
+.ts-tbl th.day-sat,.ts-tbl th.day-sun{color:var(--muted)}
+.ts-tbl td{border:1px solid rgba(30,58,85,.45);padding:5px 7px;vertical-align:middle;text-align:center;font-size:11px}
+.ts-tbl tr:hover td{background:rgba(14,165,233,.04)!important}
+.ts-hr-cell{font-family:var(--mono,monospace);font-size:12px;font-weight:700;color:var(--text);min-width:36px}
+.ts-hr-cell.ts-over{color:var(--red);background:rgba(239,68,68,.12)!important}
+.ts-hr-cell.ts-leave{color:var(--amber);background:rgba(245,158,11,.12)!important}
+.ts-hr-cell.ts-zero{color:var(--muted);background:transparent}
+.ts-hr-cell.ts-today{outline:2px solid var(--teal);outline-offset:-2px}
+.ts-hr-cell.ts-weekend{background:rgba(30,58,85,.25);color:var(--muted)}
+.ts-total{font-family:var(--mono,monospace);font-size:13px;font-weight:800;color:var(--white);background:rgba(14,165,233,.08)!important;min-width:52px}
+.ts-name-cell{text-align:left!important;min-width:160px;max-width:200px}
+.ts-tab-bar{display:flex;gap:1px;background:var(--navy2);border-radius:8px;padding:3px;width:fit-content;margin-bottom:12px}
+.ts-tab{padding:5px 16px;border-radius:6px;cursor:pointer;font-size:11px;font-weight:600;color:var(--muted);border:none;background:transparent;font-family:'Sora',sans-serif;transition:all .15s}
+.ts-tab.active{background:var(--navy3);color:var(--white);box-shadow:0 1px 4px rgba(0,0,0,.3)}
+.ts-range-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px;padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r)}
+.ts-legend{display:flex;gap:12px;align-items:center;font-size:10px;color:var(--muted);flex-wrap:wrap}
+.ts-leg-dot{width:12px;height:12px;border-radius:3px;display:inline-block;margin-right:4px}
 </style>
 </head>
 <body>
@@ -309,7 +351,7 @@ select.ctrl option{background:var(--navy)}
   <header class="topbar">
     <div class="topbar-logo"><div class="tl-mark">W</div><span class="tl-brand">WMS</span></div>
     <div class="tb-div"></div>
-    <nav class="topbar-nav" id="topNav"></nav>
+    <nav class="topbar-nav" id="topNav" style="flex:1;display:flex;align-items:center;overflow-x:auto;gap:2px"></nav>
     <div class="topbar-right">
       <div id="syncStatus" style="margin-right:6px;display:flex;align-items:center;gap:6px">
         <span id="syncLabel" style="font-size:11px;font-weight:600"></span>
@@ -324,7 +366,7 @@ select.ctrl option{background:var(--navy)}
     </div>
   </header>
   <div class="app-body">
-    <div id="pages" style="flex:1;overflow:hidden;position:relative;display:flex;flex-direction:column">
+    <div id="pages" style="flex:1;overflow:hidden;position:relative">
 
       <!-- MANAGER DASHBOARD -->
       <div class="page" id="page-dashboard">
@@ -332,6 +374,33 @@ select.ctrl option{background:var(--navy)}
           <div style="display:flex;gap:7px">
             <button class="btn btn-primary btn-sm" onclick="openProjModal()">+ Project</button>
             <button class="btn btn-ghost btn-sm" onclick="openTaskModal()">+ Task</button>
+          </div>
+        </div>
+        <!-- Workflow Guide Banner -->
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px" id="wfGuideBanner">
+          <div style="background:var(--surface);border:1px solid rgba(14,165,233,.3);border-radius:var(--r);padding:13px;cursor:pointer;transition:all .15s" onclick="showPage('planner')" onmouseover="this.style.borderColor='var(--teal)'" onmouseout="this.style.borderColor='rgba(14,165,233,.3)'">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+              <div style="width:24px;height:24px;border-radius:50%;background:rgba(14,165,233,.2);color:var(--teal);font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center">1</div>
+              <span style="font-size:12px;font-weight:700;color:var(--white)">Create Project</span>
+            </div>
+            <div style="font-size:10px;color:var(--muted);line-height:1.5">Admin/Manager creates projects with all details. Assigns a Project Manager. Project Manager can edit any field.</div>
+            <div style="margin-top:8px;font-size:10px;color:var(--teal);font-weight:600">Planning → +Project ›</div>
+          </div>
+          <div style="background:var(--surface);border:1px solid rgba(124,58,237,.3);border-radius:var(--r);padding:13px;cursor:pointer;transition:all .15s" onclick="showPage('lead-assign')" onmouseover="this.style.borderColor='var(--violet2)'" onmouseout="this.style.borderColor='rgba(124,58,237,.3)'">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+              <div style="width:24px;height:24px;border-radius:50%;background:rgba(124,58,237,.2);color:var(--violet2);font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center">2</div>
+              <span style="font-size:12px;font-weight:700;color:var(--white)">Create & Assign Tasks</span>
+            </div>
+            <div style="font-size:10px;color:var(--muted);line-height:1.5">Create tasks for the project. Assign each task to a Team Lead. Leads create sub-tasks and delegate to Associates.</div>
+            <div style="margin-top:8px;font-size:10px;color:var(--violet2);font-weight:600">Task Assignment ›</div>
+          </div>
+          <div style="background:var(--surface);border:1px solid rgba(34,197,94,.3);border-radius:var(--r);padding:13px;cursor:pointer;transition:all .15s" onclick="showPage('tracker')" onmouseover="this.style.borderColor='var(--green)'" onmouseout="this.style.borderColor='rgba(34,197,94,.3)'">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+              <div style="width:24px;height:24px;border-radius:50%;background:rgba(34,197,94,.2);color:var(--green);font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center">3</div>
+              <span style="font-size:12px;font-weight:700;color:var(--white)">Track & Report Hours</span>
+            </div>
+            <div style="font-size:10px;color:var(--muted);line-height:1.5">Associates pick or create tasks and log hours daily. View hours by project, lead or associate in Hours Report.</div>
+            <div style="margin-top:8px;font-size:10px;color:var(--green);font-weight:600">Daily Tracker & Hours Report ›</div>
           </div>
         </div>
         <div class="stats-grid" id="dashStats"></div>
@@ -399,13 +468,99 @@ select.ctrl option{background:var(--navy)}
         </div>
       </div>
 
-      <!-- ASSOCIATE HOURS OVERVIEW (Manager) -->
-      <div class="page" id="page-hours-report">
-        <div class="sec-head"><div><div class="sec-title">Associate Hours Report</div><div class="sec-sub">Assigned vs Actual worked hours per associate per task</div></div>
-          <div class="date-nav"><button class="date-btn" onclick="changeOvDay(-1)">‹</button><div class="date-lbl" id="ovDateLbl"></div><button class="date-btn" onclick="changeOvDay(1)">›</button><button class="btn btn-ghost btn-sm" onclick="ovDate='all';renderHoursReport()">All Time</button></div>
+      <!-- PROJECT OVERVIEW SHEET (Admin/Manager) -->
+      <div class="page" id="page-proj-overview">
+        <div class="sec-head" style="flex-shrink:0">
+          <div><div class="sec-title">Project Overview</div><div class="sec-sub" id="poSheetSub">All projects — live hours, status and progress</div></div>
+          <div style="display:flex;gap:7px">
+            <button class="btn btn-primary btn-sm" onclick="openProjModal()">+ New Project</button>
+            <button class="btn btn-ghost btn-sm" onclick="exportProjCSV()">&#x2913; Export CSV</button>
+          </div>
         </div>
-        <div class="stats-grid" id="hrsStats"></div>
-        <div class="assoc-hrs-grid" id="assocHrsGrid"></div>
+        <!-- Stats bar -->
+        <div class="sheet-stats" id="poStats"></div>
+        <!-- Quick filters -->
+        <div class="sheet-filter-bar" id="poFilters">
+          <div><label class="ctrl-lbl">Project Lead</label><select class="ctrl" id="poFLead" onchange="renderProjOverview()" style="width:160px"><option value="">All Leads</option></select></div>
+          <div><label class="ctrl-lbl">Account</label><select class="ctrl" id="poFAccount" onchange="renderProjOverview()" style="width:120px"><option value="">All Accounts</option></select></div>
+          <div><label class="ctrl-lbl">Category</label><select class="ctrl" id="poFCategory" onchange="renderProjOverview()" style="width:130px"><option value="">All Categories</option></select></div>
+          <div><label class="ctrl-lbl">Status</label><select class="ctrl" id="poFStatus" onchange="renderProjOverview()" style="width:130px"><option value="">All Statuses</option></select></div>
+          <button class="btn btn-ghost btn-sm" onclick="clearPoFilters()" style="align-self:flex-end">&#x2715; Clear</button>
+        </div>
+        <!-- Sheet -->
+        <div class="sheet-wrap" id="poSheetWrap">
+          <table class="sheet-tbl" id="poSheet">
+            <thead id="poSheetHead"></thead>
+            <tbody id="poSheetBody"></tbody>
+          </table>
+          <div class="empty-state" id="poEmpty" style="display:none"><div style="font-size:28px;margin-bottom:8px">&#x1F4CA;</div>No projects yet. Click "+ New Project" to get started.</div>
+        </div>
+      </div>
+
+      <!-- HOURS REPORT (All roles) -->
+      <div class="page" id="page-hours-report" style="overflow:hidden">
+        <div class="sec-head" style="flex-shrink:0">
+          <div><div class="sec-title">Hours Report</div><div class="sec-sub">Hours worked — project-wise, lead-wise, associate-wise or overall</div></div>
+          <div style="display:flex;gap:7px">
+            <button class="btn btn-ghost btn-sm" onclick="exportHoursReportCSV()">&#x2913; Export CSV</button>
+            <button class="btn btn-ghost btn-sm" onclick="exportTimesheetCSV()">&#x2913; Timesheet CSV</button>
+          </div>
+        </div>
+        <!-- Date range + quick buttons -->
+        <div class="ts-range-bar" id="tsRangeBar" style="flex-shrink:0;flex-wrap:wrap;gap:8px">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <label class="ctrl-lbl" style="margin:0;white-space:nowrap">Date Range:</label>
+            <input type="date" class="ctrl" id="tsDateFrom" style="width:135px" onchange="renderHoursReport()">
+            <span style="color:var(--muted);font-size:12px">→</span>
+            <input type="date" class="ctrl" id="tsDateTo" style="width:135px" onchange="renderHoursReport()">
+          </div>
+          <div style="display:flex;gap:5px;flex-wrap:wrap">
+            <button class="btn btn-ghost btn-sm" onclick="setTsWeek(0)">This Week</button>
+            <button class="btn btn-ghost btn-sm" onclick="setTsWeek(-1)">Last Week</button>
+            <button class="btn btn-ghost btn-sm" onclick="setTsMonth(0)">This Month</button>
+            <button class="btn btn-ghost btn-sm" onclick="setTsMonth(-1)">Last Month</button>
+          </div>
+        </div>
+        <!-- View tabs — Project / Lead / Associate / Overall / Timesheet -->
+        <div style="flex-shrink:0;margin-bottom:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <div class="ts-tab-bar" style="margin-bottom:0">
+            <button class="ts-tab active" id="tsTabHrProject" onclick="switchHrView('project')">📁 By Project</button>
+            <button class="ts-tab" id="tsTabHrLead" onclick="switchHrView('lead')">👤 By Lead</button>
+            <button class="ts-tab" id="tsTabHrAssoc" onclick="switchHrView('assoc')">🧑‍💻 By Associate</button>
+            <button class="ts-tab" id="tsTabHrOverall" onclick="switchHrView('overall')">🌐 Overall</button>
+            <button class="ts-tab" id="tsTabHrTimesheet" onclick="switchHrView('timesheet')">📅 Timesheet</button>
+          </div>
+          <!-- Per-view filter shown inline -->
+          <div id="hrFilterProj" style="display:none"><select class="ctrl" id="tsFilterProj" onchange="renderHoursReport()" style="width:190px"><option value="">All Projects</option></select></div>
+          <div id="hrFilterLead" style="display:none"><select class="ctrl" id="tsFilterLead" onchange="renderHoursReport()" style="width:180px"><option value="">All Leads</option></select></div>
+          <div id="hrFilterAssoc" style="display:none"><select class="ctrl" id="tsFilterAssoc" onchange="renderHoursReport()" style="width:180px"><option value="">All Associates</option></select></div>
+        </div>
+        <!-- Stats bar -->
+        <div class="sheet-stats" id="tsStats" style="flex-shrink:0;display:none;margin-bottom:8px"></div>
+        <!-- Summary cards (Project/Lead/Assoc views) -->
+        <div id="hrSummaryCards" style="flex-shrink:0;display:none;margin-bottom:10px"></div>
+        <!-- Legend (timesheet only) -->
+        <div id="tsLegend" class="ts-legend" style="flex-shrink:0;margin-bottom:6px;padding:0 2px;display:none">
+          <span><span class="ts-leg-dot" style="background:rgba(239,68,68,.3)"></span>Over 8h</span>
+          <span><span class="ts-leg-dot" style="background:rgba(245,158,11,.3)"></span>Part day</span>
+          <span><span class="ts-leg-dot" style="background:rgba(30,58,85,.4)"></span>Weekend</span>
+        </div>
+        <!-- Hours summary table (Project/Lead/Assoc/Overall views) -->
+        <div id="hrTableWrap" class="sheet-wrap" style="flex:1;overflow:auto;display:none">
+          <table class="sheet-tbl" id="hrTable">
+            <thead id="hrTableHead"></thead>
+            <tbody id="hrTableBody"></tbody>
+          </table>
+          <div class="empty-state" id="hrEmpty" style="display:none"><div style="font-size:28px;margin-bottom:8px">⏱</div>No hours logged in this date range.</div>
+        </div>
+        <!-- Timesheet calendar grid -->
+        <div id="tsView" class="ts-wrap" style="flex:1;display:none">
+          <table class="ts-tbl" id="tsTbl">
+            <thead id="tsTblHead"></thead>
+            <tbody id="tsTblBody"></tbody>
+          </table>
+          <div class="empty-state" id="tsEmpty" style="display:none"><div style="font-size:28px;margin-bottom:8px">&#x1F4C5;</div>No entries in this date range.</div>
+        </div>
       </div>
 
       <!-- DAILY OVERVIEW (Manager/Lead) -->
@@ -419,6 +574,23 @@ select.ctrl option{background:var(--navy)}
       <!-- LEAD DASHBOARD -->
       <div class="page" id="page-lead-dashboard">
         <div class="sec-head"><div><div class="sec-title">My Projects & Tasks</div><div class="sec-sub">Manage assigned projects, delegate to associates</div></div></div>
+        <!-- Lead Workflow Guide -->
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px">
+          <div style="background:var(--surface);border:1px solid rgba(124,58,237,.3);border-radius:var(--r);padding:12px">
+            <div style="display:flex;align-items:center;gap:7px;margin-bottom:5px"><div style="width:20px;height:20px;border-radius:50%;background:rgba(124,58,237,.2);color:var(--violet2);font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center">1</div><span style="font-size:11px;font-weight:700;color:var(--white)">Review My Projects</span></div>
+            <div style="font-size:10px;color:var(--muted)">See projects assigned to you. Check tasks and deadlines.</div>
+          </div>
+          <div style="background:var(--surface);border:1px solid rgba(14,165,233,.3);border-radius:var(--r);padding:12px;cursor:pointer" onclick="showPage('lead-assign')">
+            <div style="display:flex;align-items:center;gap:7px;margin-bottom:5px"><div style="width:20px;height:20px;border-radius:50%;background:rgba(14,165,233,.2);color:var(--teal);font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center">2</div><span style="font-size:11px;font-weight:700;color:var(--white)">Create & Assign Tasks</span></div>
+            <div style="font-size:10px;color:var(--muted)">Create sub-tasks for your projects, assign to Associates.</div>
+            <div style="font-size:10px;color:var(--teal);margin-top:4px;font-weight:600">Task Assignment ›</div>
+          </div>
+          <div style="background:var(--surface);border:1px solid rgba(34,197,94,.3);border-radius:var(--r);padding:12px;cursor:pointer" onclick="showPage('hours-report')">
+            <div style="display:flex;align-items:center;gap:7px;margin-bottom:5px"><div style="width:20px;height:20px;border-radius:50%;background:rgba(34,197,94,.2);color:var(--green);font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center">3</div><span style="font-size:11px;font-weight:700;color:var(--white)">Track Team Hours</span></div>
+            <div style="font-size:10px;color:var(--muted)">Monitor associate hours in Hours Report by lead or overall.</div>
+            <div style="font-size:10px;color:var(--green);margin-top:4px;font-weight:600">Hours Report ›</div>
+          </div>
+        </div>
         <div class="stats-grid" id="leadStats"></div>
         <div class="divider"></div>
         <div class="sec-head"><div class="sec-title">My Projects</div></div>
@@ -444,6 +616,18 @@ select.ctrl option{background:var(--navy)}
         <div class="sec-head">
           <div><div class="sec-title" id="myTasksTitle">My Tasks</div><div class="sec-sub" id="myTasksSub">Your assigned tasks</div></div>
           <div style="display:flex;gap:7px" id="myTasksActions"></div>
+        </div>
+        <!-- Associate: Pick Up Tasks section -->
+        <div id="assocPickSection" style="display:none;margin-bottom:20px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+            <div>
+              <div style="font-size:13px;font-weight:700;color:var(--white)">📥 Available Tasks — Pick Up to Start Working</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:2px">Tasks assigned to you by your Team Lead — click Pick Up to begin</div>
+            </div>
+          </div>
+          <div id="assocAvailTasks" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px"></div>
+          <div style="height:1px;background:var(--border);margin:16px 0"></div>
+          <div style="font-size:13px;font-weight:700;color:var(--white);margin-bottom:10px">📋 My Active Tasks</div>
         </div>
         <div id="myTasksFilter" style="display:none;margin-bottom:14px;flex-wrap:wrap;gap:10px;align-items:flex-end">
           <div><label class="ctrl-lbl">Person</label><select class="ctrl" id="myTasksUserSel" onchange="renderMyTasks()" style="width:160px"><option value="all">Everyone</option></select></div>
@@ -557,16 +741,32 @@ select.ctrl option{background:var(--navy)}
 
 <!-- Project Modal -->
 <div class="overlay" id="projModal" onclick="bgClose(event,'projModal')">
-  <div class="modal">
-    <div class="modal-title">📁 New Project</div>
-    <div class="fg"><label class="fl">Project Name *</label><input class="fc" id="pm_name" placeholder="e.g. Solar Grid Alpha"></div>
-    <div class="fr"><div class="fg"><label class="fl">Account / Client</label><input class="fc" id="pm_account" placeholder="Client name"></div>
-      <div class="fg"><label class="fl">Type</label><select class="fc" id="pm_type"><option>PR</option><option>QC</option><option>Dev</option><option>Design</option><option>Admin</option></select></div></div>
-    <div class="fg"><label class="fl">Description</label><textarea class="fc" id="pm_desc" placeholder="Brief description…"></textarea></div>
-    <div class="fr"><div class="fg"><label class="fl">Start Date</label><input class="fc" id="pm_start" type="date"></div>
-      <div class="fg"><label class="fl">Due Date</label><input class="fc" id="pm_due" type="date"></div></div>
-    <div class="fg"><label class="fl">Assign Leads</label><select class="fc msel" id="pm_leads" multiple></select><div style="font-size:10px;color:var(--muted);margin-top:3px">Hold Ctrl/Cmd for multiple</div></div>
-    <div class="fg"><label class="fl">Color</label><div class="colors-row" id="pm_colors"></div></div>
+  <div class="modal" style="width:640px">
+    <div class="modal-title">&#x1F4C1; New Project</div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Project Name *</label><input class="fc" id="pm_name" placeholder="e.g. Solar Grid Alpha"></div>
+      <div class="fg"><label class="fl">Project Code</label><input class="fc" id="pm_code" placeholder="e.g. P332_QRK"></div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Account / Client</label><input class="fc" id="pm_account" placeholder="e.g. QRK"></div>
+      <div class="fg"><label class="fl">Category</label><select class="fc" id="pm_type"><option>Fixed BID</option><option>Dedicated</option><option>Flexible</option><option>Daily Task Based</option><option>Client Assignment</option><option>QC</option><option>PR</option><option>Dev</option><option>Design</option><option>Admin</option></select></div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Project Lead</label><select class="fc" id="pm_proj_lead"></select></div>
+      <div class="fg"><label class="fl">Approved Hours</label><input class="fc" id="pm_approved_hrs" type="number" min="0" step="1" placeholder="e.g. 7600"></div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Start Date</label><input class="fc" id="pm_start" type="date"></div>
+      <div class="fg"><label class="fl">Due Date</label><input class="fc" id="pm_due" type="date"></div>
+      <div class="fg"><label class="fl">Completion Date</label><input class="fc" id="pm_completion" type="date"></div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Project Status</label><select class="fc" id="pm_proj_status"><option value="In Progress">In Progress</option><option value="Completed">Completed</option><option value="On Hold">On Hold</option><option value="Not Started">Not Started</option><option value="Cancelled">Cancelled</option></select></div>
+      <div class="fg"><label class="fl">Assign Leads</label><select class="fc msel" id="pm_leads" multiple></select></div>
+    </div>
+    <div class="fg"><label class="fl">Remarks</label><input class="fc" id="pm_remarks" placeholder="e.g. submitted on 05-02-2026..."></div>
+    <div class="fg"><label class="fl">Description</label><textarea class="fc" id="pm_desc" placeholder="Brief description…" style="height:50px"></textarea></div>
+    <div class="fg"><label class="fl">Color Tag</label><div class="colors-row" id="pm_colors"></div></div>
     <div class="fa"><button class="btn btn-ghost" onclick="closeModal('projModal')">Cancel</button><button class="btn btn-primary" onclick="saveProject()">Create Project</button></div>
   </div>
 </div>
@@ -1226,7 +1426,7 @@ function buildCredList(){
         </div>
         <div style="text-align:right;flex-shrink:0;margin-left:8px">
           <span class="role-tag role-${role}" style="display:block;text-align:center;margin-bottom:3px">${rm.label}</span>
-          <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-dim)">${u.password}</div>
+          <div style="font-family:var(--mono,monospace);font-size:10px;color:var(--text-dim)">${u.password}</div>
         </div>
       </div>`;
     });
@@ -1278,16 +1478,123 @@ function logout(){
 }
 
 // ══════════════════════════════════════════════
-// NAVIGATION
+// NAVIGATION — 3-Step Workflow
 // ══════════════════════════════════════════════
+const NAV_STEPS={
+  admin:[
+    {step:'1',label:'Projects',icon:'🏗️',pages:[
+      {id:'dashboard',l:'Dashboard'},
+      {id:'planner',l:'Planning'},
+      {id:'proj-overview',l:'Project Overview'},
+    ]},
+    {step:'2',label:'Tasks',icon:'📋',pages:[
+      {id:'lead-assign',l:'Task Assignment'},
+      {id:'my-tasks',l:'All Tasks'},
+    ]},
+    {step:'3',label:'Track & Report',icon:'⏱',pages:[
+      {id:'tracker',l:'Daily Tracker'},
+      {id:'hours-report',l:'Hours Report'},
+      {id:'daily-overview',l:'Daily Overview'},
+    ]},
+    {step:'⚙',label:'Settings',icon:'',pages:[
+      {id:'team',l:'Team'},
+      {id:'admin',l:'Users'},
+    ]},
+  ],
+  manager:[
+    {step:'1',label:'Projects',icon:'🏗️',pages:[
+      {id:'dashboard',l:'Dashboard'},
+      {id:'planner',l:'Planning'},
+      {id:'proj-overview',l:'Project Overview'},
+    ]},
+    {step:'2',label:'Tasks',icon:'📋',pages:[
+      {id:'lead-assign',l:'Task Assignment'},
+      {id:'my-tasks',l:'All Tasks'},
+    ]},
+    {step:'3',label:'Track & Report',icon:'⏱',pages:[
+      {id:'tracker',l:'Daily Tracker'},
+      {id:'hours-report',l:'Hours Report'},
+      {id:'daily-overview',l:'Daily Overview'},
+    ]},
+    {step:'⚙',label:'Settings',icon:'',pages:[
+      {id:'team',l:'Team'},
+    ]},
+  ],
+  lead:[
+    {step:'1',label:'My Projects',icon:'🏗️',pages:[
+      {id:'lead-dashboard',l:'Dashboard'},
+    ]},
+    {step:'2',label:'Tasks',icon:'📋',pages:[
+      {id:'lead-assign',l:'Task Assignment'},
+      {id:'my-tasks',l:'All Tasks'},
+    ]},
+    {step:'3',label:'Tracking',icon:'⏱',pages:[
+      {id:'tracker',l:'Daily Tracker'},
+      {id:'hours-report',l:'Hours Report'},
+      {id:'daily-overview',l:'Daily Overview'},
+    ]},
+    {step:'⚙',label:'Settings',icon:'',pages:[
+      {id:'team',l:'Team'},
+    ]},
+  ],
+  associate:[
+    {step:'1',label:'My Tasks',icon:'✅',pages:[
+      {id:'my-tasks',l:'My Tasks'},
+    ]},
+    {step:'2',label:'Tracking',icon:'⏱',pages:[
+      {id:'tracker',l:'Daily Tracker'},
+    ]},
+    {step:'⚙',label:'Settings',icon:'',pages:[
+      {id:'team',l:'Team'},
+    ]},
+  ],
+};
+// Flat NAV kept for compatibility with refreshAll lookup
 const NAV={
-  admin:    [{id:'dashboard',l:'📊 Dashboard'},{id:'planner',l:'🗂 Planning'},{id:'lead-assign',l:'📋 Lead Assignment'},{id:'hours-report',l:'⏱ Hours Report'},{id:'daily-overview',l:'📅 Daily Overview'},{id:'my-tasks',l:'✅ My Tasks'},{id:'tracker',l:'📅 Daily Tracker'},{id:'team',l:'👥 Team'},{id:'admin',l:'⚙️ Users'}],
-  manager:  [{id:'dashboard',l:'📊 Dashboard'},{id:'planner',l:'🗂 Planning'},{id:'lead-assign',l:'📋 Lead Assignment'},{id:'hours-report',l:'⏱ Hours Report'},{id:'daily-overview',l:'📅 Daily Overview'},{id:'my-tasks',l:'✅ My Tasks'},{id:'tracker',l:'📅 Daily Tracker'},{id:'team',l:'👥 Team'}],
-  lead:     [{id:'lead-dashboard',l:'🗂 My Projects'},{id:'lead-assign',l:'📋 Task Assignment'},{id:'daily-overview',l:'📅 Daily Overview'},{id:'my-tasks',l:'✅ My Tasks'},{id:'tracker',l:'📅 Daily Tracker'},{id:'team',l:'👥 Team'}],
+  admin:    [{id:'dashboard',l:'📊 Dashboard'},{id:'planner',l:'🗂 Planning'},{id:'proj-overview',l:'📈 Project Overview'},{id:'lead-assign',l:'📋 Lead Assignment'},{id:'hours-report',l:'⏱ Hours Report'},{id:'daily-overview',l:'📅 Daily Overview'},{id:'my-tasks',l:'✅ My Tasks'},{id:'tracker',l:'📅 Daily Tracker'},{id:'team',l:'👥 Team'},{id:'admin',l:'⚙️ Users'}],
+  manager:  [{id:'dashboard',l:'📊 Dashboard'},{id:'planner',l:'🗂 Planning'},{id:'proj-overview',l:'📈 Project Overview'},{id:'lead-assign',l:'📋 Lead Assignment'},{id:'hours-report',l:'⏱ Hours Report'},{id:'daily-overview',l:'📅 Daily Overview'},{id:'my-tasks',l:'✅ My Tasks'},{id:'tracker',l:'📅 Daily Tracker'},{id:'team',l:'👥 Team'}],
+  lead:     [{id:'lead-dashboard',l:'🗂 My Projects'},{id:'lead-assign',l:'📋 Task Assignment'},{id:'daily-overview',l:'📅 Daily Overview'},{id:'my-tasks',l:'✅ My Tasks'},{id:'tracker',l:'📅 Daily Tracker'},{id:'team',l:'👥 Team'},{id:'hours-report',l:'⏱ Hours'}],
   associate:[{id:'my-tasks',l:'✅ My Tasks'},{id:'tracker',l:'📅 Daily Tracker'},{id:'team',l:'👥 Team'}]
 };
 function buildNav(){
-  document.getElementById('topNav').innerHTML=(NAV[currentUser.role]||[]).map(n=>`<button class="tnav" data-page="${n.id}" onclick="showPage('${n.id}')">${n.l}</button>`).join('');
+  const steps=NAV_STEPS[currentUser.role]||[];
+  const nav=document.getElementById('topNav');
+  nav.innerHTML='';
+  steps.forEach((grp,gi)=>{
+    if(gi>0){
+      const sep=document.createElement('span');
+      sep.className='wf-sep';sep.textContent='›';
+      nav.appendChild(sep);
+    }
+    const isSettings=grp.step==='⚙';
+    const wrapper=document.createElement('div');
+    wrapper.className='wf-group';
+    // Group label
+    const lbl=document.createElement('span');
+    lbl.className='wf-group-label';
+    lbl.dataset.group=gi;
+    if(!isSettings){
+      lbl.innerHTML=`<span class="wf-step-num">${grp.step}</span>${grp.label}`;
+    } else {
+      lbl.innerHTML=`<span style="font-size:12px">⚙</span>`;
+      lbl.style.borderRadius='6px 0 0 6px';
+    }
+    wrapper.appendChild(lbl);
+    // Page buttons
+    const pages=document.createElement('div');
+    pages.className='wf-pages';
+    grp.pages.forEach(p=>{
+      const btn=document.createElement('button');
+      btn.className='tnav';btn.dataset.page=p.id;
+      btn.textContent=p.l;
+      btn.onclick=()=>showPage(p.id);
+      pages.appendChild(btn);
+    });
+    wrapper.appendChild(pages);
+    nav.appendChild(wrapper);
+  });
+  // Highlight active step group
+  _updateStepHighlight();
 }
 function showPage(name){
   currentPage=name;
@@ -1295,7 +1602,26 @@ function showPage(name){
   document.querySelectorAll('.tnav').forEach(a=>a.classList.remove('active'));
   const pg=document.getElementById('page-'+name); if(pg) pg.classList.add('active');
   document.querySelectorAll(`.tnav[data-page="${name}"]`).forEach(a=>a.classList.add('active'));
-  ({dashboard:renderManagerDashboard,planner:renderPlanner,'lead-assign':renderLeadAssignPage,'hours-report':renderHoursReport,'daily-overview':renderDailyOverview,'lead-dashboard':renderLeadDashboard,'assoc-assign':renderAssocAssignPage,'my-tasks':renderMyTasks,tracker:renderTracker,team:renderTeam,admin:renderAdminPage})[name]?.();
+  _updateStepHighlight();
+  ({dashboard:renderManagerDashboard,planner:renderPlanner,'proj-overview':renderProjOverview,'lead-assign':renderLeadAssignPage,'hours-report':renderHoursReport,'daily-overview':renderDailyOverview,'lead-dashboard':renderLeadDashboard,'assoc-assign':renderAssocAssignPage,'my-tasks':renderMyTasks,tracker:renderTracker,team:renderTeam,admin:renderAdminPage})[name]?.();
+}
+function _updateStepHighlight(){
+  const steps=NAV_STEPS[currentUser?.role]||[];
+  document.querySelectorAll('.wf-group-label').forEach(lbl=>{
+    lbl.classList.remove('wf-active','wf-done');
+  });
+  // Find which step group contains the current page
+  let activeGroupIdx=-1;
+  steps.forEach((grp,gi)=>{
+    if(grp.pages.some(p=>p.id===currentPage)) activeGroupIdx=gi;
+  });
+  // Mark groups
+  steps.forEach((grp,gi)=>{
+    const lbl=document.querySelector(`.wf-group-label[data-group="${gi}"]`);
+    if(!lbl) return;
+    if(gi===activeGroupIdx) lbl.classList.add('wf-active');
+    else if(gi<activeGroupIdx && grp.step!=='⚙') lbl.classList.add('wf-done');
+  });
 }
 
 // ══════════════════════════════════════════════
@@ -1324,7 +1650,7 @@ function renderAdminPage(){
     const isMe=u.id===currentUser.id;
     const taskCount=myTasks(u).length;
     return `<tr style="${u.status==='inactive'?'opacity:.45':''}">
-      <td style="color:var(--text-dim);font-size:10px;font-family:'JetBrains Mono',monospace">${i+1}</td>
+      <td style="color:var(--text-dim);font-size:10px;font-family:var(--mono,monospace)">${i+1}</td>
       <td>
         <div style="display:flex;align-items:center;gap:10px">
           <div style="width:34px;height:34px;border-radius:50%;background:${u.color};color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">${u.initials}</div>
@@ -1335,7 +1661,7 @@ function renderAdminPage(){
         </div>
       </td>
       <td>
-        <div style="font-size:11px;color:var(--text);font-family:'JetBrains Mono',monospace">${u.email}</div>
+        <div style="font-size:11px;color:var(--text);font-family:var(--mono,monospace)">${u.email}</div>
         ${u.phone?`<div style="font-size:10px;color:var(--muted);margin-top:2px">${u.phone}</div>`:''}
       </td>
       <td><span class="badge" style="background:${rm.bg};color:${rm.c};font-size:10px">${rm.label}</span></td>
@@ -1348,7 +1674,7 @@ function renderAdminPage(){
       </td>
       <td style="font-size:10px;color:var(--muted)">${fmt(u.createdAt)}</td>
       <td style="font-size:10px;color:var(--muted)">${u.lastLogin?fmt(u.lastLogin):'<span style="color:var(--text-dim)">Never</span>'}</td>
-      <td style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent);font-weight:700">${taskCount}</td>
+      <td style="font-family:var(--mono,monospace);font-size:12px;color:var(--accent);font-weight:700">${taskCount}</td>
       <td>
         <div style="display:flex;gap:5px;align-items:center;flex-wrap:wrap">
           <button onclick="editUser('${u.id}')" style="padding:4px 10px;border-radius:6px;border:1px solid rgba(14,165,233,.3);background:rgba(14,165,233,.08);color:var(--teal);font-size:10px;font-weight:600;cursor:pointer;font-family:'Sora',sans-serif">✏️ Edit</button>
@@ -1389,14 +1715,14 @@ function viewCredential(id){
       <div style="background:var(--navy3);border-radius:9px;padding:13px;display:flex;justify-content:space-between;align-items:center;gap:10px">
         <div>
           <div style="font-size:9px;font-weight:700;text-transform:uppercase;color:var(--text-dim);letter-spacing:.7px;margin-bottom:4px">Email — Login ID</div>
-          <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--accent)">${u.email}</div>
+          <div style="font-family:var(--mono,monospace);font-size:13px;color:var(--accent)">${u.email}</div>
         </div>
         <button onclick="copyText('${u.email}')" style="padding:5px 12px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-size:10px;font-family:'Sora',sans-serif;white-space:nowrap">📋 Copy</button>
       </div>
       <div style="background:var(--navy3);border-radius:9px;padding:13px;display:flex;justify-content:space-between;align-items:center;gap:10px">
         <div>
           <div style="font-size:9px;font-weight:700;text-transform:uppercase;color:var(--text-dim);letter-spacing:.7px;margin-bottom:4px">Password</div>
-          <div id="credPwdDisplay" style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--amber);letter-spacing:2px">${'•'.repeat(Math.min((u.password||'').length,8))}</div>
+          <div id="credPwdDisplay" style="font-family:var(--mono,monospace);font-size:13px;color:var(--amber);letter-spacing:2px">${'•'.repeat(Math.min((u.password||'').length,8))}</div>
         </div>
         <div style="display:flex;gap:6px">
           <button id="revealBtn" onclick="revealPwd('${u.id}')" style="padding:5px 12px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-size:10px;font-family:'Sora',sans-serif">👁 Show</button>
@@ -1561,16 +1887,16 @@ function renderManagerDashboard(){
     const delta=act-est;
     const deltaColor=delta>0?'var(--red)':delta<0?'var(--amber)':'var(--green)';
     return `<tr>
-      <td style="color:var(--muted);font-size:10px;font-family:'JetBrains Mono',monospace">${i+1}</td>
+      <td style="color:var(--muted);font-size:10px;font-family:var(--mono,monospace)">${i+1}</td>
       <td><div style="font-size:12px;font-weight:600;color:var(--white)">${t.title}</div></td>
       <td><span class="badge" style="background:${p?.color||'#475569'}22;color:${p?.color||'#94a3b8'}">${p?.name||'—'}</span></td>
       <td>${lead?avatarChip(lead):avEmpty()}</td>
       <td>${assoc?avatarChip(assoc):avEmpty()}</td>
       <td><span class="badge ${bcls(t.status)}">${t.status}</span></td>
       <td style="font-size:10px;color:${isLate(t.due)&&t.status!=='Completed'?'var(--red)':'var(--muted)'}">${fmt(t.due)}</td>
-      <td style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted)">${est}h</td>
-      <td style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent)">${act.toFixed(1)}h</td>
-      <td style="font-family:'JetBrains Mono',monospace;font-size:11px;color:${deltaColor};font-weight:700">${delta>0?'+':''}${delta.toFixed(1)}h</td>
+      <td style="font-family:var(--mono,monospace);font-size:11px;color:var(--muted)">${est}h</td>
+      <td style="font-family:var(--mono,monospace);font-size:11px;color:var(--accent)">${act.toFixed(1)}h</td>
+      <td style="font-family:var(--mono,monospace);font-size:11px;color:${deltaColor};font-weight:700">${delta>0?'+':''}${delta.toFixed(1)}h</td>
     </tr>`;
   }).join('');
 }
@@ -1727,6 +2053,205 @@ function addBucketPrompt(){
 // ══════════════════════════════════════════════
 // RENDER: LEAD ASSIGN TABLE (Manager → Lead)
 // ══════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
+// PROJECT OVERVIEW SHEET
+// ═══════════════════════════════════════════════════
+let _poSort={col:'name',dir:'asc'};
+
+function getProjConsumedHours(projId){
+  return DB.trackerEntries.filter(e=>e.projectId===projId&&e.submitted).reduce((s,e)=>s+(e.hours||0),0);
+}
+function getProjApprovedHours(p){
+  // Use explicitly set approvedHours, else fallback to sum of task hours
+  if(p.approvedHours&&p.approvedHours>0) return p.approvedHours;
+  return Object.values(p.buckets||{}).flat().reduce((s,t)=>s+(t.hours||0),0);
+}
+
+function renderProjOverview(){
+  const rows=DB.projects;
+  // Populate filters
+  function poPopFilter(id,vals){
+    const el=document.getElementById(id); if(!el) return;
+    const cur=el.value;
+    const first=el.options[0].outerHTML;
+    el.innerHTML=first+[...new Set(vals.filter(Boolean).sort())].map(v=>`<option value="${v}" ${cur===v?'selected':''}>${v}</option>`).join('');
+    el.value=cur;
+  }
+  poPopFilter('poFLead', rows.map(r=>getUser(r.projectLead)?.name||''));
+  poPopFilter('poFAccount', rows.map(r=>r.account||''));
+  poPopFilter('poFCategory', rows.map(r=>r.type||''));
+  poPopFilter('poFStatus', rows.map(r=>r.projStatus||'In Progress'));
+
+  // Apply filters
+  const fLead=document.getElementById('poFLead')?.value||'';
+  const fAcct=document.getElementById('poFAccount')?.value||'';
+  const fCat=document.getElementById('poFCategory')?.value||'';
+  const fSt=document.getElementById('poFStatus')?.value||'';
+
+  let filtered=rows.filter(r=>{
+    const leadName=getUser(r.projectLead)?.name||'';
+    const st=r.projStatus||'In Progress';
+    return (!fLead||leadName===fLead)&&(!fAcct||(r.account||'')===fAcct)&&(!fCat||(r.type||'')===fCat)&&(!fSt||st===fSt);
+  });
+
+  // Sort
+  const {col,dir}=_poSort;
+  filtered.sort((a,b)=>{
+    let av='',bv='';
+    const aAppr=getProjApprovedHours(a), bAppr=getProjApprovedHours(b);
+    const aCons=getProjConsumedHours(a.id), bCons=getProjConsumedHours(b.id);
+    if(col==='lead'){av=getUser(a.projectLead)?.name||'';bv=getUser(b.projectLead)?.name||'';}
+    else if(col==='account'){av=a.account||'';bv=b.account||'';}
+    else if(col==='code'){av=a.code||'';bv=b.code||'';}
+    else if(col==='name'){av=a.name||'';bv=b.name||'';}
+    else if(col==='category'){av=a.type||'';bv=b.type||'';}
+    else if(col==='approved'){av=aAppr;bv=bAppr;}
+    else if(col==='consumed'){av=aCons;bv=bCons;}
+    else if(col==='pct'){av=aAppr?aCons/aAppr:0;bv=bAppr?bCons/bAppr:0;}
+    else if(col==='available'){av=aAppr-aCons;bv=bAppr-bCons;}
+    else if(col==='status'){av=a.projStatus||'';bv=b.projStatus||'';}
+    else if(col==='start'){av=a.start||'';bv=b.start||'';}
+    else if(col==='due'){av=a.due||'';bv=b.due||'';}
+    else if(col==='completion'){av=a.completion||'';bv=b.completion||'';}
+    if(typeof av==='number') return dir==='asc'?av-bv:bv-av;
+    return dir==='asc'?av.localeCompare(bv):bv.localeCompare(av);
+  });
+
+  // Stats
+  const totalProj=filtered.length;
+  const totalApproved=filtered.reduce((s,p)=>s+getProjApprovedHours(p),0);
+  const totalConsumed=filtered.reduce((s,p)=>s+getProjConsumedHours(p.id),0);
+  const inProg=filtered.filter(p=>(p.projStatus||'In Progress')==='In Progress').length;
+  const completed=filtered.filter(p=>p.projStatus==='Completed').length;
+  const overBudget=filtered.filter(p=>{const a=getProjApprovedHours(p),c=getProjConsumedHours(p.id);return a>0&&c>a;}).length;
+  document.getElementById('poStats').innerHTML=
+    '<div class="sh-stat"><div class="sh-stat-val" style="color:var(--teal)">'+totalProj+'</div><div class="sh-stat-lbl">Projects</div></div>'+
+    '<div style="width:1px;background:var(--border)"></div>'+
+    '<div class="sh-stat"><div class="sh-stat-val" style="color:var(--violet2)">'+inProg+'</div><div class="sh-stat-lbl">In Progress</div></div>'+
+    '<div class="sh-stat"><div class="sh-stat-val" style="color:var(--green)">'+completed+'</div><div class="sh-stat-lbl">Completed</div></div>'+
+    '<div style="width:1px;background:var(--border)"></div>'+
+    '<div class="sh-stat"><div class="sh-stat-val" style="color:var(--accent)">'+totalApproved.toLocaleString()+'</div><div class="sh-stat-lbl">Approved Hrs</div></div>'+
+    '<div class="sh-stat"><div class="sh-stat-val" style="color:var(--amber)">'+totalConsumed.toFixed(0)+'</div><div class="sh-stat-lbl">Consumed Hrs</div></div>'+
+    '<div class="sh-stat"><div class="sh-stat-val" style="color:'+(overBudget>0?'var(--red)':'var(--green)')+'">'+overBudget+'</div><div class="sh-stat-lbl">Over Budget</div></div>'+
+    '<div style="margin-left:auto;font-size:10px;color:var(--text-dim);align-self:center">Showing <strong style="color:var(--white)">'+filtered.length+'</strong> of <strong style="color:var(--white)">'+rows.length+'</strong> rows</div>';
+
+  // Header columns
+  const PO_COLS=[
+    {key:'sn',     label:'Sl.No',          w:'44px', nosort:true},
+    {key:'lead',   label:'Project Lead',   w:'140px'},
+    {key:'account',label:'Account',        w:'80px'},
+    {key:'code',   label:'Project Code',   w:'120px'},
+    {key:'name',   label:'Project Name',   w:'160px'},
+    {key:'category',label:'Category',      w:'120px'},
+    {key:'approved',label:'Approved Hours',w:'100px'},
+    {key:'consumed',label:'Consumed Hours',w:'105px'},
+    {key:'pct',    label:'Consumed %',     w:'100px'},
+    {key:'available',label:'Available Hours',w:'105px'},
+    {key:'status', label:'Project Status', w:'120px'},
+    {key:'start',  label:'Starting Date',  w:'100px'},
+    {key:'due',    label:'Due Date',       w:'100px'},
+    {key:'completion',label:'Completion Date',w:'110px'},
+    {key:'_action',label:'Actions',        w:'90px', nosort:true},
+    {key:'remarks',label:'Remarks',        w:'180px'},
+  ];
+
+  document.getElementById('poSheetHead').innerHTML='<tr>'+PO_COLS.map(function(c){
+    const sorted=_poSort.col===c.key;
+    const dir=sorted?_poSort.dir:'';
+    const sortCls=sorted?'sorted-'+dir:'';
+    const clickAttr=c.nosort?'':('onclick="poSortSheet(\'' + c.key + '\')"');
+    const sortIcon=c.nosort?'':'<span class="sh-sort-icon"></span>';
+    return '<th style="width:'+c.w+';min-width:'+c.w+'">'
+      +'<div class="sh-th-inner">'
+      +'<div class="sh-th-label '+sortCls+'" '+clickAttr+'>'
+      +'<span>'+c.label+'</span>'+sortIcon
+      +'</div></div></th>';
+  }).join('')+'</tr>';
+
+  // Empty state
+  document.getElementById('poEmpty').style.display=filtered.length?'none':'block';
+
+  // Body rows
+  document.getElementById('poSheetBody').innerHTML=filtered.map(function(p,i){
+    const lead=getUser(p.projectLead);
+    const approved=getProjApprovedHours(p);
+    const consumed=getProjConsumedHours(p.id);
+    const available=approved-consumed;
+    const pct=approved>0?Math.round(consumed/approved*100):0;
+    const st=p.projStatus||'In Progress';
+    const stClr=({'In Progress':'#7c3aed','Completed':'#22c55e','On Hold':'#f59e0b','Not Started':'#475569','Cancelled':'#ef4444'})[st]||'#475569';
+    const isOver=approved>0&&consumed>approved;
+    const isComplete=st==='Completed';
+    // Consumed % colour: green <50, amber 50-99, red >=100
+    const pctClr=pct>=100?'var(--red)':pct>=50?'var(--amber)':'var(--green)';
+    const availClr=available<0?'var(--red)':available===0?'var(--amber)':'var(--accent)';
+    const rowBg=isComplete?'rgba(34,197,94,.03)':isOver?'rgba(239,68,68,.04)':'';
+
+    // Mini bar for consumed %
+    const barW=Math.min(100,pct);
+    const barClr=pct>=100?'#ef4444':pct>=50?'#f59e0b':'#22c55e';
+    const miniBar='<div style="height:3px;border-radius:2px;background:var(--border);margin-top:3px"><div style="height:3px;border-radius:2px;background:'+barClr+';width:'+barW+'%"></div></div>';
+
+    const leadCell=lead
+      ?'<div style="display:flex;align-items:center;gap:5px"><div style="width:20px;height:20px;border-radius:50%;background:'+lead.color+';display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#fff;flex-shrink:0">'+lead.initials+'</div><span style="font-size:11px;font-weight:600;color:var(--white)">'+lead.name+'</span></div>'
+      :'<span style="color:var(--muted);font-size:10px">Unassigned</span>';
+
+    return '<tr style="background:'+rowBg+'">'
+      +'<td class="sh-sn">'+(i+1)+'</td>'
+      +'<td>'+leadCell+'</td>'
+      +'<td class="sh-acct">'+(p.account||'—')+'</td>'
+      +'<td style="font-size:10px;color:var(--teal);font-family:var(--mono,monospace);font-weight:600">'+(p.code||'—')+'</td>'
+      +'<td><div style="font-size:11px;font-weight:700;color:var(--white);display:flex;align-items:center;gap:5px"><div style="width:7px;height:7px;border-radius:50%;background:'+p.color+';flex-shrink:0"></div>'+(p.name||'—')+'</div></td>'
+      +'<td><span style="font-size:10px;padding:2px 8px;border-radius:4px;background:rgba(14,165,233,.1);color:var(--teal)">'+(p.type||'—')+'</span></td>'
+      +'<td style="font-family:var(--mono,monospace);font-size:11px;font-weight:700;color:var(--accent);text-align:center">'+(approved>0?approved.toLocaleString():'—')+'</td>'
+      +'<td style="font-family:var(--mono,monospace);font-size:11px;font-weight:700;color:'+pctClr+';text-align:center">'+consumed.toFixed(0)+'</td>'
+      +'<td><div style="text-align:center"><span style="font-size:11px;font-weight:700;color:'+pctClr+'">'+pct+'%</span>'+miniBar+'</div></td>'
+      +'<td style="font-family:var(--mono,monospace);font-size:11px;font-weight:700;color:'+availClr+';text-align:center">'+(available>=0?available.toFixed(0):'<span style="color:var(--red)">'+available.toFixed(0)+'</span>')+'</td>'
+      +'<td><span class="sh-status-pill" style="background:'+stClr+'22;color:'+stClr+'">'+st+'</span></td>'
+      +'<td class="sh-date">'+(p.start||'—')+'</td>'
+      +'<td class="sh-date" style="color:'+(isLate(p.due)&&!isComplete?'var(--red)':'var(--text-dim)');+'">'+(p.due||'—')+'</td>'
+      +'<td class="sh-date" style="color:var(--green)">'+(p.completion||'—')+'</td>'
+      +'<td style="white-space:nowrap;display:flex;gap:4px;padding:6px">'
+        +'<button class="btn btn-ghost" style="padding:2px 8px;font-size:10px" onclick="openProjModal(\''+p.id+'\')">&#9998;</button>'
+        +'<button style="padding:2px 8px;font-size:10px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);border-radius:6px;color:var(--red);cursor:pointer" onclick="deleteProject(\''+p.id+'\')">&#128465;</button>'
+      +'</td>'
+      +'<td style="font-size:10px;color:var(--muted);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+(p.projRemarks||'')+'">'+(p.projRemarks||'—')+'</td>'
+      +'</tr>';
+  }).join('');
+}
+
+function poSortSheet(col){
+  if(_poSort.col===col) _poSort.dir=_poSort.dir==='asc'?'desc':'asc';
+  else{_poSort.col=col;_poSort.dir='asc';}
+  renderProjOverview();
+}
+function clearPoFilters(){
+  ['poFLead','poFAccount','poFCategory','poFStatus'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  renderProjOverview();
+}
+function exportProjCSV(){
+  const rows=DB.projects;
+  const headers=['Sl.No','Project Lead','Account','Project Code','Project Name','Category','Approved Hours','Consumed Hours','Consumed %','Available Hours','Project Status','Starting Date','Due Date','Completion Date','Remarks'];
+  const lines=[headers.join(',')];
+  rows.forEach(function(p,i){
+    const approved=getProjApprovedHours(p);
+    const consumed=getProjConsumedHours(p.id);
+    const pct=approved>0?Math.round(consumed/approved*100):0;
+    lines.push([
+      i+1,
+      getUser(p.projectLead)?.name||'',
+      p.account||'', p.code||'', p.name||'', p.type||'',
+      approved, consumed.toFixed(0), pct+'%', (approved-consumed).toFixed(0),
+      p.projStatus||'In Progress', p.start||'', p.due||'', p.completion||'',
+      (p.projRemarks||'').replace(/,/g,';')
+    ].join(','));
+  });
+  const blob=new Blob([lines.join('\n')],{type:'text/csv'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='project-overview-'+TODAY+'.csv';a.click();
+  toast('CSV exported','var(--green)');
+}
+
 // ═══════════════════════════════════════════════════
 // ASSIGNMENT SHEET — unified Excel-style table
 // ═══════════════════════════════════════════════════
@@ -1944,63 +2469,489 @@ function exportSheetCSV(){
 }
 
 // ══════════════════════════════════════════════
-// RENDER: HOURS REPORT
+// RENDER: HOURS REPORT — Project / Lead / Associate / Overall / Timesheet
 // ══════════════════════════════════════════════
+let _tsView='project'; // default to project view
+
+function switchHrView(view){
+  _tsView=view;
+  ['project','lead','assoc','overall','timesheet'].forEach(v=>{
+    const key='tsTabHr'+v.charAt(0).toUpperCase()+v.slice(1);
+    const btn=document.getElementById(key);
+    if(btn) btn.classList.toggle('active',v===view);
+  });
+  // Show/hide per-view filter
+  const fp=document.getElementById('hrFilterProj');
+  const fl=document.getElementById('hrFilterLead');
+  const fa=document.getElementById('hrFilterAssoc');
+  if(fp) fp.style.display=view==='project'?'block':'none';
+  if(fl) fl.style.display=view==='lead'?'block':'none';
+  if(fa) fa.style.display=view==='assoc'?'block':'none';
+  // Populate filter dropdowns
+  if(view==='project'){
+    const sel=document.getElementById('tsFilterProj');
+    if(sel){const cur=sel.value;sel.innerHTML='<option value="">All Projects</option>'+DB.projects.map(p=>`<option value="${p.id}">${p.name}</option>`).join('');if(cur)sel.value=cur;}
+  } else if(view==='lead'){
+    const sel=document.getElementById('tsFilterLead');
+    if(sel){const cur=sel.value;sel.innerHTML='<option value="">All Leads</option>'+USERS.filter(u=>u.role==='lead').map(u=>`<option value="${u.id}">${u.name}</option>`).join('');if(cur)sel.value=cur;}
+  } else if(view==='assoc'){
+    const sel=document.getElementById('tsFilterAssoc');
+    if(sel){const cur=sel.value;sel.innerHTML='<option value="">All Associates</option>'+USERS.filter(u=>u.role==='associate').map(u=>`<option value="${u.id}">${u.name}</option>`).join('');if(cur)sel.value=cur;}
+  }
+  renderHoursReport();
+}
+// Legacy alias
+function switchTsView(view){ switchHrView(view==='overall'?'overall':view); }
+
+function setTsWeek(offset){
+  const now=new Date();
+  const day=now.getDay();
+  const mon=new Date(now); mon.setDate(now.getDate()-((day+6)%7)+(offset*7));
+  const sun=new Date(mon); sun.setDate(mon.getDate()+6);
+  document.getElementById('tsDateFrom').value=mon.toISOString().split('T')[0];
+  document.getElementById('tsDateTo').value=sun.toISOString().split('T')[0];
+  renderHoursReport();
+}
+function setTsMonth(offset){
+  const now=new Date();
+  const y=now.getFullYear(), m=now.getMonth()+offset;
+  const from=new Date(y,m,1);
+  const to=new Date(y,m+1,0);
+  document.getElementById('tsDateFrom').value=from.toISOString().split('T')[0];
+  document.getElementById('tsDateTo').value=to.toISOString().split('T')[0];
+  renderHoursReport();
+}
+
+function getDatesInRange(from,to){
+  const dates=[];
+  const cur=new Date(from+'T00:00:00');
+  const end=new Date(to+'T00:00:00');
+  while(cur<=end){ dates.push(cur.toISOString().split('T')[0]); cur.setDate(cur.getDate()+1); }
+  return dates;
+}
+function isWeekend(dateStr){
+  const d=new Date(dateStr+'T00:00:00');
+  return d.getDay()===0||d.getDay()===6;
+}
+function dayLetter(dateStr){
+  return ['S','M','T','W','T','F','S'][new Date(dateStr+'T00:00:00').getDay()];
+}
+function fmtDateShort(dateStr){
+  const d=new Date(dateStr+'T00:00:00');
+  return d.toLocaleDateString('en-GB',{day:'2-digit',month:'short'});
+}
+
 function renderHoursReport(){
-  const dateLabel=ovDate==='all'?'All Time':new Date(ovDate+'T00:00:00').toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
-  document.getElementById('ovDateLbl').textContent=dateLabel;
+  // Ensure tabs are highlighted correctly on first open
+  ['project','lead','assoc','overall','timesheet'].forEach(function(v){
+    var key='tsTabHr'+v.charAt(0).toUpperCase()+v.slice(1);
+    var btn=document.getElementById(key);
+    if(btn) btn.classList.toggle('active',v===_tsView);
+  });
+  // Show/hide per-view filters
+  var fp=document.getElementById('hrFilterProj');
+  var fl=document.getElementById('hrFilterLead');
+  var fa=document.getElementById('hrFilterAssoc');
+  if(fp) fp.style.display=_tsView==='project'?'block':'none';
+  if(fl) fl.style.display=_tsView==='lead'?'block':'none';
+  if(fa) fa.style.display=_tsView==='assoc'?'block':'none';
+  const fromEl=document.getElementById('tsDateFrom');
+  if(fromEl&&!fromEl.value){ setTsWeek(0); return; }
+  const from=fromEl.value;
+  const to=document.getElementById('tsDateTo').value;
+  const hrWrap=document.getElementById('hrTableWrap');
+  const tsViewEl=document.getElementById('tsView');
+  const legend=document.getElementById('tsLegend');
+  const isTimesheet=_tsView==='timesheet';
+  if(hrWrap) hrWrap.style.display=isTimesheet?'none':'block';
+  if(tsViewEl) tsViewEl.style.display=isTimesheet?'block':'none';
+  if(legend) legend.style.display=isTimesheet?'flex':'none';
+  if(!from||!to||from>to){
+    const tsEl=document.getElementById('tsEmpty'); if(tsEl) tsEl.style.display='block';
+    const hrEl=document.getElementById('hrEmpty'); if(hrEl) hrEl.style.display='block';
+    return;
+  }
+  const entries=DB.trackerEntries.filter(function(e){return e.submitted&&e.date>=from&&e.date<=to;});
+  const statsEl=document.getElementById('tsStats');
+  function showStats(html){ if(statsEl){statsEl.style.display='flex';statsEl.innerHTML=html;} }
+  function fmtH(h){ return h>0?h.toFixed(1)+'h':'\u2014'; }
 
-  const associates=USERS.filter(u=>u.role==='associate');
-  let totalEst=0,totalAct=0,overCount=0,underCount=0;
+  if(isTimesheet){
+    const cappedDates=getDatesInRange(from,to).slice(0,31);
+    const entryMap={};
+    entries.forEach(function(e){
+      if(!entryMap[e.userId]) entryMap[e.userId]={};
+      if(!entryMap[e.userId][e.date]) entryMap[e.userId][e.date]=0;
+      entryMap[e.userId][e.date]+=e.hours||0;
+    });
+    _renderTsGrid(USERS.filter(function(u){return ['associate','lead'].includes(u.role);}), cappedDates, entryMap, 'Timesheet');
+    return;
+  }
 
-  document.getElementById('assocHrsGrid').innerHTML=associates.map(u=>{
-    const tasks=myTasks(u);
-    if(!tasks.length) return '';
-    let uEst=0,uAct=0;
-    const rows=tasks.map(t=>{
-      const entries=DB.trackerEntries.filter(e=>e.taskId===t.id&&e.userId===u.id&&e.submitted&&(ovDate==='all'||e.date===ovDate));
-      const act=entries.reduce((s,e)=>s+e.hours,0);
-      const est=t.hours||0;
-      uEst+=est; uAct+=act;
-      totalEst+=est; totalAct+=act;
-      const diff=act-est;
-      if(act>est) overCount++;
-      else if(act>0&&act<est) underCount++;
-      const pct=est>0?Math.min(100,Math.round(act/est*100)):0;
-      const barClr=pct>=100?'var(--red)':pct>70?'var(--amber)':'var(--green)';
-      const proj=DB.projects.find(p=>Object.values(p.buckets).flat().some(tt=>tt.id===t.id));
-      return `<div class="aht-row">
-        <div class="aht-task">
-          <div>${t.title}</div>
-          <div style="font-size:9px;color:var(--muted)">${proj?.name||''}</div>
-          <div class="over-bar" style="width:${pct}%;background:${barClr}"></div>
-        </div>
-        <div style="font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace;text-align:right">${est}h</div>
-        <div style="font-size:11px;font-family:'JetBrains Mono',monospace;text-align:right;color:${act>est?'var(--red)':act===0?'var(--muted)':'var(--accent)'};font-weight:700">${act.toFixed(1)}h</div>
-        <div style="font-size:11px;font-family:'JetBrains Mono',monospace;text-align:right;color:${diff>0?'var(--red)':diff<0?'var(--amber)':'var(--green)'};font-weight:700">${diff>0?'+':''}${diff.toFixed(1)}</div>
-      </div>`;
+  const hrHead=document.getElementById('hrTableHead');
+  const hrBody=document.getElementById('hrTableBody');
+  const hrEmpty=document.getElementById('hrEmpty');
+
+  if(_tsView==='project'){
+    const pid=document.getElementById('tsFilterProj')?document.getElementById('tsFilterProj').value:'';
+    const projects=pid?DB.projects.filter(function(p){return p.id===pid;}):DB.projects;
+    const projData={};
+    projects.forEach(function(p){
+      const tasks=Object.values(p.buckets).flat();
+      const asgn=tasks.reduce(function(s,t){return s+(t.hours||0);},0);
+      const consumed=entries.filter(function(e){return tasks.some(function(t){return t.id===e.taskId;});}).reduce(function(s,e){return s+(e.hours||0);},0);
+      const userHrs={};
+      entries.filter(function(e){return tasks.some(function(t){return t.id===e.taskId;});}).forEach(function(e){userHrs[e.userId]=(userHrs[e.userId]||0)+(e.hours||0);});
+      projData[p.id]={proj:p,assigned:asgn,consumed:consumed,userHrs:userHrs};
+    });
+    const totalConsumed=Object.values(projData).reduce(function(s,r){return s+r.consumed;},0);
+    const totalAssigned=Object.values(projData).reduce(function(s,r){return s+r.assigned;},0);
+    showStats(
+      '<div class="sh-stat"><div class="sh-stat-val" style="color:var(--teal)">'+projects.length+'</div><div class="sh-stat-lbl">Projects</div></div>'+
+      '<div style="width:1px;background:var(--border)"></div>'+
+      '<div class="sh-stat"><div class="sh-stat-val" style="color:var(--accent)">'+totalAssigned.toFixed(0)+'h</div><div class="sh-stat-lbl">Approved Hrs</div></div>'+
+      '<div class="sh-stat"><div class="sh-stat-val" style="color:var(--green)">'+totalConsumed.toFixed(1)+'h</div><div class="sh-stat-lbl">Consumed Hrs</div></div>'+
+      '<div class="sh-stat"><div class="sh-stat-val" style="color:'+(totalAssigned>0&&totalConsumed>totalAssigned?'var(--red)':'var(--amber)')+'">'+( totalAssigned>0?Math.round(totalConsumed/totalAssigned*100):0)+'%</div><div class="sh-stat-lbl">Utilisation</div></div>'+
+      '<div style="font-size:10px;color:var(--text-dim);margin-left:auto;align-self:center">Period: <strong style="color:var(--white)">'+from+'</strong> to <strong style="color:var(--white)">'+to+'</strong></div>'
+    );
+    hrHead.innerHTML='<tr>'+
+      '<th style="min-width:40px;text-align:center">#</th>'+
+      '<th style="min-width:160px">Project</th>'+
+      '<th style="min-width:90px">Account</th>'+
+      '<th style="min-width:130px">Project Lead</th>'+
+      '<th style="min-width:100px;text-align:center">Approved Hrs</th>'+
+      '<th style="min-width:110px;text-align:center">Consumed Hrs</th>'+
+      '<th style="min-width:100px;text-align:center">Remaining</th>'+
+      '<th style="min-width:80px;text-align:center">% Used</th>'+
+      '<th style="min-width:150px">Top Contributor</th>'+
+      '</tr>';
+    const rows=Object.values(projData).filter(function(r){return r.consumed>0||Object.keys(r.userHrs).length>0;});
+    hrEmpty.style.display=rows.length?'none':'block';
+    hrBody.innerHTML=rows.map(function(r,i){
+      var proj=r.proj,assigned=r.assigned,consumed=r.consumed,userHrs=r.userHrs;
+      var remaining=assigned-consumed;
+      var pct=assigned>0?Math.round(consumed/assigned*100):0;
+      var pctClr=pct>=100?'var(--red)':pct>=80?'var(--amber)':'var(--green)';
+      var lead=getUser(proj.projectLead);
+      var topUid=Object.entries(userHrs).sort(function(a,b){return b[1]-a[1];})[0];
+      var topUser=topUid?getUser(topUid[0]):null;
+      var barW=Math.min(100,pct);
+      var bar='<div style="height:3px;background:var(--border);border-radius:2px;margin-top:3px"><div style="height:3px;background:'+pctClr+';width:'+barW+'%;border-radius:2px"></div></div>';
+      return '<tr>'+
+        '<td style="color:var(--muted);font-size:10px;text-align:center">'+(i+1)+'</td>'+
+        '<td><div style="display:flex;align-items:center;gap:6px"><div style="width:8px;height:8px;border-radius:50%;background:'+proj.color+';flex-shrink:0"></div><span style="font-size:11px;font-weight:700;color:var(--white)">'+proj.name+'</span></div></td>'+
+        '<td style="font-size:11px;font-weight:700;color:var(--teal)">'+(proj.account||'—')+'</td>'+
+        (lead?'<td><div style="display:flex;align-items:center;gap:5px"><div style="width:20px;height:20px;border-radius:50%;background:'+lead.color+';color:#fff;font-size:8px;font-weight:700;display:flex;align-items:center;justify-content:center">'+lead.initials+'</div><span style="font-size:11px;color:var(--white)">'+lead.name+'</span></div></td>':'<td style="color:var(--muted);font-size:10px">—</td>')+
+        '<td style="font-family:var(--mono,monospace);font-size:12px;font-weight:700;color:var(--accent);text-align:center">'+(assigned>0?assigned+'h':'—')+'</td>'+
+        '<td style="font-family:var(--mono,monospace);font-size:13px;font-weight:800;color:'+(consumed>0?pctClr:'var(--muted)')+';text-align:center">'+fmtH(consumed)+'</td>'+
+        '<td style="font-family:var(--mono,monospace);font-size:12px;font-weight:700;color:'+(remaining<0?'var(--red)':'var(--text-dim)')+';text-align:center">'+(assigned>0?fmtH(remaining):'—')+'</td>'+
+        '<td style="text-align:center"><span style="font-size:11px;font-weight:800;color:'+pctClr+'">'+(assigned>0?pct+'%':'—')+'</span>'+(assigned>0?bar:'')+'</td>'+
+        (topUser?'<td><div style="display:flex;align-items:center;gap:5px"><div style="width:18px;height:18px;border-radius:50%;background:'+topUser.color+';color:#fff;font-size:7px;font-weight:700;display:flex;align-items:center;justify-content:center">'+topUser.initials+'</div><span style="font-size:10px;color:var(--white)">'+topUser.name+'</span><span style="font-family:var(--mono,monospace);font-size:10px;color:var(--accent);margin-left:4px">'+topUid[1].toFixed(1)+'h</span></div></td>':'<td style="color:var(--muted);font-size:10px">—</td>')+
+        '</tr>';
     }).join('');
 
-    return `<div class="aht-card">
-      <div class="aht-head">
-        <div class="aht-name"><div class="dc-av" style="background:${u.color}">${u.initials}</div>${u.name}</div>
-        <div class="aht-summary">
-          <span style="color:var(--muted)">Est: <span style="color:var(--text);font-family:'JetBrains Mono',monospace">${uEst}h</span></span>
-          <span style="color:var(--muted)">Actual: <span style="font-family:'JetBrains Mono',monospace;color:${uAct>uEst?'var(--red)':'var(--accent)'};font-weight:700">${uAct.toFixed(1)}h</span></span>
-        </div>
-      </div>
-      <div class="aht-head-row"><div>Task</div><div style="text-align:right">Est</div><div style="text-align:right">Actual</div><div style="text-align:right">Δ</div></div>
-      ${rows}
-    </div>`;
-  }).filter(Boolean).join('');
+  } else if(_tsView==='lead'){
+    var lid=document.getElementById('tsFilterLead')?document.getElementById('tsFilterLead').value:'';
+    var leads=lid?USERS.filter(function(u){return u.id===lid;}):USERS.filter(function(u){return u.role==='lead';});
+    var leadRows=leads.map(function(lead){
+      var leadTasks=allTasks().filter(function(t){return t.assignedLead===lead.id;});
+      var assignedHrs=leadTasks.reduce(function(s,t){return s+(t.hours||0);},0);
+      var selfHrs=entries.filter(function(e){return e.userId===lead.id;}).reduce(function(s,e){return s+(e.hours||0);},0);
+      var assocIds=new Set(DB.assocAssignments.filter(function(a){return a.lead===lead.id;}).map(function(a){return a.associate;}));
+      var teamHrs=entries.filter(function(e){return assocIds.has(e.userId)&&leadTasks.some(function(t){return t.id===e.taskId;});}).reduce(function(s,e){return s+(e.hours||0);},0);
+      var totalConsumed2=selfHrs+teamHrs;
+      var doneTasks=leadTasks.filter(function(t){return t.status==='Completed';}).length;
+      return {lead:lead,assignedHrs:assignedHrs,selfHrs:selfHrs,teamHrs:teamHrs,totalConsumed:totalConsumed2,doneTasks:doneTasks,total:leadTasks.length};
+    }).filter(function(r){return r.total>0||r.totalConsumed>0;});
+    var grandTotalL=leadRows.reduce(function(s,r){return s+r.totalConsumed;},0);
+    showStats(
+      '<div class="sh-stat"><div class="sh-stat-val" style="color:var(--teal)">'+leadRows.length+'</div><div class="sh-stat-lbl">Leads</div></div>'+
+      '<div style="width:1px;background:var(--border)"></div>'+
+      '<div class="sh-stat"><div class="sh-stat-val" style="color:var(--green)">'+grandTotalL.toFixed(1)+'h</div><div class="sh-stat-lbl">Total Hours</div></div>'+
+      '<div class="sh-stat"><div class="sh-stat-val" style="color:var(--accent)">'+leadRows.reduce(function(s,r){return s+r.selfHrs;},0).toFixed(1)+'h</div><div class="sh-stat-lbl">Lead Hours</div></div>'+
+      '<div class="sh-stat"><div class="sh-stat-val" style="color:var(--violet2)">'+leadRows.reduce(function(s,r){return s+r.teamHrs;},0).toFixed(1)+'h</div><div class="sh-stat-lbl">Team Hours</div></div>'+
+      '<div style="font-size:10px;color:var(--text-dim);margin-left:auto;align-self:center">Period: <strong style="color:var(--white)">'+from+'</strong> to <strong style="color:var(--white)">'+to+'</strong></div>'
+    );
+    hrHead.innerHTML='<tr>'+
+      '<th style="min-width:40px;text-align:center">#</th>'+
+      '<th style="min-width:160px">Lead</th>'+
+      '<th style="min-width:80px">Dept</th>'+
+      '<th style="min-width:90px;text-align:center">Tasks</th>'+
+      '<th style="min-width:90px;text-align:center">Done</th>'+
+      '<th style="min-width:110px;text-align:center">Approved Hrs</th>'+
+      '<th style="min-width:110px;text-align:center">Lead Hours</th>'+
+      '<th style="min-width:110px;text-align:center">Team Hours</th>'+
+      '<th style="min-width:120px;text-align:center">Total Consumed</th>'+
+      '</tr>';
+    hrEmpty.style.display=leadRows.length?'none':'block';
+    hrBody.innerHTML=leadRows.map(function(r,i){
+      var u=r.lead;
+      return '<tr>'+
+        '<td style="color:var(--muted);font-size:10px;text-align:center">'+(i+1)+'</td>'+
+        '<td><div style="display:flex;align-items:center;gap:8px"><div style="width:28px;height:28px;border-radius:50%;background:'+u.color+';color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center">'+u.initials+'</div><div><div style="font-size:12px;font-weight:700;color:var(--white)">'+u.name+'</div><div style="font-size:9px;color:var(--muted)">'+(u.empid||'')+'</div></div></div></td>'+
+        '<td style="font-size:10px;color:var(--muted)">'+(u.dept||'—')+'</td>'+
+        '<td style="font-family:var(--mono,monospace);font-size:12px;font-weight:700;color:var(--text-dim);text-align:center">'+r.total+'</td>'+
+        '<td style="font-family:var(--mono,monospace);font-size:12px;font-weight:700;color:var(--green);text-align:center">'+r.doneTasks+'</td>'+
+        '<td style="font-family:var(--mono,monospace);font-size:12px;font-weight:700;color:var(--accent);text-align:center">'+(r.assignedHrs>0?r.assignedHrs+'h':'—')+'</td>'+
+        '<td style="font-family:var(--mono,monospace);font-size:13px;font-weight:800;color:'+(r.selfHrs>0?'var(--teal)':'var(--muted)')+';text-align:center">'+fmtH(r.selfHrs)+'</td>'+
+        '<td style="font-family:var(--mono,monospace);font-size:13px;font-weight:800;color:'+(r.teamHrs>0?'var(--violet2)':'var(--muted)')+';text-align:center">'+fmtH(r.teamHrs)+'</td>'+
+        '<td style="font-family:var(--mono,monospace);font-size:14px;font-weight:800;color:'+(r.totalConsumed>0?'var(--white)':'var(--muted)')+';text-align:center;background:rgba(14,165,233,.05)">'+fmtH(r.totalConsumed)+'</td>'+
+        '</tr>';
+    }).join('');
 
-  document.getElementById('hrsStats').innerHTML=`
-    <div class="sc sc-bl"><div class="sc-lbl">Total Est. Hours</div><div class="sc-val">${totalEst}</div><div class="sc-sub">Across all tasks</div></div>
-    <div class="sc sc-cy"><div class="sc-lbl">Actual Worked</div><div class="sc-val">${totalAct.toFixed(0)}</div><div class="sc-sub">${totalEst?Math.round(totalAct/totalEst*100):0}% utilisation</div></div>
-    <div class="sc sc-rd"><div class="sc-lbl">Over Estimate</div><div class="sc-val">${overCount}</div><div class="sc-sub">Tasks over allocated</div></div>
-    <div class="sc sc-am"><div class="sc-lbl">Under Estimate</div><div class="sc-val">${underCount}</div><div class="sc-sub">Tasks in progress</div></div>
-  `;
+  } else if(_tsView==='assoc'){
+    var aid=document.getElementById('tsFilterAssoc')?document.getElementById('tsFilterAssoc').value:'';
+    var assocs=aid?USERS.filter(function(u){return u.id===aid;}):USERS.filter(function(u){return u.role==='associate';});
+    var assocRows=assocs.map(function(assoc){
+      var myEntries=entries.filter(function(e){return e.userId===assoc.id;});
+      var totalHrs=myEntries.reduce(function(s,e){return s+(e.hours||0);},0);
+      var ph={};
+      myEntries.forEach(function(e){var found=findTask(e.taskId);if(found){var pid=found.project.id;ph[pid]=(ph[pid]||0)+(e.hours||0);}});
+      var topProj=Object.entries(ph).sort(function(a,b){return b[1]-a[1];})[0];
+      var topProjObj=topProj?DB.projects.find(function(p){return p.id===topProj[0];}):null;
+      var myTaskList=allTasks().filter(function(t){return t.assignedAssociate===assoc.id;});
+      var assignedHrs2=myTaskList.reduce(function(s,t){return s+(t.hours||0);},0);
+      var doneTasks2=myTaskList.filter(function(t){return t.status==='Completed';}).length;
+      var daysWorked=new Set(myEntries.map(function(e){return e.date;})).size;
+      var avgPerDay=daysWorked>0?totalHrs/daysWorked:0;
+      var lead2=USERS.find(function(u){return DB.assocAssignments.some(function(a){return a.associate===assoc.id&&a.lead===u.id;});});
+      return {assoc:assoc,totalHrs:totalHrs,assignedHrs:assignedHrs2,doneTasks:doneTasks2,tasks:myTaskList.length,daysWorked:daysWorked,avgPerDay:avgPerDay,topProjObj:topProjObj,topProjHrs:topProj?topProj[1]:0,lead:lead2};
+    }).filter(function(r){return r.tasks>0||r.totalHrs>0;});
+    var grandTotalA=assocRows.reduce(function(s,r){return s+r.totalHrs;},0);
+    showStats(
+      '<div class="sh-stat"><div class="sh-stat-val" style="color:var(--teal)">'+assocRows.length+'</div><div class="sh-stat-lbl">Associates</div></div>'+
+      '<div style="width:1px;background:var(--border)"></div>'+
+      '<div class="sh-stat"><div class="sh-stat-val" style="color:var(--green)">'+grandTotalA.toFixed(1)+'h</div><div class="sh-stat-lbl">Total Hours</div></div>'+
+      '<div class="sh-stat"><div class="sh-stat-val" style="color:var(--amber)">'+assocRows.reduce(function(s,r){return s+r.daysWorked;},0)+'</div><div class="sh-stat-lbl">Person Days</div></div>'+
+      '<div class="sh-stat"><div class="sh-stat-val" style="color:var(--accent)">'+(assocRows.length>0?(grandTotalA/assocRows.length).toFixed(1)+'h':'—')+'</div><div class="sh-stat-lbl">Avg/Person</div></div>'+
+      '<div style="font-size:10px;color:var(--text-dim);margin-left:auto;align-self:center">Period: <strong style="color:var(--white)">'+from+'</strong> to <strong style="color:var(--white)">'+to+'</strong></div>'
+    );
+    hrHead.innerHTML='<tr>'+
+      '<th style="min-width:40px;text-align:center">#</th>'+
+      '<th style="min-width:160px">Associate</th>'+
+      '<th style="min-width:120px">Team Lead</th>'+
+      '<th style="min-width:90px;text-align:center">Tasks</th>'+
+      '<th style="min-width:90px;text-align:center">Done</th>'+
+      '<th style="min-width:110px;text-align:center">Approved Hrs</th>'+
+      '<th style="min-width:110px;text-align:center">Hours Logged</th>'+
+      '<th style="min-width:90px;text-align:center">Days Worked</th>'+
+      '<th style="min-width:90px;text-align:center">Avg/Day</th>'+
+      '<th style="min-width:160px">Top Project</th>'+
+      '</tr>';
+    hrEmpty.style.display=assocRows.length?'none':'block';
+    hrBody.innerHTML=assocRows.map(function(r,i){
+      var u=r.assoc;
+      return '<tr>'+
+        '<td style="color:var(--muted);font-size:10px;text-align:center">'+(i+1)+'</td>'+
+        '<td><div style="display:flex;align-items:center;gap:8px"><div style="width:28px;height:28px;border-radius:50%;background:'+u.color+';color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center">'+u.initials+'</div><div><div style="font-size:12px;font-weight:700;color:var(--white)">'+u.name+'</div><div style="font-size:9px;color:var(--muted)">'+(u.empid||'')+'</div></div></div></td>'+
+        (r.lead?'<td><div style="display:flex;align-items:center;gap:5px"><div style="width:18px;height:18px;border-radius:50%;background:'+r.lead.color+';color:#fff;font-size:7px;font-weight:700;display:flex;align-items:center;justify-content:center">'+r.lead.initials+'</div><span style="font-size:10px;color:var(--text)">'+r.lead.name+'</span></div></td>':'<td style="color:var(--muted);font-size:10px">—</td>')+
+        '<td style="font-family:var(--mono,monospace);font-size:12px;font-weight:700;color:var(--text-dim);text-align:center">'+r.tasks+'</td>'+
+        '<td style="font-family:var(--mono,monospace);font-size:12px;font-weight:700;color:var(--green);text-align:center">'+r.doneTasks+'</td>'+
+        '<td style="font-family:var(--mono,monospace);font-size:12px;font-weight:700;color:var(--accent);text-align:center">'+(r.assignedHrs>0?r.assignedHrs+'h':'—')+'</td>'+
+        '<td style="font-family:var(--mono,monospace);font-size:14px;font-weight:800;color:'+(r.totalHrs>0?'var(--white)':'var(--muted)')+';text-align:center;background:rgba(14,165,233,.05)">'+fmtH(r.totalHrs)+'</td>'+
+        '<td style="font-family:var(--mono,monospace);font-size:12px;font-weight:700;color:var(--teal);text-align:center">'+r.daysWorked+'</td>'+
+        '<td style="font-family:var(--mono,monospace);font-size:12px;font-weight:700;color:'+(r.avgPerDay>=6?'var(--green)':r.avgPerDay>=4?'var(--amber)':r.avgPerDay>0?'var(--red)':'var(--muted)')+';text-align:center">'+(r.avgPerDay>0?r.avgPerDay.toFixed(1)+'h':'—')+'</td>'+
+        (r.topProjObj?'<td><span style="font-size:10px;padding:2px 8px;border-radius:4px;background:'+r.topProjObj.color+'22;color:'+r.topProjObj.color+';font-weight:600">'+r.topProjObj.name+'</span><span style="font-family:var(--mono,monospace);font-size:10px;color:var(--muted);margin-left:6px">'+r.topProjHrs.toFixed(1)+'h</span></td>':'<td style="color:var(--muted);font-size:10px">—</td>')+
+        '</tr>';
+    }).join('');
+
+  } else {
+    // OVERALL
+    var grandHrs=entries.reduce(function(s,e){return s+(e.hours||0);},0);
+    var projSet=new Set();
+    entries.forEach(function(e){var f=findTask(e.taskId);if(f)projSet.add(f.project.id);});
+    var activePeople=new Set(entries.map(function(e){return e.userId;})).size;
+    var daysRange=getDatesInRange(from,to).length;
+    showStats(
+      '<div class="sh-stat"><div class="sh-stat-val" style="color:var(--teal)">'+grandHrs.toFixed(1)+'h</div><div class="sh-stat-lbl">Total Hours</div></div>'+
+      '<div style="width:1px;background:var(--border)"></div>'+
+      '<div class="sh-stat"><div class="sh-stat-val" style="color:var(--green)">'+activePeople+'</div><div class="sh-stat-lbl">Active People</div></div>'+
+      '<div class="sh-stat"><div class="sh-stat-val" style="color:var(--violet2)">'+projSet.size+'</div><div class="sh-stat-lbl">Projects</div></div>'+
+      '<div class="sh-stat"><div class="sh-stat-val" style="color:var(--accent)">'+daysRange+'</div><div class="sh-stat-lbl">Days</div></div>'+
+      '<div class="sh-stat"><div class="sh-stat-val" style="color:var(--amber)">'+(activePeople>0?(grandHrs/activePeople).toFixed(1)+'h':'—')+'</div><div class="sh-stat-lbl">Avg/Person</div></div>'+
+      '<div style="font-size:10px;color:var(--text-dim);margin-left:auto;align-self:center">Period: <strong style="color:var(--white)">'+from+'</strong> to <strong style="color:var(--white)">'+to+'</strong></div>'
+    );
+    var allPeople=USERS.filter(function(u){return ['lead','associate'].includes(u.role);});
+    var topProjects=[...projSet].map(function(pid){return DB.projects.find(function(p){return p.id===pid;});}).filter(Boolean).slice(0,5);
+    hrHead.innerHTML='<tr>'+
+      '<th style="min-width:40px;text-align:center">#</th>'+
+      '<th style="min-width:160px">Person</th>'+
+      '<th style="min-width:80px;text-align:center">Role</th>'+
+      '<th style="min-width:110px;text-align:center">Hours Logged</th>'+
+      '<th style="min-width:90px;text-align:center">Days Worked</th>'+
+      '<th style="min-width:90px;text-align:center">Avg/Day</th>'+
+      topProjects.map(function(p){return '<th style="min-width:100px;text-align:center"><span style="color:'+p.color+'">'+p.name+'</span></th>';}).join('')+
+      '</tr>';
+    var personRows=allPeople.map(function(u){
+      var myE=entries.filter(function(e){return e.userId===u.id;});
+      var hrs=myE.reduce(function(s,e){return s+(e.hours||0);},0);
+      var days=new Set(myE.map(function(e){return e.date;})).size;
+      var ph={};
+      myE.forEach(function(e){var f=findTask(e.taskId);if(f){var pid=f.project.id;ph[pid]=(ph[pid]||0)+(e.hours||0);}});
+      return{user:u,hrs:hrs,days:days,ph:ph};
+    }).filter(function(r){return r.hrs>0;}).sort(function(a,b){return b.hrs-a.hrs;});
+    hrEmpty.style.display=personRows.length?'none':'block';
+    hrBody.innerHTML=personRows.map(function(r,i){
+      var u=r.user;var rmeta=ROLE_META[u.role]||ROLE_META.associate;
+      return '<tr>'+
+        '<td style="color:var(--muted);font-size:10px;text-align:center">'+(i+1)+'</td>'+
+        '<td><div style="display:flex;align-items:center;gap:8px"><div style="width:28px;height:28px;border-radius:50%;background:'+u.color+';color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center">'+u.initials+'</div><div><div style="font-size:12px;font-weight:700;color:var(--white)">'+u.name+'</div><div style="font-size:9px;color:var(--muted)">'+(u.dept||'')+'</div></div></div></td>'+
+        '<td style="text-align:center"><span style="font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px;background:'+rmeta.bg+';color:'+rmeta.c+'">'+rmeta.label+'</span></td>'+
+        '<td style="font-family:var(--mono,monospace);font-size:14px;font-weight:800;color:var(--white);text-align:center;background:rgba(14,165,233,.06)">'+fmtH(r.hrs)+'</td>'+
+        '<td style="font-family:var(--mono,monospace);font-size:12px;font-weight:700;color:var(--teal);text-align:center">'+r.days+'</td>'+
+        '<td style="font-family:var(--mono,monospace);font-size:12px;font-weight:700;color:'+(r.days>0&&r.hrs/r.days>=6?'var(--green)':r.days>0&&r.hrs/r.days>=4?'var(--amber)':'var(--red)')+';text-align:center">'+(r.days>0?(r.hrs/r.days).toFixed(1)+'h':'—')+'</td>'+
+        topProjects.map(function(p){return '<td style="font-family:var(--mono,monospace);font-size:11px;font-weight:700;color:'+(r.ph[p.id]>0?'var(--accent)':'var(--muted)')+';text-align:center">'+(r.ph[p.id]?r.ph[p.id].toFixed(1)+'h':'—')+'</td>';}).join('')+
+        '</tr>';
+    }).join('');
+  }
 }
+
+function exportHoursReportCSV(){
+  var from=document.getElementById('tsDateFrom')?document.getElementById('tsDateFrom').value:'';
+  var to=document.getElementById('tsDateTo')?document.getElementById('tsDateTo').value:'';
+  if(!from||!to){toast('Select date range first','var(--amber)');return;}
+  var entries=DB.trackerEntries.filter(function(e){return e.submitted&&e.date>=from&&e.date<=to;});
+  var headers=['Date','Person','Role','Dept','EID','Project','Account','Task','Hours'];
+  var lines=[headers.join(',')];
+  entries.forEach(function(e){
+    var u=getUser(e.userId);var found=findTask(e.taskId);
+    if(!u||!found) return;
+    lines.push([e.date,'"'+u.name+'"',u.role,u.dept||'',u.empid||'','"'+(found.project.name||'')+'"',found.project.account||'','"'+(found.task.title||'')+'"',(e.hours||0)].join(','));
+  });
+  var blob=new Blob([lines.join('\n')],{type:'text/csv'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='hours-'+from+'-to-'+to+'.csv';a.click();
+  toast('Hours report exported','var(--green)');
+}
+
+function _renderTsGrid(allUsers, cappedDates, entryMap, title){
+  // Only show users with entries or assignments
+  const activeUsers=allUsers.filter(u=>{
+    const hasEntries=Object.keys(entryMap[u.id]||{}).length>0;
+    const hasAssignments=DB.assocAssignments.some(a=>a.associate===u.id)||DB.leadAssignments.some(a=>a.assignedLead===u.id);
+    return hasEntries||hasAssignments;
+  });
+
+  document.getElementById('tsEmpty').style.display=activeUsers.length?'none':'block';
+  if(!activeUsers.length){
+    document.getElementById('tsTblHead').innerHTML='';
+    document.getElementById('tsTblBody').innerHTML='';
+    document.getElementById('tsStats').style.display='none';
+    return;
+  }
+
+  // Stats
+  let totalHrsAll=0,totalPersonDays=0,overDays=0;
+  activeUsers.forEach(u=>{
+    cappedDates.forEach(d=>{
+      const h=entryMap[u.id]?.[d]||0;
+      if(h>0){totalHrsAll+=h;totalPersonDays++;}
+      if(h>8) overDays++;
+    });
+  });
+  document.getElementById('tsStats').style.display='flex';
+  document.getElementById('tsStats').innerHTML=
+    '<div class="sh-stat"><div class="sh-stat-val" style="color:var(--text-dim);font-size:11px">'+title+'</div><div class="sh-stat-lbl">View</div></div>'+
+    '<div style="width:1px;background:var(--border)"></div>'+
+    '<div class="sh-stat"><div class="sh-stat-val" style="color:var(--teal)">'+activeUsers.length+'</div><div class="sh-stat-lbl">People</div></div>'+
+    '<div class="sh-stat"><div class="sh-stat-val" style="color:var(--accent)">'+cappedDates.length+'</div><div class="sh-stat-lbl">Days</div></div>'+
+    '<div class="sh-stat"><div class="sh-stat-val" style="color:var(--green)">'+totalHrsAll.toFixed(0)+'</div><div class="sh-stat-lbl">Total Hours</div></div>'+
+    '<div class="sh-stat"><div class="sh-stat-val" style="color:'+(overDays>0?'var(--red)':'var(--muted)')+'">'+overDays+'</div><div class="sh-stat-lbl">Over 8h Days</div></div>'+
+    '<div class="sh-stat"><div class="sh-stat-val" style="color:var(--amber)">'+(totalPersonDays>0?(totalHrsAll/totalPersonDays).toFixed(1):'—')+'</div><div class="sh-stat-lbl">Avg Hrs/Day</div></div>';
+
+  // Header
+  const thead='<tr>'
+    +'<th style="min-width:36px;width:36px">Sl.No</th>'
+    +'<th style="min-width:90px;width:90px;text-align:left">EID</th>'
+    +'<th style="min-width:160px;text-align:left">Name</th>'
+    +'<th style="min-width:70px">Location</th>'
+    +'<th style="min-width:60px">Role</th>'
+    +cappedDates.map(function(d){
+      const isWE=isWeekend(d);
+      const isToday=d===TODAY;
+      return '<th class="day-th'+(isWE?' day-'+(new Date(d+'T00:00:00').getDay()===6?'sat':'sun'):'')+'" style="'+(isToday?'color:var(--teal);border-bottom:2px solid var(--teal)':'')+'">'
+        +'<div>'+dayLetter(d)+'</div>'
+        +'<div style="font-size:8px;font-weight:400;color:var(--muted)">'+fmtDateShort(d)+'</div>'
+        +'</th>';
+    }).join('')
+    +'<th style="min-width:52px;background:#0a1e30;color:var(--white)">Total</th>'
+    +'</tr>';
+  document.getElementById('tsTblHead').innerHTML=thead;
+
+  const rows=activeUsers.map(function(u,i){
+    let rowTotal=0;
+    const dayCells=cappedDates.map(function(d){
+      const h=entryMap[u.id]?.[d]||0;
+      const isWE=isWeekend(d);
+      const isToday=d===TODAY;
+      rowTotal+=h;
+      let cls='ts-hr-cell';
+      if(isWE) cls+=' ts-weekend';
+      if(h>8) cls+=' ts-over';
+      else if(h>0&&h<6) cls+=' ts-leave';
+      else if(h===0&&!isWE) cls+=' ts-zero';
+      if(isToday) cls+=' ts-today';
+      const display=h>0?h:isWE?'':'-';
+      return '<td class="'+cls+'">'+display+'</td>';
+    }).join('');
+
+    const lastEntry=DB.trackerEntries.filter(e=>e.userId===u.id&&e.submitted).slice(-1)[0];
+    const loc=lastEntry?.location||DB.assocAssignments.find(a=>a.associate===u.id)?.location||DB.leadAssignments.find(a=>a.assignedLead===u.id)?.location||'OFS';
+    const eid=u.eid||u.empid||u.id.replace('u_','').toUpperCase().slice(0,8);
+    const roleTag=u.role==='lead'?'LEAD':u.role==='manager'?'MGR':u.role==='admin'?'ADMIN':'EXEC';
+    const rm=ROLE_META[u.role]||ROLE_META.associate;
+
+    return '<tr>'
+      +'<td style="color:var(--muted);font-size:10px;text-align:center">'+(i+1)+'</td>'
+      +'<td style="font-family:var(--mono,monospace);font-size:10px;color:var(--teal);text-align:left;padding:5px 8px">'+eid+'</td>'
+      +'<td class="ts-name-cell" style="text-align:left;padding:5px 8px">'
+        +'<div style="display:flex;align-items:center;gap:6px">'
+        +'<div style="width:22px;height:22px;border-radius:50%;background:'+u.color+';display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#fff;flex-shrink:0">'+u.initials+'</div>'
+        +'<div><div style="font-size:11px;font-weight:600;color:var(--white)">'+u.name+'</div>'
+        +'<div style="font-size:9px;color:var(--muted)">'+u.role+'</div></div>'
+        +'</div>'
+      +'</td>'
+      +'<td style="text-align:center"><span style="font-size:10px;padding:1px 7px;border-radius:4px;background:rgba(14,165,233,.1);color:var(--teal);font-weight:600">'+loc+'</span></td>'
+      +'<td style="text-align:center"><span style="font-size:9px;padding:1px 7px;border-radius:4px;background:'+rm.bg+';color:'+rm.c+';font-weight:700">'+roleTag+'</span></td>'
+      +dayCells
+      +'<td class="ts-total">'+(rowTotal>0?rowTotal.toFixed(1):'—')+'</td>'
+      +'</tr>';
+  }).join('');
+
+  document.getElementById('tsTblBody').innerHTML=rows;
+}
+
+// Legacy renderTimesheet alias
+function renderTimesheet(){ renderHoursReport(); }
+
+function exportTimesheetCSV(){
+  const from=document.getElementById('tsDateFrom')?.value||'';
+  const to=document.getElementById('tsDateTo')?.value||'';
+  if(!from||!to){toast('Select date range first','var(--amber)');return;}
+  const dates=getDatesInRange(from,to).slice(0,31);
+  const users=USERS.filter(u=>['associate','lead'].includes(u.role));
+  const entryMap={};
+  DB.trackerEntries.filter(e=>e.submitted&&e.date>=from&&e.date<=to).forEach(e=>{
+    if(!entryMap[e.userId]) entryMap[e.userId]={};
+    if(!entryMap[e.userId][e.date]) entryMap[e.userId][e.date]=0;
+    entryMap[e.userId][e.date]+=e.hours||0;
+  });
+  const headers=['Sl.No','EID','Name','Role','Location',...dates,'Total'];
+  const lines=[headers.join(',')];
+  users.forEach(function(u,i){
+    const eid=u.eid||u.empid||u.id.replace('u_','').toUpperCase().slice(0,8);
+    const lastEntry=DB.trackerEntries.filter(e=>e.userId===u.id&&e.submitted).slice(-1)[0];
+    const loc=lastEntry?.location||'OFS';
+    const roleTag=u.role==='lead'?'LEAD':'EXEC';
+    let total=0;
+    const dayCols=dates.map(function(d){const h=entryMap[u.id]?.[d]||0;total+=h;return h>0?h:'';});
+    lines.push([i+1,eid,'"'+u.name+'"',roleTag,loc,...dayCols,total>0?total.toFixed(1):''].join(','));
+  });
+  const blob=new Blob([lines.join('\n')],{type:'text/csv'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='timesheet-'+from+'-to-'+to+'.csv';a.click();
+  toast('Timesheet exported','var(--green)');
+}
+
 
 // ══════════════════════════════════════════════
 // RENDER: DAILY OVERVIEW
@@ -2036,7 +2987,7 @@ function renderDailyOverview(){
           ${e.remark?`<div style="font-size:10px;color:var(--muted);margin-top:2px">${e.remark}</div>`:''}
         </div>
         <div class="dc-hrs-box">
-          <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--accent)">${e.hours}h</div>
+          <div style="font-family:var(--mono,monospace);font-size:13px;font-weight:700;color:var(--accent)">${e.hours}h</div>
           <div style="font-size:9px;color:var(--muted);margin-top:2px">${e.submitted?'✓ submitted':''}</div>
         </div>
       </div>`;
@@ -2045,7 +2996,7 @@ function renderDailyOverview(){
     return `<div class="daily-card">
       <div class="dc-head">
         <div class="dc-name"><div class="dc-av" style="background:${u.color}">${u.initials}</div>${u.name}</div>
-        <div style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:var(--accent)">${total.toFixed(1)}h</div>
+        <div style="font-family:var(--mono,monospace);font-size:14px;font-weight:700;color:var(--accent)">${total.toFixed(1)}h</div>
       </div>
       ${rows||'<div class="empty-state" style="padding:18px;font-size:11px">No entries for this date</div>'}
       <div class="dc-foot">
@@ -2116,10 +3067,11 @@ function renderLeadBoard(){
 // ══════════════════════════════════════════════
 function renderMyTasks(){
   const canManage=['admin','manager','lead'].includes(currentUser.role);
+  const isAssociate=currentUser.role==='associate';
   document.getElementById('myTasksTitle').textContent=canManage?'Team Tasks':'My Tasks';
-  document.getElementById('myTasksSub').textContent=canManage?'View & edit team tasks with filters':'Your assigned tasks — click to update or log time';
+  document.getElementById('myTasksSub').textContent=canManage?'View & edit team tasks with filters':'Your assigned tasks — pick up or click to update';
   document.getElementById('myTasksActions').innerHTML=canManage?`<button class="btn btn-primary btn-sm" onclick="openTaskModal()">+ Task</button>`:
-    `<button class="btn btn-ghost btn-sm" onclick="showPage('tracker')">&#x1F4C5; Log Hours</button>`;
+    `<button class="btn btn-ghost btn-sm" onclick="openTaskModal()">+ Create Task</button><button class="btn btn-ghost btn-sm" onclick="showPage('tracker')">&#x1F4C5; Log Hours</button>`;
   const filterEl=document.getElementById('myTasksFilter');
   filterEl.style.display=canManage?'flex':'none';
   if(canManage){
@@ -2130,6 +3082,35 @@ function renderMyTasks(){
     pSel.innerHTML='<option value="all">All Projects</option>'+DB.projects.map(p=>`<option value="${p.id}" ${curP===p.id?'selected':''}>${p.account?p.account+' > ':''} ${p.name}</option>`).join('');
     uSel.value=curU; pSel.value=curP;
   }
+
+  // Associate: show pick-up section for Not Started tasks
+  const pickSection=document.getElementById('assocPickSection');
+  if(isAssociate){
+    pickSection.style.display='block';
+    const notStarted=myTasks(currentUser).filter(t=>t.status==='Not Started'||t.status==='Not Started Yet');
+    document.getElementById('assocAvailTasks').innerHTML=notStarted.length?notStarted.map(t=>{
+      const proj=DB.projects.find(p=>Object.values(p.buckets).flat().some(tt=>tt.id===t.id));
+      const lead=getUser(t.assignedLead);
+      const prio=t.priority||'Medium';
+      const prioCl={High:'var(--red)',Medium:'var(--amber)',Low:'var(--green)'}[prio]||'var(--muted)';
+      return `<div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px;transition:all .15s;border-left:3px solid var(--teal)">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;gap:8px">
+          <div style="font-size:12px;font-weight:700;color:var(--white);flex:1;line-height:1.4">${t.title}</div>
+          <span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;background:${prioCl}22;color:${prioCl};flex-shrink:0">${prio}</span>
+        </div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:4px">📁 ${proj?.name||'Unknown project'}</div>
+        ${lead?`<div style="font-size:11px;color:var(--muted);margin-bottom:4px">👤 Lead: <span style="color:${lead.color}">${lead.name}</span></div>`:''}
+        <div style="font-size:11px;color:var(--muted);margin-bottom:10px">⏱ Est: <span style="color:var(--accent);font-family:var(--mono,monospace);font-weight:700">${t.hours||0}h</span>${t.due?` &nbsp;·&nbsp; Due: <span style="color:${isLate(t.due)?'var(--red)':'var(--text-dim)'}">${fmt(t.due)}</span>`:''}</div>
+        <div style="display:flex;gap:6px">
+          <button onclick="pickUpTask('${t.id}')" class="btn btn-primary btn-sm" style="flex:1">▶ Pick Up &amp; Start</button>
+          <button onclick="openTaskDetail('${t.id}')" class="btn btn-ghost btn-sm">Details</button>
+        </div>
+      </div>`;
+    }).join(''):`<div style="padding:18px 16px;background:var(--surface);border:1px dashed var(--border);border-radius:10px;text-align:center;color:var(--muted);font-size:12px;grid-column:1/-1">No pending tasks to pick up — all caught up! ✅</div>`;
+  } else {
+    pickSection.style.display='none';
+  }
+
   let tasks;
   if(canManage){
     const uV=document.getElementById('myTasksUserSel')?.value||'all';
@@ -2140,7 +3121,8 @@ function renderMyTasks(){
     if(uV!=='all') tasks=tasks.filter(t=>t.assignedAssociate===uV||t.assignedLead===uV);
     if(sV!=='all') tasks=tasks.filter(t=>t.status===sV);
   } else {
-    tasks=myTasks(currentUser);
+    // For associate, show active tasks (not "Not Started") in kanban
+    tasks=myTasks(currentUser).filter(t=>t.status!=='Not Started'&&t.status!=='Not Started Yet');
   }
   const done=tasks.filter(t=>t.status==='Completed').length;
   const ip=tasks.filter(t=>t.status==='In Progress').length;
@@ -2148,7 +3130,7 @@ function renderMyTasks(){
   const totalEst=tasks.reduce((s,t)=>s+(t.hours||0),0);
   const totalAct=tasks.reduce((s,t)=>s+getActualHours(t.id),0);
   document.getElementById('assocStats').innerHTML=`
-    <div class="sc sc-bl"><div class="sc-lbl">${canManage?'Total':'My'} Tasks</div><div class="sc-val">${tasks.length}</div></div>
+    <div class="sc sc-bl"><div class="sc-lbl">${canManage?'Total':'Active'} Tasks</div><div class="sc-val">${tasks.length}</div></div>
     <div class="sc sc-am"><div class="sc-lbl">In Progress</div><div class="sc-val">${ip}</div></div>
     <div class="sc sc-gn"><div class="sc-lbl">Completed</div><div class="sc-val">${done}</div><div class="sc-sub">${tasks.length?Math.round(done/tasks.length*100):0}%</div></div>
     <div class="sc sc-rd"><div class="sc-lbl">Overdue</div><div class="sc-val">${late}</div></div>
@@ -2171,6 +3153,13 @@ function renderMyTasks(){
       </div>
     </div>`;
   }).join('');
+}
+
+function pickUpTask(taskId){
+  mutateTask(taskId,{status:'In Progress',submittedByUserId:currentUser.id});
+  toast('Task picked up — In Progress!','var(--green)');
+  renderMyTasks();
+  setTimeout(()=>openTaskDetail(taskId),200);
 }
 
 // ══════════════════════════════════════════════
@@ -2199,11 +3188,11 @@ function openTaskDetail(taskId){
     ${task.desc?`<div class="info-row"><strong>Desc:</strong>${task.desc}</div>`:''}
     ${task.leadRemark?`<div class="info-row"><strong>Lead note:</strong>${task.leadRemark}</div>`:''}
     <div class="info-row"><strong>Status:</strong><span class="badge ${bcls(task.status)}">${task.status}</span></div>
-    ${(()=>{const el=getLiveElapsed(task);return el>0?`<div class="info-row"><strong>Time Tracked:</strong><span style="font-family:'JetBrains Mono',monospace;font-weight:700;color:${task.status==='Completed'?'var(--green)':'var(--amber)'}">&#128336; ${fmtElapsed(el)}</span><span style="font-size:9px;color:var(--text-dim);margin-left:6px">${task.startedAt?'started '+new Date(task.startedAt).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}):''}${task.completedAt?' &rarr; done '+new Date(task.completedAt).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}):' (live)'}</span></div>`:''})()}
+    ${(()=>{const el=getLiveElapsed(task);return el>0?`<div class="info-row"><strong>Time Tracked:</strong><span style="font-family:var(--mono,monospace);font-weight:700;color:${task.status==='Completed'?'var(--green)':'var(--amber)'}">&#128336; ${fmtElapsed(el)}</span><span style="font-size:9px;color:var(--text-dim);margin-left:6px">${task.startedAt?'started '+new Date(task.startedAt).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}):''}${task.completedAt?' &rarr; done '+new Date(task.completedAt).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}):' (live)'}</span></div>`:''})()}
     <div style="margin-top:10px;padding:10px;background:var(--navy3);border-radius:8px">
       <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:11px">
         <span style="color:var(--muted)">Hours Progress</span>
-        <span style="font-family:'JetBrains Mono',monospace;font-weight:700;color:${diff>0?'var(--red)':diff<0?'var(--amber)':'var(--green)'}">
+        <span style="font-family:var(--mono,monospace);font-weight:700;color:${diff>0?'var(--red)':diff<0?'var(--amber)':'var(--green)'}">
           ${act.toFixed(1)}h actual / ${est}h assigned (${diff>0?'+':''}${diff.toFixed(1)}h)
         </span>
       </div>
@@ -2350,7 +3339,7 @@ function addTrackerRow(){
   const tbody=document.getElementById('trackerTbl');
   const tr=document.createElement('tr');tr.id='tr-'+rowId;tr.setAttribute('data-new','1');
   tr.innerHTML=`
-    <td style="color:var(--muted);font-size:10px;font-family:'JetBrains Mono',monospace">${tbody.children.length+1}</td>
+    <td style="color:var(--muted);font-size:10px;font-family:var(--mono,monospace)">${tbody.children.length+1}</td>
     <td><div style="font-size:12px;font-weight:600;color:var(--white)">${task.title}</div><div style="font-size:9px;color:${mode==='own'?'var(--violet2)':'var(--muted)'}">${mode==='own'?'Own task':'Est: '+(task.hours||0)+'h'}</div></td>
     <td><span class="badge" style="background:${project?.color||'#475569'}22;color:${project?.color||'#94a3b8'}">${project?.name||'&mdash;'}</span></td>
     <td style="font-size:10px;color:var(--teal);font-weight:600">${project?.account||'&mdash;'}</td>
@@ -2358,10 +3347,10 @@ function addTrackerRow(){
     <td style="font-size:10px;color:var(--muted)">${workType||'&mdash;'}</td>
     <td><span style="font-size:10px;padding:1px 7px;border-radius:4px;background:rgba(14,165,233,.1);color:var(--teal)">${location||'&mdash;'}</span></td>
     <td style="font-size:11px">${currentUser.name}</td>
-    <td style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted)">${task.hours||0}h</td>
-    <td style="font-size:10px;color:var(--green);font-family:'JetBrains Mono',monospace">${startTimeStr}</td>
-    <td style="font-size:10px;color:var(--muted);font-family:'JetBrains Mono',monospace" id="et-${rowId}">&mdash;</td>
-    <td style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:var(--teal)" id="tt-${rowId}">00:00:00</td>
+    <td style="font-family:var(--mono,monospace);font-size:11px;color:var(--muted)">${task.hours||0}h</td>
+    <td style="font-size:10px;color:var(--green);font-family:var(--mono,monospace)">${startTimeStr}</td>
+    <td style="font-size:10px;color:var(--muted);font-family:var(--mono,monospace)" id="et-${rowId}">&mdash;</td>
+    <td style="font-family:var(--mono,monospace);font-size:11px;font-weight:700;color:var(--teal)" id="tt-${rowId}">00:00:00</td>
     <td><input id="wh-${rowId}" class="tbl-inp hrs-inp" type="number" min="0" max="24" step="0.5" placeholder="0.00" data-taskid="${taskId}" data-rowid="${rowId}" oninput="recalcHrs()"></td>
     <td><select class="tbl-sel" id="st-${rowId}" data-taskid="${taskId}" data-rowid="${rowId}" style="min-width:120px" onchange="onTrackerStatusChange('${rowId}',this.value)">
       ${WMS_STATUSES.map(s=>`<option ${s==='In Progress'?'selected':''}>${s}</option>`).join('')}
@@ -2417,7 +3406,7 @@ function renderSubmittedTrackerRows(){
       <td style="color:var(--green);font-size:12px">&#10003;</td>
       <td style="font-size:12px;font-weight:600;color:var(--white)">${task.title}
         <div style="font-size:9px;color:var(--muted)">
-          ${totalTrackedHrs>0?`<span style="color:var(--teal);font-family:'JetBrains Mono',monospace">&#128336; ${totalTrackedHrs.toFixed(1)}h total</span>`:'Est: '+(task.hours||0)+'h'}
+          ${totalTrackedHrs>0?`<span style="color:var(--teal);font-family:var(--mono,monospace)">&#128336; ${totalTrackedHrs.toFixed(1)}h total</span>`:'Est: '+(task.hours||0)+'h'}
         </div>
       </td>
       <td><span class="badge" style="background:${project.color}22;color:${project.color}">${project.name}</span></td>
@@ -2426,11 +3415,11 @@ function renderSubmittedTrackerRows(){
       <td style="font-size:10px;color:var(--muted)">${e.workType||'&mdash;'}</td>
       <td><span style="font-size:10px;padding:1px 7px;border-radius:4px;background:rgba(14,165,233,.1);color:var(--teal)">${e.location||'&mdash;'}</span></td>
       <td style="font-size:11px">${currentUser.name}</td>
-      <td style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted)">${task.hours||0}h</td>
-      <td style="font-size:10px;color:var(--green);font-family:'JetBrains Mono',monospace">${e.startTime||'&mdash;'}</td>
-      <td style="font-size:10px;color:var(--muted);font-family:'JetBrains Mono',monospace">${e.endTime||'&mdash;'}</td>
-      <td style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--teal);font-weight:700">${e.totalTime||'&mdash;'}</td>
-      <td style="font-family:'JetBrains Mono',monospace;color:var(--accent);font-weight:700">${e.hours}h</td>
+      <td style="font-family:var(--mono,monospace);font-size:11px;color:var(--muted)">${task.hours||0}h</td>
+      <td style="font-size:10px;color:var(--green);font-family:var(--mono,monospace)">${e.startTime||'&mdash;'}</td>
+      <td style="font-size:10px;color:var(--muted);font-family:var(--mono,monospace)">${e.endTime||'&mdash;'}</td>
+      <td style="font-family:var(--mono,monospace);font-size:11px;color:var(--teal);font-weight:700">${e.totalTime||'&mdash;'}</td>
+      <td style="font-family:var(--mono,monospace);color:var(--accent);font-weight:700">${e.hours}h</td>
       <td><span class="badge" style="background:${stClr}22;color:${stClr}">${e.status}</span></td>
       <td style="font-size:10px;color:var(--muted)">${e.remark||'&mdash;'}</td>
       <td><span style="color:var(--green);font-size:11px;font-weight:700">&#10003; Submitted</span></td>
@@ -2529,7 +3518,7 @@ function renderTeam(){
         return `<div style="display:flex;align-items:center;gap:5px;padding:5px 0;border-bottom:1px solid rgba(30,58,95,.28);font-size:11px">
           <div style="width:5px;height:5px;border-radius:50%;background:${STATUS_CLR[t.status]||'#475569'};flex-shrink:0"></div>
           <span style="flex:1;color:var(--text)">${t.title}</span>
-          <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted)">${act.toFixed(0)}/${est}h</span>
+          <span style="font-family:var(--mono,monospace);font-size:10px;color:var(--muted)">${act.toFixed(0)}/${est}h</span>
           <span class="badge ${bcls(t.status)}" style="font-size:9px">${t.status}</span>
         </div>`;
       }).join('')}
@@ -2557,25 +3546,49 @@ function bgClose(e,id){ if(e.target.id===id) closeModal(id); }
 // Project
 let editingProjectId=null;
 function openProjModal(projId){
+  // Only admin/manager can create. Lead/associate can only edit if they have the project.
+  if(!projId && !['admin','manager'].includes(currentUser.role)){
+    toast('Only Admin/Manager can create projects','var(--amber)'); return;
+  }
   editingProjectId=projId||null;
   const p=projId?DB.projects.find(x=>x.id===projId):null;
   selClr=p?.color||COLORS[0];
   const titleEl=document.querySelector('#projModal .modal-title');
-  if(titleEl) titleEl.textContent=p?'&#9998; Edit Project':'&#128193; New Project';
+  if(titleEl) titleEl.innerHTML=p?'&#9998; Edit Project':'&#128193; New Project';
   const saveBtnEl=document.querySelector('#projModal .btn-primary');
   if(saveBtnEl) saveBtnEl.textContent=p?'Save Changes':'Create Project';
-  const fmap={pm_name:'name',pm_account:'account',pm_desc:'desc',pm_start:'start',pm_due:'due'};
+  const fmap={pm_name:'name',pm_code:'code',pm_account:'account',pm_desc:'desc',pm_start:'start',pm_due:'due',pm_completion:'completion',pm_remarks:'projRemarks',pm_approved_hrs:'approvedHours'};
   Object.entries(fmap).forEach(([id,key])=>{const el=document.getElementById(id);if(el)el.value=p?p[key]||'':'';});
-  if(p) document.getElementById('pm_type').value=p.type||'PR';
+  const typeEl=document.getElementById('pm_type'); if(typeEl) typeEl.value=p?.type||'Fixed BID';
+  const stEl=document.getElementById('pm_proj_status'); if(stEl) stEl.value=p?.projStatus||'In Progress';
   document.getElementById('pm_colors').innerHTML=COLORS.map(c=>`<div class="clr ${c===selClr?'sel':''}" style="background:${c}" onclick="selClr='${c}';document.querySelectorAll('.clr').forEach(x=>x.classList.remove('sel'));this.classList.add('sel')"></div>`).join('');
-  document.getElementById('pm_leads').innerHTML=USERS.filter(u=>u.role==='lead').map(u=>`<option value="${u.id}" ${p&&p.assignedLeads?.includes(u.id)?'selected':''}>${u.name}</option>`).join('');
+  const allLeads=USERS.filter(u=>u.role==='lead'||u.role==='manager');
+  document.getElementById('pm_leads').innerHTML=allLeads.map(u=>`<option value="${u.id}" ${p&&p.assignedLeads?.includes(u.id)?'selected':''}>${u.name}</option>`).join('');
+  // project lead single select
+  const plEl=document.getElementById('pm_proj_lead');
+  plEl.innerHTML='<option value="">— Select —</option>'+allLeads.map(u=>`<option value="${u.id}" ${p?.projectLead===u.id?'selected':''}>${u.name}</option>`).join('');
   openModal('projModal');
 }
 function saveProject(){
   const name=document.getElementById('pm_name').value.trim();
   if(!name){toast('Name required','var(--red)');return;}
   const leads=Array.from(document.getElementById('pm_leads').selectedOptions).map(o=>o.value);
-  const data={name,account:document.getElementById('pm_account').value,type:document.getElementById('pm_type').value,desc:document.getElementById('pm_desc').value,color:selClr,start:document.getElementById('pm_start').value,due:document.getElementById('pm_due').value,assignedLeads:leads};
+  const data={
+    name,
+    code:document.getElementById('pm_code').value.trim(),
+    account:document.getElementById('pm_account').value.trim(),
+    type:document.getElementById('pm_type').value,
+    projStatus:document.getElementById('pm_proj_status').value,
+    projectLead:document.getElementById('pm_proj_lead').value,
+    approvedHours:parseFloat(document.getElementById('pm_approved_hrs').value)||0,
+    desc:document.getElementById('pm_desc').value,
+    projRemarks:document.getElementById('pm_remarks').value,
+    color:selClr,
+    start:document.getElementById('pm_start').value,
+    due:document.getElementById('pm_due').value,
+    completion:document.getElementById('pm_completion').value,
+    assignedLeads:leads
+  };
   if(editingProjectId){
     const p=DB.projects.find(x=>x.id===editingProjectId);
     if(p){Object.assign(p,data);toast(`Project "${name}" updated`,'var(--green)');}
