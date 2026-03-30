@@ -1054,7 +1054,7 @@ function getDefaultDB(){
 // ══════════════════════════════════════════════
 // GOOGLE SHEETS BACKEND
 // ══════════════════════════════════════════════
-const GS_URL = 'https://script.google.com/macros/s/AKfycbwTY6cOIp_mt1yGuoXvishUzqTL2-k_kRRs5xeSqozSLePtXZ-3UhYzjGyNJiXj0jON9A/exec';
+const GS_URL = 'http://localhost:3000/api/data';
 const LS_KEY = 'wms_v4_cache';
 let DB = null;
 let USERS = [];
@@ -1178,7 +1178,7 @@ function saveDB(){
       const res = await fetch(GS_URL, {
         method: 'POST',
         redirect: 'follow',
-        headers: { 'Content-Type': 'text/plain' }, // text/plain avoids preflight
+        headers: { 'Content-Type': 'application/json' }, // application/json for local backend
         body: JSON.stringify({
           action:'write',
           data:{
